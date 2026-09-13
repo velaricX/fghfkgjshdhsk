@@ -2178,30 +2178,83 @@ function Astral:MakeWindow(config)
 			ActionArrow.ScaleType = Enum.ScaleType.Fit
 			ActionArrow.Parent = ButtonFrame
 
-			ButtonFrame.MouseButton1Click:Connect(function() task.spawn(callback) end)
+			-- Lock state: gray overlay + lock icon, clicks + hover disabled
+			local locked = buttonConfig.Locked or false
+			local LockOverlay = Instance.new("Frame")
+			LockOverlay.Name = "LockOverlay"
+			LockOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			LockOverlay.BackgroundTransparency = 0.55
+			LockOverlay.BorderSizePixel = 0
+			LockOverlay.Size = UDim2.new(1, 0, 1, 0)
+			LockOverlay.Visible = locked
+			LockOverlay.ZIndex = 12
+			LockOverlay.Active = true
+			LockOverlay.Parent = ButtonFrame
+
+			local LockOverlayCorner = Instance.new("UICorner")
+			LockOverlayCorner.CornerRadius = UDim.new(0, 8)
+			LockOverlayCorner.Parent = LockOverlay
+
+			local LockIcon = Instance.new("ImageLabel")
+			LockIcon.Name = "LockIcon"
+			LockIcon.BackgroundTransparency = 1
+			LockIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+			LockIcon.Position = UDim2.new(1, -24, 0.5, 0)
+			LockIcon.Size = UDim2.new(0, 20, 0, 20)
+			LockIcon.Image = "rbxassetid://15117261700"
+			LockIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
+			LockIcon.ScaleType = Enum.ScaleType.Fit
+			LockIcon.Visible = locked
+			LockIcon.ZIndex = 13
+			LockIcon.Parent = ButtonFrame
+
+			local function applyLock()
+				LockOverlay.Visible = locked
+				LockIcon.Visible = locked
+				ActionArrow.Visible = not locked
+			end
+			applyLock()
+
+			ButtonFrame.MouseButton1Click:Connect(function()
+				if locked then return end
+				task.spawn(callback)
+			end)
 			ButtonFrame.InputBegan:Connect(function(input)
+				if locked then return end
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					TweenService:Create(ButtonScale, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 0.95}):Play()
 				end
 			end)
 			ButtonFrame.InputEnded:Connect(function(input)
+				if locked then return end
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					TweenService:Create(ButtonScale, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
 				end
 			end)
 			ButtonFrame.MouseEnter:Connect(function()
+				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
 				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 			end)
 			ButtonFrame.MouseLeave:Connect(function()
+				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
 				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(160, 160, 165)}):Play()
 			end)
 
 			registerElement(ButtonFrame, calculatedHeight, buttonConfig.Position)
-			return ButtonFrame
+
+			local ButtonController = {}
+			function ButtonController:SetLocked(state)
+				locked = not not state
+				applyLock()
+			end
+			function ButtonController:IsLocked()
+				return locked
+			end
+			return ButtonController
 		end
 
 		-- AddToggle Implementation (FIXED: Standardized to exactly 60px height)
