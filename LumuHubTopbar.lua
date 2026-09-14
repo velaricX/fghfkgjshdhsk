@@ -682,7 +682,7 @@ function Astral:MakeWindow(config)
 	local ArrowW = 26
 	local ArrowGap = 6
 	local stripLeft = 8 + ArrowW + ArrowGap
-	local stripRight = 8 + ArrowW + ArrowGap
+	local stripRight = 8 + ArrowW + 4 + ArrowW + ArrowGap -- right arrow + collapse button
 	local TabContainer = Instance.new("ScrollingFrame")
 	TabContainer.Name = "TabContainer"
 	TabContainer.BackgroundTransparency = 1
@@ -790,7 +790,7 @@ function Astral:MakeWindow(config)
 	end
 
 	local TabsLeft = makeTabArrow("TabsLeft", Astral.Icons.left_arrow or Astral.Icons.Left, UDim2.new(0, 8, 0, 0), 0, -1)
-	local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -8, 0, 0), 1, 1)
+	local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -8 - ArrowW - 4, 0, 0), 1, 1)
 
 	-- Hide an arrow when there is nothing more to scroll that way
 	local function updateTabArrows()
@@ -810,6 +810,67 @@ function Astral:MakeWindow(config)
 			scrollTabs(-input.Position.Z * 60)
 		end
 	end)
+
+	-- ===== Collapse button: hide tab names, keep icons only =====
+	local function applyTabCompact()
+		local compact = MainFrame:GetAttribute("TabCompact") or false
+		for _, d in ipairs(TabContainer:GetDescendants()) do
+			if d.Name == "ButtonText" and d:IsA("TextLabel") then
+				d.Visible = not compact
+			end
+		end
+	end
+	MainFrame:SetAttribute("TabCompact", false)
+
+	do
+		local TabsCollapse = Instance.new("TextButton")
+		TabsCollapse.Name = "TabsCollapse"
+		TabsCollapse.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		TabsCollapse.BorderSizePixel = 0
+		TabsCollapse.AnchorPoint = Vector2.new(1, 0.5)
+		TabsCollapse.Position = UDim2.new(1, -8, 0, 0.5)
+		TabsCollapse.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
+		TabsCollapse.Text = ""
+		TabsCollapse.AutoButtonColor = false
+		TabsCollapse.ZIndex = 6
+		TabsCollapse.Parent = TabBarSection
+
+		local CCorner = Instance.new("UICorner")
+		CCorner.CornerRadius = UDim.new(0, 6)
+		CCorner.Parent = TabsCollapse
+
+		local CStroke = Instance.new("UIStroke")
+		CStroke.Color = Color3.fromRGB(42, 42, 46)
+		CStroke.Thickness = 1
+		CStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		CStroke.Parent = TabsCollapse
+
+		local CIcon = Instance.new("ImageLabel")
+		CIcon.Name = "Icon"
+		CIcon.BackgroundTransparency = 1
+		CIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		CIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		CIcon.Size = UDim2.new(0, 14, 0, 14)
+		CIcon.Image = Astral.Icons.expand or Astral.Icons.menu_ImageLabel
+		CIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
+		CIcon.ScaleType = Enum.ScaleType.Fit
+		CIcon.ZIndex = 7
+		CIcon.Parent = TabsCollapse
+
+		TabsCollapse.MouseEnter:Connect(function()
+			TweenService:Create(TabsCollapse, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
+			TweenService:Create(CIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+		end)
+		TabsCollapse.MouseLeave:Connect(function()
+			TweenService:Create(TabsCollapse, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
+			TweenService:Create(CIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+		end)
+
+		TabsCollapse.MouseButton1Click:Connect(function()
+			MainFrame:SetAttribute("TabCompact", not (MainFrame:GetAttribute("TabCompact") or false))
+			applyTabCompact()
+		end)
+	end
 
 	-- Divider under the tab strip
 	local Separator = Instance.new("Frame")
@@ -1932,7 +1993,7 @@ function Astral:MakeWindow(config)
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 0
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(0, 0, 1, 0)
+		TabButton.Size = UDim2.new(0, 0, 0, 30)
 		TabButton.AutomaticSize = Enum.AutomaticSize.X
 		TabButton.AutoButtonColor = false
 		TabButton.Text = ""
@@ -1946,7 +2007,7 @@ function Astral:MakeWindow(config)
 		TabButton.Parent = TabContainer
 
 		local ButtonCorner = Instance.new("UICorner")
-		ButtonCorner.CornerRadius = UDim.new(0, 8)
+		ButtonCorner.CornerRadius = UDim.new(0, 6)
 		ButtonCorner.Parent = TabButton
 
 		local TabStroke = Instance.new("UIStroke")
@@ -1969,15 +2030,15 @@ function Astral:MakeWindow(config)
 		Indicator.Parent = TabButton
 
 		local BtnPadding = Instance.new("UIPadding")
-		BtnPadding.PaddingLeft = UDim.new(0, 12)
-		BtnPadding.PaddingRight = UDim.new(0, 12)
+		BtnPadding.PaddingLeft = UDim.new(0, 10)
+		BtnPadding.PaddingRight = UDim.new(0, 10)
 		BtnPadding.Parent = TabButton
 
 		local BtnLayout = Instance.new("UIListLayout")
 		BtnLayout.FillDirection = Enum.FillDirection.Horizontal
 		BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 		BtnLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		BtnLayout.Padding = UDim.new(0, 8)
+		BtnLayout.Padding = UDim.new(0, 6)
 		BtnLayout.Parent = TabButton
 
 		local IconLabel = nil
@@ -1987,7 +2048,7 @@ function Astral:MakeWindow(config)
 			IconLabel = Instance.new("ImageLabel")
 			IconLabel.Name = "TabIcon"
 			IconLabel.BackgroundTransparency = 1
-			IconLabel.Size = UDim2.new(0, 18, 0, 18)
+			IconLabel.Size = UDim2.new(0, 16, 0, 16)
 			IconLabel.LayoutOrder = 1
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(180, 180, 185)
@@ -1998,7 +2059,7 @@ function Astral:MakeWindow(config)
 			FallbackLabel = Instance.new("TextLabel")
 			FallbackLabel.Name = "FallbackIcon"
 			FallbackLabel.BackgroundTransparency = 1
-			FallbackLabel.Size = UDim2.new(0, 18, 0, 18)
+			FallbackLabel.Size = UDim2.new(0, 16, 0, 16)
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
 			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
@@ -2013,14 +2074,16 @@ function Astral:MakeWindow(config)
 		ButtonText.BackgroundTransparency = 1
 		ButtonText.Size = UDim2.new(0, 0, 1, 0)
 		ButtonText.AutomaticSize = Enum.AutomaticSize.X
-		ButtonText.Font = Enum.Font.GothamSemibold
+		ButtonText.Font = Enum.Font.GothamBold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		ButtonText.TextSize = 12
+		ButtonText.TextSize = 11
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
 		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
 		ButtonText.LayoutOrder = 2
 		ButtonText.ZIndex = 11
+		ButtonText.Visible = not (MainFrame:GetAttribute("TabCompact") or false)
+		ButtonText.Visible = not (MainFrame:GetAttribute("TabCompact") or false)
 		ButtonText.Parent = TabButton
 
 		-- Create Tab Page Frame
