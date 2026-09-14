@@ -653,7 +653,7 @@ function Astral:MakeWindow(config)
 	-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
 	-- =====================================================================
 	local TabBarTop = 54
-	local TabBarHeight = 44
+	local TabBarHeight = 38
 	local ContentTop = TabBarTop + TabBarHeight + 6
 
 	-- ===== Bar section: a rounded panel that holds the tabs + arrows =====
@@ -681,8 +681,8 @@ function Astral:MakeWindow(config)
 	-- Horizontal tab strip (leaves room for the left/right arrows)
 	local ArrowW = 26
 	local ArrowGap = 6
-	local stripLeft = 8 + ArrowW + ArrowGap
-	local stripRight = 8 + ArrowW + 4 + ArrowW + ArrowGap -- right arrow + collapse button
+	local stripLeft = 8
+	local stripRight = 8 + ArrowW + 6 -- room for the collapse toggle only
 	local TabContainer = Instance.new("ScrollingFrame")
 	TabContainer.Name = "TabContainer"
 	TabContainer.BackgroundTransparency = 1
@@ -716,7 +716,7 @@ function Astral:MakeWindow(config)
 	TabPadding.PaddingRight = UDim.new(0, 10)
 	TabPadding.Parent = TabContainer
 
-	-- ===== Left / right tab navigation =====
+	-- ===== Scroll helpers (wheel + drag; no arrow buttons) =====
 	local function tabMaxScroll()
 		local ok, canvas = pcall(function() return TabContainer.AbsoluteCanvasSize.X end)
 		if not ok or type(canvas) ~= "number" then return 0 end
@@ -738,78 +738,13 @@ function Astral:MakeWindow(config)
 		end)
 	end
 
-	local function makeTabArrow(name, iconId, xUDim, anchorX, dir)
-		local Btn = Instance.new("TextButton")
-		Btn.Name = name
-		Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-		Btn.BorderSizePixel = 0
-		Btn.AnchorPoint = Vector2.new(anchorX, 0.5)
-		Btn.Position = UDim2.new(xUDim.X.Scale, xUDim.X.Offset, 0, 0.5)
-		Btn.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
-		Btn.Text = ""
-		Btn.AutoButtonColor = false
-		Btn.ZIndex = 6
-		Btn.Parent = TabBarSection
-
-		local Corner = Instance.new("UICorner")
-		Corner.CornerRadius = UDim.new(0, 6)
-		Corner.Parent = Btn
-
-		local Stroke = Instance.new("UIStroke")
-		Stroke.Color = Color3.fromRGB(42, 42, 46)
-		Stroke.Thickness = 1
-		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		Stroke.Parent = Btn
-
-		local Icon = Instance.new("ImageLabel")
-		Icon.Name = "Icon"
-		Icon.BackgroundTransparency = 1
-		Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-		Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		Icon.Size = UDim2.new(0, 14, 0, 14)
-		Icon.Image = iconId
-		Icon.ImageColor3 = Color3.fromRGB(180, 180, 185)
-		Icon.ScaleType = Enum.ScaleType.Fit
-		Icon.ZIndex = 7
-		Icon.Parent = Btn
-
-		Btn.MouseEnter:Connect(function()
-			TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-			TweenService:Create(Icon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-		end)
-		Btn.MouseLeave:Connect(function()
-			TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-			TweenService:Create(Icon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
-		end)
-
-		Btn.MouseButton1Click:Connect(function()
-			scrollTabs(dir * 150)
-		end)
-
-		return Btn
-	end
-
-	local TabsLeft = makeTabArrow("TabsLeft", Astral.Icons.left_arrow or Astral.Icons.Left, UDim2.new(0, 8, 0, 0), 0, -1)
-	local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -8 - ArrowW - 4, 0, 0), 1, 1)
-
-	-- Hide an arrow when there is nothing more to scroll that way
-	local function updateTabArrows()
-		local maxX = tabMaxScroll()
-		local x = tabScrollX()
-		TabsLeft.Visible = x > 1
-		TabsRight.Visible = x < maxX - 1
-	end
-	TabContainer:GetPropertyChangedSignal("CanvasPosition"):Connect(updateTabArrows)
-	TabContainer:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateTabArrows)
-	TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateTabArrows)
-	task.defer(updateTabArrows)
-
 	-- Mouse wheel scrolls the strip horizontally while hovering it
 	TabContainer.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseWheel then
 			scrollTabs(-input.Position.Z * 60)
 		end
 	end)
+
 
 	-- ===== Collapse button: hide tab names, keep icons only =====
 	local function applyTabCompact()
@@ -850,7 +785,7 @@ function Astral:MakeWindow(config)
 		CIcon.BackgroundTransparency = 1
 		CIcon.AnchorPoint = Vector2.new(0.5, 0.5)
 		CIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		CIcon.Size = UDim2.new(0, 16, 0, 16)
+		CIcon.Size = UDim2.new(0, 18, 0, 18)
 		CIcon.Image = Astral.Icons.big_arrow_down or Astral.Icons.down_arrow
 		CIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
 		CIcon.ScaleType = Enum.ScaleType.Fit
@@ -2054,7 +1989,7 @@ function Astral:MakeWindow(config)
 			IconLabel = Instance.new("ImageLabel")
 			IconLabel.Name = "TabIcon"
 			IconLabel.BackgroundTransparency = 1
-			IconLabel.Size = UDim2.new(0, 16, 0, 16)
+			IconLabel.Size = UDim2.new(0, 18, 0, 18)
 			IconLabel.LayoutOrder = 1
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(180, 180, 185)
@@ -2065,11 +2000,11 @@ function Astral:MakeWindow(config)
 			FallbackLabel = Instance.new("TextLabel")
 			FallbackLabel.Name = "FallbackIcon"
 			FallbackLabel.BackgroundTransparency = 1
-			FallbackLabel.Size = UDim2.new(0, 16, 0, 16)
+			FallbackLabel.Size = UDim2.new(0, 18, 0, 18)
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
 			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
-			FallbackLabel.TextSize = 12
+			FallbackLabel.TextSize = 14
 			FallbackLabel.LayoutOrder = 1
 			FallbackLabel.ZIndex = 11
 			FallbackLabel.Parent = TabButton
@@ -2083,7 +2018,7 @@ function Astral:MakeWindow(config)
 		ButtonText.Font = Enum.Font.GothamBold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		ButtonText.TextSize = 11
+		ButtonText.TextSize = 13
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
 		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
 		ButtonText.LayoutOrder = 2
