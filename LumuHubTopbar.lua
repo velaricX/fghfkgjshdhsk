@@ -2678,7 +2678,7 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Size = UDim2.new(0, 54, 0, 28)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(0, 10)
+			TrackCorner.CornerRadius = UDim.new(0, 4)
 			TrackCorner.Parent = SwitchTrack
 			local SwitchThumb = Instance.new("Frame")
 			SwitchThumb.Name = "SwitchThumb"
@@ -3203,7 +3203,7 @@ function Astral:MakeWindow(config)
 			SliderTrack.AutoButtonColor = false
 			SliderTrack.Parent = SliderFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(0, 10)
+			TrackCorner.CornerRadius = UDim.new(0, 4)
 			TrackCorner.Parent = SliderTrack
 			local SliderFill = Instance.new("Frame")
 			SliderFill.Name = "SliderFill"
@@ -3211,7 +3211,7 @@ function Astral:MakeWindow(config)
 			SliderFill.Size = UDim2.new((default - min)/math.max(1,max-min),0,1,0)
 			SliderFill.Parent = SliderTrack
 			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(0, 10)
+			FillCorner.CornerRadius = UDim.new(0, 4)
 			FillCorner.Parent = SliderFill
 			local SliderThumb = Instance.new("Frame")
 			SliderThumb.Name = "SliderThumb"
@@ -3221,7 +3221,7 @@ function Astral:MakeWindow(config)
 			SliderThumb.Size = UDim2.fromOffset(20,28)
 			SliderThumb.Parent = SliderTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(0, 6)
+			ThumbCorner.CornerRadius = UDim.new(0, 3)
 			ThumbCorner.Parent = SliderThumb
 			local ThumbStroke = Instance.new("UIStroke")
 			ThumbStroke.Color = Color3.fromRGB(0,0,0)
@@ -5717,12 +5717,19 @@ function Astral:MakeWindow(config)
 	--   S:SetRow("Next Boss", { Value = "5m", Icon = "timer", Color = "gold" })
 	--   S:Countdown("Next Full Moon", 1380)
 	-- =========================================================================
+	-- =========================================================================
+	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	--   local S = Window:AddGameStatus({ Title = "Game Status" })
+	--   S:Set("Server Uptime", "56h")
+	--   S:SetRow("Next Boss", { Value = "5m", Icon = "timer", Color = "gold" })
+	--   S:Countdown("Next Full Moon", 1380)
+	-- =========================================================================
 	function Window:AddGameStatus(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
 		local panelW = tonumber(config.Width) or 268
-		local rowH = tonumber(config.RowHeight) or 27
+		local rowH = tonumber(config.RowHeight) or 28
 		local showBeta = config.Beta
 		if showBeta == nil then showBeta = true end
 		local enabled = config.Enabled
@@ -5751,7 +5758,7 @@ function Astral:MakeWindow(config)
 		Panel.Name = "GameStatus"
 		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 		Panel.BorderSizePixel = 0
-		Panel.Size = UDim2.new(0, panelW, 0, 44)
+		Panel.Size = UDim2.new(0, panelW, 0, 46)
 		Panel.Position = config.Position or UDim2.new(0, 20, 0, 130)
 		Panel.AutomaticSize = Enum.AutomaticSize.Y
 		Panel.ZIndex = 500
@@ -5764,10 +5771,15 @@ function Astral:MakeWindow(config)
 		PanelCorner.Parent = Panel
 
 		local PanelStroke = Instance.new("UIStroke")
-		PanelStroke.Color = Color3.fromRGB(52, 52, 62)
+		PanelStroke.Color = Color3.fromRGB(54, 54, 64)
 		PanelStroke.Thickness = 1.2
 		PanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		PanelStroke.Parent = Panel
+
+		local PanelGrad = Instance.new("UIGradient")
+		PanelGrad.Rotation = 90
+		PanelGrad.Color = ColorSequence.new(Color3.fromRGB(30, 30, 38), Color3.fromRGB(16, 16, 20))
+		PanelGrad.Parent = Panel
 
 		local PanelLayout = Instance.new("UIListLayout")
 		PanelLayout.FillDirection = Enum.FillDirection.Vertical
@@ -5778,9 +5790,10 @@ function Astral:MakeWindow(config)
 		-- Header doubles as the drag handle
 		local Header = Instance.new("Frame")
 		Header.Name = "Header"
-		Header.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+		Header.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+		Header.BackgroundTransparency = 0.35
 		Header.BorderSizePixel = 0
-		Header.Size = UDim2.new(1, 0, 0, 40)
+		Header.Size = UDim2.new(1, 0, 0, 42)
 		Header.LayoutOrder = 1
 		Header.ZIndex = 501
 		Header.Active = true
@@ -5791,19 +5804,20 @@ function Astral:MakeWindow(config)
 		HeaderIcon.BackgroundTransparency = 1
 		HeaderIcon.AnchorPoint = Vector2.new(0, 0.5)
 		HeaderIcon.Position = UDim2.new(0, 12, 0.5, 0)
-		HeaderIcon.Size = UDim2.new(0, 18, 0, 18)
+		HeaderIcon.Size = UDim2.new(0, 19, 0, 19)
 		HeaderIcon.ZIndex = 502
 		HeaderIcon.ScaleType = Enum.ScaleType.Fit
-		HeaderIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+		HeaderIcon.ImageColor3 = AccentColor
 		if icon then Astral.ApplyIcon(HeaderIcon, icon) end
 		HeaderIcon.Parent = Header
+		onAccentChange(function(c) HeaderIcon.ImageColor3 = c end)
 
 		local TitleLabel = Instance.new("TextLabel")
 		TitleLabel.Name = "Title"
 		TitleLabel.BackgroundTransparency = 1
 		TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-		TitleLabel.Position = UDim2.new(0, 38, 0.5, 0)
-		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 38 - 66), 1, 0)
+		TitleLabel.Position = UDim2.new(0, 39, 0.5, 0)
+		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 39 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
 		TitleLabel.Text = title
 		TitleLabel.TextSize = 14
@@ -5853,7 +5867,7 @@ function Astral:MakeWindow(config)
 
 		local Sep = Instance.new("Frame")
 		Sep.Name = "Separator"
-		Sep.BackgroundColor3 = Color3.fromRGB(44, 44, 52)
+		Sep.BackgroundColor3 = Color3.fromRGB(48, 48, 58)
 		Sep.BorderSizePixel = 0
 		Sep.AnchorPoint = Vector2.new(0.5, 1)
 		Sep.Position = UDim2.new(0.5, 0, 1, 0)
@@ -5873,17 +5887,17 @@ function Astral:MakeWindow(config)
 		local RowsLayout = Instance.new("UIListLayout")
 		RowsLayout.FillDirection = Enum.FillDirection.Vertical
 		RowsLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		RowsLayout.Padding = UDim.new(0, 4)
+		RowsLayout.Padding = UDim.new(0, 3)
 		RowsLayout.Parent = RowsContainer
 
 		local RowsPad = Instance.new("UIPadding")
 		RowsPad.PaddingLeft = UDim.new(0, 12)
 		RowsPad.PaddingRight = UDim.new(0, 12)
-		RowsPad.PaddingTop = UDim.new(0, 6)
+		RowsPad.PaddingTop = UDim.new(0, 7)
 		RowsPad.PaddingBottom = UDim.new(0, 12)
 		RowsPad.Parent = RowsContainer
 
-		local ICON_GAP = 24
+		local ICON_GAP = 25
 
 		local function makeRow(name, value, iconAsset, colorOverride)
 			local Row = Instance.new("Frame")
@@ -5893,11 +5907,26 @@ function Astral:MakeWindow(config)
 			Row.ZIndex = 501
 			Row.Parent = RowsContainer
 
+			-- Rounded hover highlight behind the text
+			local RowHover = Instance.new("Frame")
+			RowHover.Name = "Hover"
+			RowHover.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+			RowHover.BackgroundTransparency = 1
+			RowHover.BorderSizePixel = 0
+			RowHover.Position = UDim2.new(0, -6, 0, 0)
+			RowHover.Size = UDim2.new(1, 12, 1, 0)
+			RowHover.ZIndex = 500
+			RowHover.Parent = Row
+
+			local RowHoverCorner = Instance.new("UICorner")
+			RowHoverCorner.CornerRadius = UDim.new(0, 6)
+			RowHoverCorner.Parent = RowHover
+
 			local IconLabel = Instance.new("ImageLabel")
 			IconLabel.Name = "Icon"
 			IconLabel.BackgroundTransparency = 1
 			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
-			IconLabel.Position = UDim2.new(0, 0, 0.5, 0)
+			IconLabel.Position = UDim2.new(0, 2, 0.5, 0)
 			IconLabel.Size = UDim2.new(0, 17, 0, 17)
 			IconLabel.Visible = false
 			IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -5914,7 +5943,7 @@ function Astral:MakeWindow(config)
 			NameLabel.Font = Enum.Font.Gotham
 			NameLabel.Text = tostring(name)
 			NameLabel.TextSize = 13
-			NameLabel.TextColor3 = Color3.fromRGB(162, 162, 172)
+			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			NameLabel.ZIndex = 502
@@ -5924,7 +5953,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Name = "Value"
 			ValueLabel.BackgroundTransparency = 1
 			ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
-			ValueLabel.Position = UDim2.new(1, 0, 0.5, 0)
+			ValueLabel.Position = UDim2.new(1, -2, 0.5, 0)
 			ValueLabel.Size = UDim2.new(0.42, 0, 1, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.Text = tostring(value or "--")
@@ -5935,7 +5964,14 @@ function Astral:MakeWindow(config)
 			ValueLabel.ZIndex = 502
 			ValueLabel.Parent = Row
 
-			local row = { Frame = Row, Name = NameLabel, Value = ValueLabel, Icon = IconLabel, color = colorOverride, token = 0 }
+			Row.MouseEnter:Connect(function()
+				TweenService:Create(RowHover, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
+			end)
+			Row.MouseLeave:Connect(function()
+				TweenService:Create(RowHover, TweenInfo.new(0.15), {BackgroundTransparency = 1}):Play()
+			end)
+
+			local row = { Frame = Row, Name = NameLabel, Value = ValueLabel, Icon = IconLabel, Hover = RowHover, color = colorOverride, token = 0 }
 			onAccentChange(function(c)
 				if not row.color then row.Value.TextColor3 = c end
 			end)
@@ -6122,6 +6158,7 @@ function Astral:MakeWindow(config)
 
 		return GameStatus
 	end
+
 
 
 	return Window
