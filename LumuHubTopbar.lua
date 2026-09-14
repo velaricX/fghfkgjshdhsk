@@ -3769,9 +3769,11 @@ function Astral:MakeWindow(config)
 			local description = labelConfig.Description
 			local icon = parseIcon(labelConfig.Icon)
 			local callback = labelConfig.Callback or function() end
+			local titleSize = tonumber(labelConfig.TextSize) or 14
+			local descSize = tonumber(labelConfig.DescSize) or 11
 
 			local hasDesc = description and description ~= ""
-			local calculatedHeight = 60 -- Standardized to exactly 60px height
+			local calculatedHeight = 64
 
 			local LabelFrame = Instance.new("Frame")
 			LabelFrame.Name = title .. "_Label"
@@ -3821,12 +3823,70 @@ function Astral:MakeWindow(config)
 				IconLabel.Parent = IconContainer
 			end
 
+			local leftInset = icon and 60 or 12
+
+			-- Right-hand STATUS BADGE (hidden until SetStatus is called)
+			local StatusBadge = Instance.new("Frame")
+			StatusBadge.Name = "StatusBadge"
+			StatusBadge.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+			StatusBadge.BorderSizePixel = 0
+			StatusBadge.AnchorPoint = Vector2.new(1, 0.5)
+			StatusBadge.Position = UDim2.new(1, -12, 0.5, 0)
+			StatusBadge.Size = UDim2.new(0, 0, 0, 26)
+			StatusBadge.AutomaticSize = Enum.AutomaticSize.X
+			StatusBadge.Visible = false
+			StatusBadge.Parent = LabelFrame
+
+			local StatusCorner = Instance.new("UICorner")
+			StatusCorner.CornerRadius = UDim.new(0, 8)
+			StatusCorner.Parent = StatusBadge
+
+			local StatusStroke = Instance.new("UIStroke")
+			StatusStroke.Color = Color3.fromRGB(70, 70, 75)
+			StatusStroke.Thickness = 1.2
+			StatusStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			StatusStroke.Parent = StatusBadge
+
+			local StatusPad = Instance.new("UIPadding")
+			StatusPad.PaddingLeft = UDim.new(0, 8)
+			StatusPad.PaddingRight = UDim.new(0, 9)
+			StatusPad.Parent = StatusBadge
+
+			local StatusLayout = Instance.new("UIListLayout")
+			StatusLayout.FillDirection = Enum.FillDirection.Horizontal
+			StatusLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			StatusLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			StatusLayout.Padding = UDim.new(0, 5)
+			StatusLayout.Parent = StatusBadge
+
+			local StatusIcon = Instance.new("ImageLabel")
+			StatusIcon.Name = "StatusIcon"
+			StatusIcon.BackgroundTransparency = 1
+			StatusIcon.Size = UDim2.new(0, 15, 0, 15)
+			StatusIcon.LayoutOrder = 1
+			StatusIcon.ScaleType = Enum.ScaleType.Fit
+			StatusIcon.ImageColor3 = Color3.fromRGB(46, 204, 113)
+			StatusIcon.Parent = StatusBadge
+
+			local StatusText = Instance.new("TextLabel")
+			StatusText.Name = "StatusText"
+			StatusText.BackgroundTransparency = 1
+			StatusText.AutomaticSize = Enum.AutomaticSize.X
+			StatusText.Size = UDim2.new(0, 0, 1, 0)
+			StatusText.LayoutOrder = 2
+			StatusText.Font = Enum.Font.GothamBold
+			StatusText.Text = ""
+			StatusText.TextColor3 = Color3.fromRGB(46, 204, 113)
+			regText(StatusText, 11)
+			StatusText.TextXAlignment = Enum.TextXAlignment.Left
+			StatusText.Parent = StatusBadge
+
 			-- Text Container (Title & Description)
 			local TextContainer = Instance.new("Frame")
 			TextContainer.Name = "TextContainer"
 			TextContainer.BackgroundTransparency = 1
-			TextContainer.Position = icon and UDim2.new(0, 60, 0, 0) or UDim2.new(0, 12, 0, 0)
-			TextContainer.Size = icon and UDim2.new(1, -72, 1, 0) or UDim2.new(1, -24, 1, 0)
+			TextContainer.Position = UDim2.new(0, leftInset, 0, 0)
+			TextContainer.Size = UDim2.new(1, -(leftInset + 12), 1, 0)
 			TextContainer.Parent = LabelFrame
 
 			local TextListLayout = Instance.new("UIListLayout")
@@ -3835,34 +3895,48 @@ function Astral:MakeWindow(config)
 			TextListLayout.Padding = UDim.new(0, 2)
 			TextListLayout.Parent = TextContainer
 
-			-- Title Label
+			-- Title Label (bigger by default, override with TextSize =)
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
+			TitleLabel.Size = UDim2.new(1, 0, 0, titleSize + 5)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			regText(TitleLabel, 11)
+			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TitleLabel.TextWrapped = false
 			TitleLabel.Parent = TextContainer
 
-			-- Description Label (if provided)
-			if hasDesc then
-				local DescLabel = Instance.new("TextLabel")
-				DescLabel.Name = "Description"
-				DescLabel.BackgroundTransparency = 1
-				DescLabel.Size = UDim2.new(1, 0, 0, 14)
-				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-				regText(DescLabel, 10)
-				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
-				DescLabel.Parent = TextContainer
+			-- Description Label (created on demand, cached in a local)
+			local DescLabel = nil
+			local function ensureDesc(text)
+				if not DescLabel then
+					DescLabel = Instance.new("TextLabel")
+					DescLabel.Name = "Description"
+					DescLabel.BackgroundTransparency = 1
+					DescLabel.Size = UDim2.new(1, 0, 0, descSize + 4)
+					DescLabel.Font = Enum.Font.Gotham
+					DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+					regText(DescLabel, descSize)
+					DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+					DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+					DescLabel.Parent = TextContainer
+				end
+				DescLabel.Text = tostring(text)
 			end
+			if hasDesc then ensureDesc(description) end
+
+			-- Keep the text clear of the status badge whenever it is visible
+			local function applyStatusLayout()
+				local rightInset = 12
+				if StatusBadge.Visible then
+					rightInset = 12 + StatusBadge.AbsoluteSize.X + 10
+				end
+				TextContainer.Size = UDim2.new(1, -(leftInset + rightInset), 1, 0)
+			end
+			StatusBadge:GetPropertyChangedSignal("AbsoluteSize"):Connect(applyStatusLayout)
 
 			-- Hover white effect like toggle (good UI)
 			LabelFrame.MouseEnter:Connect(function()
@@ -3878,34 +3952,80 @@ function Astral:MakeWindow(config)
 
 			registerElement(LabelFrame, calculatedHeight, labelConfig.Position)
 
-			-- Fire callback on load
-			task.spawn(callback)
-
 			local LabelController = {}
+
+			local STATUS_DEFS = {
+				good    = { Icon = "Checkmark", Color = Color3.fromRGB(46, 204, 113),  Text = "SPAWNED" },
+				bad     = { Icon = "Close",     Color = Color3.fromRGB(231, 76, 60),   Text = "NOT SPAWNED" },
+				waiting = { Icon = "timer",     Color = Color3.fromRGB(241, 196, 15),  Text = "WAITING" },
+			}
+			local function tint(c, f)
+				return Color3.fromRGB(math.floor(c.R * 255 * f), math.floor(c.G * 255 * f), math.floor(c.B * 255 * f))
+			end
+
 			function LabelController:SetText(newText)
 				TitleLabel.Text = tostring(newText)
 			end
+			LabelController.SetTitle = LabelController.SetText
+
 			function LabelController:SetDescription(newDesc)
-				if not TextContainer:FindFirstChild("Description") then
-					local DescLabel = Instance.new("TextLabel")
-					DescLabel.Name = "Description"
-					DescLabel.BackgroundTransparency = 1
-					DescLabel.Size = UDim2.new(1, 0, 0, 14)
-					DescLabel.Font = Enum.Font.Gotham
-					DescLabel.Text = newDesc
-					DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-					regText(DescLabel, 10)
-					DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-					DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
-					DescLabel.Parent = TextContainer
-				else
-					TextContainer.Description.Text = tostring(newDesc)
+				ensureDesc(newDesc)
+			end
+
+			function LabelController:SetIcon(newIcon)
+				if IconContainer and IconContainer:FindFirstChild("Icon") then
+					Astral.ApplyIcon(IconContainer.Icon, parseIcon(newIcon))
 				end
 			end
 
+			-- Status: "good" (green check) | "bad" (red cross) | "waiting" (timer) | "none"
+			function LabelController:SetStatus(status, text)
+				local def = STATUS_DEFS[status]
+				if not def then
+					StatusBadge.Visible = false
+					applyStatusLayout()
+					return
+				end
+				StatusBadge.Visible = true
+				Astral.ApplyIcon(StatusIcon, parseIcon(def.Icon))
+				StatusIcon.ImageColor3 = def.Color
+				StatusStroke.Color = def.Color
+				StatusBadge.BackgroundColor3 = tint(def.Color, 0.16)
+				StatusText.Text = (text ~= nil) and tostring(text) or def.Text
+				StatusText.TextColor3 = def.Color
+				applyStatusLayout()
+			end
+
+			-- Live countdown written into the description: :SetCountdown(300) -> 05:00 ... 00:01 READY
+			local countdownToken = 0
+			function LabelController:SetCountdown(seconds, onDone)
+				countdownToken = countdownToken + 1
+				local myToken = countdownToken
+				task.spawn(function()
+					local remaining = math.max(0, math.floor(tonumber(seconds) or 0))
+					while true do
+						if countdownToken ~= myToken then return end
+						if remaining <= 0 then
+							LabelController:SetDescription("READY")
+							break
+						end
+						LabelController:SetDescription(string.format("%02d:%02d", math.floor(remaining / 60), remaining % 60))
+						task.wait(1)
+						remaining = remaining - 1
+					end
+					if countdownToken == myToken and onDone then task.spawn(onDone) end
+				end)
+			end
+
+			if labelConfig.Status then
+				LabelController:SetStatus(labelConfig.Status, labelConfig.StatusText)
+			end
+
+			-- Fire callback on load
+			task.spawn(callback)
+
 			return LabelController
 		end
-
 		-- =========================================================================
 		-- NEW PARAGRAPH IMPLEMENTATION (PIXEL-PERFECT IMAGE & TEXT CARD)
 		-- =========================================================================
