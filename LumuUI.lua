@@ -353,9 +353,6 @@ end
 
 function Astral:MakeWindow(config)
 	config = config or {}
-	-- Design: "Sidebar" (default, left sidebar) or "TopBar" (horizontal tabs on top)
-	local designName = tostring(config.Design or config.Layout or "Sidebar"):lower()
-	local isTopBar = (designName == "topbar" or designName == "top")
 	-- Accent engine FIRST: panels and elements below hook into it during build
 	local AccentColor = Color3.fromRGB(0, 153, 235)
 	local accentAppliers = {}
@@ -639,272 +636,102 @@ function Astral:MakeWindow(config)
 	HorizontalSeparator.ZIndex = 3
 	HorizontalSeparator.Parent = MainFrame
 
-	-- ===================== CHROME: TopBar or Sidebar =====================
-	local TabContainer, TabListLayout, TabPadding, Separator, ContentContainer, ContentCorner
-	local Sidebar, SidebarWidth, CollapsedSidebarWidth
-	if isTopBar then
-		-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
-		-- =====================================================================
-		local TabBarTop = 54
-		local TabBarHeight = 44
-		local ContentTop = TabBarTop + TabBarHeight + 6
-	
-		-- Horizontal tab strip (leaves room for the left/right arrows)
-		local ArrowW = 26
-		local ArrowGap = 6
-		local stripLeft = 10 + ArrowW + ArrowGap
-		local stripRight = 10 + ArrowW + ArrowGap
-		TabContainer = Instance.new("ScrollingFrame")
-		TabContainer.Name = "TabContainer"
-		TabContainer.BackgroundTransparency = 1
-		TabContainer.BorderSizePixel = 0
-		TabContainer.Position = UDim2.new(0, stripLeft, 0, TabBarTop)
-		TabContainer.Size = UDim2.new(1, -stripLeft - stripRight, 0, TabBarHeight)
-		TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-		TabContainer.ScrollBarThickness = 3
-		TabContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 66)
-		TabContainer.ScrollingDirection = Enum.ScrollingDirection.X
-		TabContainer.ClipsDescendants = true
-		TabContainer.ZIndex = 3
-		TabContainer.Parent = MainFrame
-	
-		TabListLayout = Instance.new("UIListLayout")
-		TabListLayout.Parent = TabContainer
-		TabListLayout.FillDirection = Enum.FillDirection.Horizontal
-		TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		TabListLayout.Padding = UDim.new(0, 6)
-		TabListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-		TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-	
-		TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-			TabContainer.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 16, 0, 0)
-		end)
-	
-		TabPadding = Instance.new("UIPadding")
-		TabPadding.PaddingTop = UDim.new(0, 3)
-		TabPadding.PaddingBottom = UDim.new(0, 3)
-		TabPadding.PaddingLeft = UDim.new(0, 4)
-		TabPadding.PaddingRight = UDim.new(0, 10)
-		TabPadding.Parent = TabContainer
-	
-		-- ===== Left / right tab navigation =====
-		local function tabMaxScroll()
-			local ok, canvas = pcall(function() return TabContainer.AbsoluteCanvasSize.X end)
-			if not ok or type(canvas) ~= "number" then return 0 end
-			return math.max(0, canvas - TabContainer.AbsoluteSize.X)
-		end
-	
-		local function tabScrollX()
-			local ok, x = pcall(function() return TabContainer.CanvasPosition.X end)
-			if ok and type(x) == "number" then return x end
-			return 0
-		end
-	
-		local function scrollTabs(delta)
-			local target = math.clamp(tabScrollX() + delta, 0, tabMaxScroll())
-			pcall(function()
-				TweenService:Create(TabContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					CanvasPosition = Vector2.new(target, 0)
-				}):Play()
-			end)
-		end
-	
-		local function makeTabArrow(name, iconId, xUDim, anchorX, dir)
-			local Btn = Instance.new("TextButton")
-			Btn.Name = name
-			Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-			Btn.BorderSizePixel = 0
-			Btn.AnchorPoint = Vector2.new(anchorX, 0.5)
-			Btn.Position = UDim2.new(xUDim.X.Scale, xUDim.X.Offset, 0, TabBarTop + TabBarHeight / 2)
-			Btn.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
-			Btn.Text = ""
-			Btn.AutoButtonColor = false
-			Btn.ZIndex = 6
-			Btn.Parent = MainFrame
-	
-			local Corner = Instance.new("UICorner")
-			Corner.CornerRadius = UDim.new(0, 6)
-			Corner.Parent = Btn
-	
-			local Stroke = Instance.new("UIStroke")
-			Stroke.Color = Color3.fromRGB(42, 42, 46)
-			Stroke.Thickness = 1
-			Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			Stroke.Parent = Btn
-	
-			local Icon = Instance.new("ImageLabel")
-			Icon.Name = "Icon"
-			Icon.BackgroundTransparency = 1
-			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-			Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Icon.Size = UDim2.new(0, 14, 0, 14)
-			Icon.Image = iconId
-			Icon.ImageColor3 = Color3.fromRGB(180, 180, 185)
-			Icon.ScaleType = Enum.ScaleType.Fit
-			Icon.ZIndex = 7
-			Icon.Parent = Btn
-	
-			Btn.MouseEnter:Connect(function()
-				TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(Icon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-			end)
-			Btn.MouseLeave:Connect(function()
-				TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(Icon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
-			end)
-	
-			Btn.MouseButton1Click:Connect(function()
-				scrollTabs(dir * 150)
-			end)
-	
-			return Btn
-		end
-	
-		local TabsLeft = makeTabArrow("TabsLeft", Astral.Icons.left_arrow or Astral.Icons.Left, UDim2.new(0, 10, 0, 0), 0, -1)
-		local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -10, 0, 0), 1, 1)
-	
-		-- Hide an arrow when there is nothing more to scroll that way
-		local function updateTabArrows()
-			local maxX = tabMaxScroll()
-			local x = tabScrollX()
-			TabsLeft.Visible = x > 1
-			TabsRight.Visible = x < maxX - 1
-		end
-		TabContainer:GetPropertyChangedSignal("CanvasPosition"):Connect(updateTabArrows)
-		TabContainer:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateTabArrows)
-		TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateTabArrows)
-		task.defer(updateTabArrows)
-	
-		-- Mouse wheel scrolls the strip horizontally while hovering it
-		TabContainer.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseWheel then
-				scrollTabs(-input.Position.Z * 60)
-			end
-		end)
-	
-		-- Divider under the tab strip
-		Separator = Instance.new("Frame")
-		Separator.Name = "Separator"
-		Separator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
-		Separator.BorderSizePixel = 0
-		Separator.Position = UDim2.new(0, 0, 0, TabBarTop + TabBarHeight + 2)
-		Separator.Size = UDim2.new(1, 0, 0, 1)
-		Separator.ZIndex = 3
-		Separator.Parent = MainFrame
-	
-		-- Content fills the window below the tab strip
-		ContentContainer = Instance.new("Frame")
-		ContentContainer.Name = "ContentContainer"
-		ContentContainer.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
-		ContentContainer.BackgroundTransparency = 0.25 -- lets background image show through
-		ContentContainer.BorderSizePixel = 0
-		ContentContainer.ClipsDescendants = true
-		ContentContainer.Position = UDim2.new(0, 10, 0, ContentTop)
-		ContentContainer.Size = UDim2.new(1, -20, 1, -ContentTop - 10)
-		ContentContainer.Parent = MainFrame
-	
-		ContentCorner = Instance.new("UICorner")
-		ContentCorner.CornerRadius = UDim.new(0, 8)
-		ContentCorner.Parent = ContentContainer
-	else
-		-- ===================== SIDEBAR DESIGN =====================
-		-- Sidebar Width Configuration
-		SidebarWidth = 165
-		CollapsedSidebarWidth = 50
-	
-		-- Sidebar Frame
-		Sidebar = Instance.new("Frame")
-		Sidebar.Name = "Sidebar"
-		Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 16)
-		Sidebar.BackgroundTransparency = 0.12 -- lets background image show through
-		Sidebar.BorderSizePixel = 0
-		Sidebar.Position = UDim2.new(0, 0, 0, 51)
-		Sidebar.Size = UDim2.new(0, SidebarWidth, 1, -51)
-		Sidebar.ClipsDescendants = true -- Set to true to prevent tab overflow on mobile
-		Sidebar.ZIndex = 2
-		Sidebar.Parent = MainFrame
-	
-		-- FIXED: Sidebar Corner Alignment System (Prevents sticking out of MainFrame)
-		local SidebarCorner = Instance.new("UICorner")
-		SidebarCorner.CornerRadius = UDim.new(0, 10) -- Matches MainFrame perfectly
-		SidebarCorner.Parent = Sidebar
-	
-		-- Seamless Filler Frames to selectively un-round top-left, top-right, and bottom-right corners
-		local SidebarFillerTop = Instance.new("Frame")
-		SidebarFillerTop.Name = "SidebarFillerTop"
-		SidebarFillerTop.BackgroundColor3 = Sidebar.BackgroundColor3
-		SidebarFillerTop.BackgroundTransparency = 0.12
-		SidebarFillerTop.BorderSizePixel = 0
-		SidebarFillerTop.Position = UDim2.new(0, 0, 0, 0)
-		SidebarFillerTop.Size = UDim2.new(1, 0, 0, 15) -- Covers top-left and top-right rounded corners
-		SidebarFillerTop.ZIndex = 2
-		SidebarFillerTop.Parent = Sidebar
-	
-		local SidebarFillerRight = Instance.new("Frame")
-		SidebarFillerRight.Name = "SidebarFillerRight"
-		SidebarFillerRight.BackgroundColor3 = Sidebar.BackgroundColor3
-		SidebarFillerRight.BackgroundTransparency = 0.12
-		SidebarFillerRight.BorderSizePixel = 0
-		SidebarFillerRight.Position = UDim2.new(1, -15, 0, 0)
-		SidebarFillerRight.Size = UDim2.new(0, 15, 1, 0) -- Covers top-right and bottom-right rounded corners
-		SidebarFillerRight.ZIndex = 2
-		SidebarFillerRight.Parent = Sidebar
-	
-		-- Tab Buttons Container
-		TabContainer = Instance.new("ScrollingFrame")
-		TabContainer.Name = "TabContainer"
-		TabContainer.BackgroundTransparency = 1
-		TabContainer.BorderSizePixel = 0
-		TabContainer.Position = UDim2.new(0, 0, 0, 6)
-		TabContainer.Size = UDim2.new(1, 0, 1, -60)
-		TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-		TabContainer.ScrollBarThickness = 0
-		TabContainer.ClipsDescendants = true -- Set to true to prevent tab overflow on mobile
-		TabContainer.ZIndex = 3
-		TabContainer.Parent = Sidebar
-	
-		TabListLayout = Instance.new("UIListLayout")
-		TabListLayout.Parent = TabContainer
-		TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		TabListLayout.Padding = UDim.new(0, 5)
-		TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	
-		TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-			TabContainer.CanvasSize = UDim2.new(0, 0, 0, TabListLayout.AbsoluteContentSize.Y + 20)
-		end)
-	
-		TabPadding = Instance.new("UIPadding")
-		TabPadding.PaddingTop = UDim.new(0, 2)
-		TabPadding.PaddingBottom = UDim.new(0, 4)
-		TabPadding.PaddingLeft = UDim.new(0, 6)
-		TabPadding.PaddingRight = UDim.new(0, 6)
-		TabPadding.Parent = TabContainer
-	
-		-- Vertical Separator Line
-		Separator = Instance.new("Frame")
-		Separator.Name = "Separator"
-		Separator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
-		Separator.BorderSizePixel = 0
-		Separator.Position = UDim2.new(0, SidebarWidth, 0, 51)
-		Separator.Size = UDim2.new(0, 1, 1, -51)
-		Separator.ZIndex = 3
-		Separator.Parent = MainFrame
-	
-		-- Content Container
-		ContentContainer = Instance.new("Frame")
-		ContentContainer.Name = "ContentContainer"
-		ContentContainer.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
-		ContentContainer.BackgroundTransparency = 0.25 -- lets background image show through
-		ContentContainer.BorderSizePixel = 0
-		ContentContainer.ClipsDescendants = true
-		ContentContainer.Position = UDim2.new(0, SidebarWidth + 1, 0, 51)
-		ContentContainer.Size = UDim2.new(1, -SidebarWidth - 9, 1, -59)
-		ContentContainer.Parent = MainFrame
-	
-		ContentCorner = Instance.new("UICorner")
-		ContentCorner.CornerRadius = UDim.new(0, 8) -- Optimized corner radius (not too curved)
-		ContentCorner.Parent = ContentContainer
-	end
+	-- Sidebar Width Configuration
+	local SidebarWidth = 165
+	local CollapsedSidebarWidth = 50
+
+	-- Sidebar Frame
+	local Sidebar = Instance.new("Frame")
+	Sidebar.Name = "Sidebar"
+	Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 16)
+	Sidebar.BackgroundTransparency = 0.12 -- lets background image show through
+	Sidebar.BorderSizePixel = 0
+	Sidebar.Position = UDim2.new(0, 0, 0, 51)
+	Sidebar.Size = UDim2.new(0, SidebarWidth, 1, -51)
+	Sidebar.ClipsDescendants = true -- Set to true to prevent tab overflow on mobile
+	Sidebar.ZIndex = 2
+	Sidebar.Parent = MainFrame
+
+	-- FIXED: Sidebar Corner Alignment System (Prevents sticking out of MainFrame)
+	local SidebarCorner = Instance.new("UICorner")
+	SidebarCorner.CornerRadius = UDim.new(0, 10) -- Matches MainFrame perfectly
+	SidebarCorner.Parent = Sidebar
+
+	-- Seamless Filler Frames to selectively un-round top-left, top-right, and bottom-right corners
+	local SidebarFillerTop = Instance.new("Frame")
+	SidebarFillerTop.Name = "SidebarFillerTop"
+	SidebarFillerTop.BackgroundColor3 = Sidebar.BackgroundColor3
+	SidebarFillerTop.BackgroundTransparency = 0.12
+	SidebarFillerTop.BorderSizePixel = 0
+	SidebarFillerTop.Position = UDim2.new(0, 0, 0, 0)
+	SidebarFillerTop.Size = UDim2.new(1, 0, 0, 15) -- Covers top-left and top-right rounded corners
+	SidebarFillerTop.ZIndex = 2
+	SidebarFillerTop.Parent = Sidebar
+
+	local SidebarFillerRight = Instance.new("Frame")
+	SidebarFillerRight.Name = "SidebarFillerRight"
+	SidebarFillerRight.BackgroundColor3 = Sidebar.BackgroundColor3
+	SidebarFillerRight.BackgroundTransparency = 0.12
+	SidebarFillerRight.BorderSizePixel = 0
+	SidebarFillerRight.Position = UDim2.new(1, -15, 0, 0)
+	SidebarFillerRight.Size = UDim2.new(0, 15, 1, 0) -- Covers top-right and bottom-right rounded corners
+	SidebarFillerRight.ZIndex = 2
+	SidebarFillerRight.Parent = Sidebar
+
+	-- Tab Buttons Container
+	local TabContainer = Instance.new("ScrollingFrame")
+	TabContainer.Name = "TabContainer"
+	TabContainer.BackgroundTransparency = 1
+	TabContainer.BorderSizePixel = 0
+	TabContainer.Position = UDim2.new(0, 0, 0, 6)
+	TabContainer.Size = UDim2.new(1, 0, 1, -60)
+	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+	TabContainer.ScrollBarThickness = 0
+	TabContainer.ClipsDescendants = true -- Set to true to prevent tab overflow on mobile
+	TabContainer.ZIndex = 3
+	TabContainer.Parent = Sidebar
+
+	local TabListLayout = Instance.new("UIListLayout")
+	TabListLayout.Parent = TabContainer
+	TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	TabListLayout.Padding = UDim.new(0, 5)
+	TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+	TabListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		TabContainer.CanvasSize = UDim2.new(0, 0, 0, TabListLayout.AbsoluteContentSize.Y + 20)
+	end)
+
+	local TabPadding = Instance.new("UIPadding")
+	TabPadding.PaddingTop = UDim.new(0, 2)
+	TabPadding.PaddingBottom = UDim.new(0, 4)
+	TabPadding.PaddingLeft = UDim.new(0, 6)
+	TabPadding.PaddingRight = UDim.new(0, 6)
+	TabPadding.Parent = TabContainer
+
+	-- Vertical Separator Line
+	local Separator = Instance.new("Frame")
+	Separator.Name = "Separator"
+	Separator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+	Separator.BorderSizePixel = 0
+	Separator.Position = UDim2.new(0, SidebarWidth, 0, 51)
+	Separator.Size = UDim2.new(0, 1, 1, -51)
+	Separator.ZIndex = 3
+	Separator.Parent = MainFrame
+
+	-- Content Container
+	local ContentContainer = Instance.new("Frame")
+	ContentContainer.Name = "ContentContainer"
+	ContentContainer.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
+	ContentContainer.BackgroundTransparency = 0.25 -- lets background image show through
+	ContentContainer.BorderSizePixel = 0
+	ContentContainer.ClipsDescendants = true
+	ContentContainer.Position = UDim2.new(0, SidebarWidth + 1, 0, 51)
+	ContentContainer.Size = UDim2.new(1, -SidebarWidth - 9, 1, -59)
+	ContentContainer.Parent = MainFrame
+
+	local ContentCorner = Instance.new("UICorner")
+	ContentCorner.CornerRadius = UDim.new(0, 8) -- Optimized corner radius (not too curved)
+	ContentCorner.Parent = ContentContainer
 
 	-- Apply Lag-Free Dragging
 	makeElementDraggable(MainFrame, TopBar)
@@ -1873,24 +1700,16 @@ function Astral:MakeWindow(config)
 			local isActive = (tab == targetTab)
 			
 			if isActive then
-				if isTopBar then
-					-- TopBar: solid accent pill
-					tab.Gradient.Enabled = false
-					TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						BackgroundColor3 = AccentColor
-					}):Play()
-				else
-					tab.Gradient.Enabled = true
-					tab.Gradient.Color = ColorSequence.new(AccentColor, Color3.new(AccentColor.R * 0.5, AccentColor.G * 0.5, AccentColor.B * 0.5))
-					tab.Gradient.Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, 0),
-						NumberSequenceKeypoint.new(0.7, 0.1),
-						NumberSequenceKeypoint.new(1, 0.8)
-					})
-					TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-					}):Play()
-				end
+				tab.Gradient.Enabled = true
+				tab.Gradient.Color = ColorSequence.new(AccentColor, Color3.new(AccentColor.R * 0.5, AccentColor.G * 0.5, AccentColor.B * 0.5))
+				tab.Gradient.Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0),
+					NumberSequenceKeypoint.new(0.7, 0.1),
+					NumberSequenceKeypoint.new(1, 0.8)
+				})
+				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Color = AccentColor,
 					Transparency = 0
@@ -1898,12 +1717,6 @@ function Astral:MakeWindow(config)
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					TextColor3 = Color3.fromRGB(255, 255, 255)
 				}):Play()
-				if tab.IconLabel then
-					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-				end
-				if tab.FallbackLabel then
-					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-				end
 			else
 				tab.Gradient.Enabled = false
 				
@@ -1917,12 +1730,6 @@ function Astral:MakeWindow(config)
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					TextColor3 = Color3.fromRGB(180, 180, 185)
 				}):Play()
-				if tab.IconLabel then
-					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
-				end
-				if tab.FallbackLabel then
-					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 185)}):Play()
-				end
 			end
 		end
 
@@ -1974,31 +1781,16 @@ function Astral:MakeWindow(config)
 		local CategoryHeader = Instance.new("TextLabel")
 		CategoryHeader.Name = name .. "_Header"
 		CategoryHeader.BackgroundTransparency = 1
+		CategoryHeader.Size = UDim2.new(1, 0, 0, 20)
 		CategoryHeader.Font = Enum.Font.GothamBold
 		CategoryHeader.Text = string.upper(name)
+		CategoryHeader.TextColor3 = Color3.fromRGB(160, 160, 165)
+		CategoryHeader.TextSize = 10
+		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Left
 		CategoryHeader.TextYAlignment = Enum.TextYAlignment.Center
 		CategoryHeader.LayoutOrder = layoutOrderCounter
 		CategoryHeader.ZIndex = 4
 		CategoryHeader.Parent = TabContainer
-
-		if isTopBar then
-			-- TopBar: small inline label chip in the horizontal strip
-			CategoryHeader.Size = UDim2.new(0, 0, 1, 0)
-			CategoryHeader.AutomaticSize = Enum.AutomaticSize.X
-			CategoryHeader.TextColor3 = Color3.fromRGB(120, 120, 125)
-			CategoryHeader.TextSize = 10
-			CategoryHeader.TextXAlignment = Enum.TextXAlignment.Center
-			local CatPad = Instance.new("UIPadding")
-			CatPad.PaddingLeft = UDim.new(0, 10)
-			CatPad.PaddingRight = UDim.new(0, 4)
-			CatPad.Parent = CategoryHeader
-		else
-			-- Sidebar: full-width section header above the tabs
-			CategoryHeader.Size = UDim2.new(1, 0, 0, 20)
-			CategoryHeader.TextColor3 = Color3.fromRGB(160, 160, 165)
-			CategoryHeader.TextSize = 10
-			CategoryHeader.TextXAlignment = Enum.TextXAlignment.Left
-		end
 
 		table.insert(categoryHeaders, CategoryHeader)
 		return CategoryHeader
@@ -2018,108 +1810,8 @@ function Astral:MakeWindow(config)
 		layoutOrderCounter = layoutOrderCounter + 1
 		local tabIndex = #tabs + 1
 
-		-- ===== Tab Button: TopBar pill or Sidebar row =====
-		local TabButton, ButtonCorner, TabStroke, TabGradient, Indicator, IconLabel, FallbackLabel, ButtonText
-		if isTopBar then
-		-- Create Tab Button (horizontal pill: icon + text, auto width)
-		TabButton = Instance.new("TextButton")
-		TabButton.Name = tabName .. "_TabButton"
-		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-		TabButton.BackgroundTransparency = 0
-		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(0, 0, 1, 0)
-		TabButton.AutomaticSize = Enum.AutomaticSize.X
-		TabButton.AutoButtonColor = false
-		TabButton.Text = ""
-		TabButton.ClipsDescendants = true
-		TabButton.LayoutOrder = layoutOrderCounter
-		TabButton.ZIndex = 10
-
-		local selectionFrame = Instance.new("Frame")
-		selectionFrame.BackgroundTransparency = 1
-		TabButton.SelectionImageObject = selectionFrame
-		TabButton.Parent = TabContainer
-
-		ButtonCorner = Instance.new("UICorner")
-		ButtonCorner.CornerRadius = UDim.new(0, 8)
-		ButtonCorner.Parent = TabButton
-
-		TabStroke = Instance.new("UIStroke")
-		TabStroke.Name = "TabStroke"
-		TabStroke.Thickness = 1
-		TabStroke.Color = Color3.fromRGB(42, 42, 46)
-		TabStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		TabStroke.ZIndex = 10
-		TabStroke.Parent = TabButton
-
-		TabGradient = Instance.new("UIGradient")
-		TabGradient.Name = "TabGradient"
-		TabGradient.Enabled = false
-		TabGradient.Parent = TabButton
-
-		Indicator = Instance.new("Frame")
-		Indicator.Name = "Indicator"
-		Indicator.Size = UDim2.new(0, 0, 0, 0)
-		Indicator.Visible = false
-		Indicator.Parent = TabButton
-
-		local BtnPadding = Instance.new("UIPadding")
-		BtnPadding.PaddingLeft = UDim.new(0, 12)
-		BtnPadding.PaddingRight = UDim.new(0, 12)
-		BtnPadding.Parent = TabButton
-
-		local BtnLayout = Instance.new("UIListLayout")
-		BtnLayout.FillDirection = Enum.FillDirection.Horizontal
-		BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-		BtnLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		BtnLayout.Padding = UDim.new(0, 8)
-		BtnLayout.Parent = TabButton
-
-		IconLabel = nil
-		FallbackLabel = nil
-
-		if tabIcon then
-			IconLabel = Instance.new("ImageLabel")
-			IconLabel.Name = "TabIcon"
-			IconLabel.BackgroundTransparency = 1
-			IconLabel.Size = UDim2.new(0, 18, 0, 18)
-			IconLabel.LayoutOrder = 1
-			Astral.ApplyIcon(IconLabel, tabIcon)
-			IconLabel.ImageColor3 = Color3.fromRGB(180, 180, 185)
-			IconLabel.ScaleType = Enum.ScaleType.Fit
-			IconLabel.ZIndex = 11
-			IconLabel.Parent = TabButton
-		else
-			FallbackLabel = Instance.new("TextLabel")
-			FallbackLabel.Name = "FallbackIcon"
-			FallbackLabel.BackgroundTransparency = 1
-			FallbackLabel.Size = UDim2.new(0, 18, 0, 18)
-			FallbackLabel.Font = Enum.Font.GothamBold
-			FallbackLabel.Text = string.sub(tabName, 1, 1)
-			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
-			FallbackLabel.TextSize = 12
-			FallbackLabel.LayoutOrder = 1
-			FallbackLabel.ZIndex = 11
-			FallbackLabel.Parent = TabButton
-		end
-
-		ButtonText = Instance.new("TextLabel")
-		ButtonText.Name = "ButtonText"
-		ButtonText.BackgroundTransparency = 1
-		ButtonText.Size = UDim2.new(0, 0, 1, 0)
-		ButtonText.AutomaticSize = Enum.AutomaticSize.X
-		ButtonText.Font = Enum.Font.GothamSemibold
-		tr(ButtonText, tabName)
-		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		ButtonText.TextSize = 12
-		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
-		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
-		ButtonText.LayoutOrder = 2
-		ButtonText.ZIndex = 11
-		ButtonText.Parent = TabButton
-		else
 		-- Create Tab Button
-		TabButton = Instance.new("TextButton")
+		local TabButton = Instance.new("TextButton")
 		TabButton.Name = tabName .. "_TabButton"
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 0
@@ -2136,11 +1828,11 @@ function Astral:MakeWindow(config)
 		TabButton.SelectionImageObject = selectionFrame
 		TabButton.Parent = TabContainer
 
-		ButtonCorner = Instance.new("UICorner")
+		local ButtonCorner = Instance.new("UICorner")
 		ButtonCorner.CornerRadius = UDim.new(0, 6)
 		ButtonCorner.Parent = TabButton
 
-		TabStroke = Instance.new("UIStroke")
+		local TabStroke = Instance.new("UIStroke")
 		TabStroke.Name = "TabStroke"
 		TabStroke.Thickness = 1
 		TabStroke.Color = Color3.fromRGB(42, 42, 46)
@@ -2148,19 +1840,19 @@ function Astral:MakeWindow(config)
 		TabStroke.ZIndex = 10
 		TabStroke.Parent = TabButton
 
-		TabGradient = Instance.new("UIGradient")
+		local TabGradient = Instance.new("UIGradient")
 		TabGradient.Name = "TabGradient"
 		TabGradient.Enabled = false
 		TabGradient.Parent = TabButton
 
-		Indicator = Instance.new("Frame")
+		local Indicator = Instance.new("Frame")
 		Indicator.Name = "Indicator"
 		Indicator.Size = UDim2.new(0, 0, 0, 0)
 		Indicator.Visible = false
 		Indicator.Parent = TabButton
 
-		IconLabel = nil
-		FallbackLabel = nil
+		local IconLabel = nil
+		local FallbackLabel = nil
 
 		if tabIcon then
 			IconLabel = Instance.new("ImageLabel")
@@ -2190,7 +1882,7 @@ function Astral:MakeWindow(config)
 			FallbackLabel.Parent = TabButton
 		end
 
-		ButtonText = Instance.new("TextLabel")
+		local ButtonText = Instance.new("TextLabel")
 		ButtonText.Name = "ButtonText"
 		ButtonText.BackgroundTransparency = 1
 		
@@ -2207,7 +1899,6 @@ function Astral:MakeWindow(config)
 		ButtonText.TextTransparency = isCollapsed and 1 or 0
 		ButtonText.ZIndex = 11
 		ButtonText.Parent = TabButton
-		end
 
 		-- Create Tab Page Frame
 		local TabPage = Instance.new("Frame")
@@ -5056,184 +4747,180 @@ function Astral:MakeWindow(config)
 		return TabObject
 	end
 
-	-- (Minimize/collapse button is sidebar-only)
-	if not isTopBar then
-		-- Create Minimize Button at the bottom of the Sidebar
-		local MinimizeButton = Instance.new("TextButton")
-		MinimizeButton.Name = "MinimizeButton"
-		MinimizeButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-		MinimizeButton.BorderSizePixel = 0
-		MinimizeButton.Position = UDim2.new(0, 6, 1, -42)
-		MinimizeButton.Size = UDim2.new(1, -12, 0, 36)
-		MinimizeButton.AutoButtonColor = false
-		MinimizeButton.Text = ""
-		MinimizeButton.ZIndex = 10
-		MinimizeButton.Parent = Sidebar
-	
-		local MinimizeCorner = Instance.new("UICorner")
-		MinimizeCorner.CornerRadius = UDim.new(0, 6)
-		MinimizeCorner.Parent = MinimizeButton
-	
-		local MinimizeStroke = Instance.new("UIStroke")
-		MinimizeStroke.Thickness = 1
-		MinimizeStroke.Color = Color3.fromRGB(42, 42, 46)
-		MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		MinimizeStroke.ZIndex = 10
-		MinimizeStroke.Parent = MinimizeButton
-	
-		local MinimizeIcon = Instance.new("ImageLabel")
-		MinimizeIcon.Name = "MinimizeIcon"
-		MinimizeIcon.BackgroundTransparency = 1
-		MinimizeIcon.AnchorPoint = Vector2.new(0, 0.5)
-		MinimizeIcon.Position = UDim2.new(0, 8, 0.5, 0)
-		MinimizeIcon.Size = UDim2.new(0, 24, 0, 24) -- Made minimize icon bigger
-		MinimizeIcon.Image = "rbxassetid://96304569438872"
-		MinimizeIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
-		MinimizeIcon.ScaleType = Enum.ScaleType.Fit
-		MinimizeIcon.ZIndex = 11
-		MinimizeIcon.Parent = MinimizeButton
-	
-		local MinimizeText = Instance.new("TextLabel")
-		MinimizeText.Name = "MinimizeText"
-		MinimizeText.BackgroundTransparency = 1
-		MinimizeText.Position = UDim2.new(0, 34, 0, 0)
-		MinimizeText.Size = UDim2.new(1, -42, 1, 0)
-		MinimizeText.Font = Enum.Font.GothamSemibold
-		MinimizeText.Text = "Minimize"
-		MinimizeText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		MinimizeText.TextSize = 11
-		MinimizeText.TextXAlignment = Enum.TextXAlignment.Left
-		MinimizeText.TextYAlignment = Enum.TextYAlignment.Center
-		MinimizeText.ZIndex = 11
-		MinimizeText.Parent = MinimizeButton
-	
-		-- Unified Sidebar Toggle Function
-		local function toggleSidebar()
-			isCollapsed = not isCollapsed
-			
-			local targetSidebarWidth = isCollapsed and CollapsedSidebarWidth or SidebarWidth
-			local targetContentOffset = targetSidebarWidth + 1
-			local textTransparency = isCollapsed and 1 or 0
-	
-			TweenService:Create(Sidebar, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Size = UDim2.new(0, targetSidebarWidth, 1, -51)
+	-- Create Minimize Button at the bottom of the Sidebar
+	local MinimizeButton = Instance.new("TextButton")
+	MinimizeButton.Name = "MinimizeButton"
+	MinimizeButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+	MinimizeButton.BorderSizePixel = 0
+	MinimizeButton.Position = UDim2.new(0, 6, 1, -42)
+	MinimizeButton.Size = UDim2.new(1, -12, 0, 36)
+	MinimizeButton.AutoButtonColor = false
+	MinimizeButton.Text = ""
+	MinimizeButton.ZIndex = 10
+	MinimizeButton.Parent = Sidebar
+
+	local MinimizeCorner = Instance.new("UICorner")
+	MinimizeCorner.CornerRadius = UDim.new(0, 6)
+	MinimizeCorner.Parent = MinimizeButton
+
+	local MinimizeStroke = Instance.new("UIStroke")
+	MinimizeStroke.Thickness = 1
+	MinimizeStroke.Color = Color3.fromRGB(42, 42, 46)
+	MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	MinimizeStroke.ZIndex = 10
+	MinimizeStroke.Parent = MinimizeButton
+
+	local MinimizeIcon = Instance.new("ImageLabel")
+	MinimizeIcon.Name = "MinimizeIcon"
+	MinimizeIcon.BackgroundTransparency = 1
+	MinimizeIcon.AnchorPoint = Vector2.new(0, 0.5)
+	MinimizeIcon.Position = UDim2.new(0, 8, 0.5, 0)
+	MinimizeIcon.Size = UDim2.new(0, 24, 0, 24) -- Made minimize icon bigger
+	MinimizeIcon.Image = "rbxassetid://96304569438872"
+	MinimizeIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	MinimizeIcon.ScaleType = Enum.ScaleType.Fit
+	MinimizeIcon.ZIndex = 11
+	MinimizeIcon.Parent = MinimizeButton
+
+	local MinimizeText = Instance.new("TextLabel")
+	MinimizeText.Name = "MinimizeText"
+	MinimizeText.BackgroundTransparency = 1
+	MinimizeText.Position = UDim2.new(0, 34, 0, 0)
+	MinimizeText.Size = UDim2.new(1, -42, 1, 0)
+	MinimizeText.Font = Enum.Font.GothamSemibold
+	MinimizeText.Text = "Minimize"
+	MinimizeText.TextColor3 = Color3.fromRGB(180, 180, 185)
+	MinimizeText.TextSize = 11
+	MinimizeText.TextXAlignment = Enum.TextXAlignment.Left
+	MinimizeText.TextYAlignment = Enum.TextYAlignment.Center
+	MinimizeText.ZIndex = 11
+	MinimizeText.Parent = MinimizeButton
+
+	-- Unified Sidebar Toggle Function
+	local function toggleSidebar()
+		isCollapsed = not isCollapsed
+		
+		local targetSidebarWidth = isCollapsed and CollapsedSidebarWidth or SidebarWidth
+		local targetContentOffset = targetSidebarWidth + 1
+		local textTransparency = isCollapsed and 1 or 0
+
+		TweenService:Create(Sidebar, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = UDim2.new(0, targetSidebarWidth, 1, -51)
+		}):Play()
+
+		TweenService:Create(Separator, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = UDim2.new(0, targetSidebarWidth, 0, 51)
+		}):Play()
+
+		TweenService:Create(ContentContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = UDim2.new(0, targetContentOffset, 0, 51),
+			Size = UDim2.new(1, -targetContentOffset - 8, 1, -59)
+		}):Play()
+
+		for _, header in ipairs(categoryHeaders) do
+			header.Visible = not isCollapsed
+		end
+
+		local targetMinButtonSize = isCollapsed and UDim2.new(0, 36, 0, 36) or UDim2.new(1, -12, 0, 36)
+		local targetMinButtonPos = isCollapsed and UDim2.new(0.5, -18, 1, -42) or UDim2.new(0, 6, 1, -42)
+		local targetMinCornerRadius = isCollapsed and UDim.new(0, 8) or UDim.new(0, 6)
+		local targetMinIconPos = isCollapsed and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
+		local targetMinIconAnchor = isCollapsed and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
+		local targetMinIconRotation = isCollapsed and 180 or 0
+		local targetMinIconSize = isCollapsed and UDim2.new(0, 28, 0, 28) or UDim2.new(0, 24, 0, 24) -- Bigger minimize icon when collapsed
+
+		TweenService:Create(MinimizeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = targetMinButtonSize,
+			Position = targetMinButtonPos
+		}):Play()
+
+		TweenService:Create(MinimizeCorner, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			CornerRadius = targetMinCornerRadius
+		}):Play()
+
+		TweenService:Create(MinimizeText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			TextTransparency = textTransparency
+		}):Play()
+
+		TweenService:Create(MinimizeIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = targetMinIconPos,
+			AnchorPoint = targetMinIconAnchor,
+			Rotation = targetMinIconRotation,
+			Size = targetMinIconSize
+		}):Play()
+
+		for _, tab in ipairs(tabs) do
+			local targetButtonSize = isCollapsed and UDim2.new(0, 36, 0, 36) or UDim2.new(1, 0, 0, 36)
+			local targetCornerRadius = isCollapsed and UDim.new(0, 8) or UDim.new(0, 6)
+
+			TweenService:Create(tab.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = targetButtonSize
 			}):Play()
-	
-			TweenService:Create(Separator, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Position = UDim2.new(0, targetSidebarWidth, 0, 51)
+
+			TweenService:Create(tab.Corner, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				CornerRadius = targetCornerRadius
 			}):Play()
-	
-			TweenService:Create(ContentContainer, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Position = UDim2.new(0, targetContentOffset, 0, 51),
-				Size = UDim2.new(1, -targetContentOffset - 8, 1, -59)
-			}):Play()
-	
-			for _, header in ipairs(categoryHeaders) do
-				header.Visible = not isCollapsed
-			end
-	
-			local targetMinButtonSize = isCollapsed and UDim2.new(0, 36, 0, 36) or UDim2.new(1, -12, 0, 36)
-			local targetMinButtonPos = isCollapsed and UDim2.new(0.5, -18, 1, -42) or UDim2.new(0, 6, 1, -42)
-			local targetMinCornerRadius = isCollapsed and UDim.new(0, 8) or UDim.new(0, 6)
-			local targetMinIconPos = isCollapsed and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
-			local targetMinIconAnchor = isCollapsed and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
-			local targetMinIconRotation = isCollapsed and 180 or 0
-			local targetMinIconSize = isCollapsed and UDim2.new(0, 28, 0, 28) or UDim2.new(0, 24, 0, 24) -- Bigger minimize icon when collapsed
-	
-			TweenService:Create(MinimizeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Size = targetMinButtonSize,
-				Position = targetMinButtonPos
-			}):Play()
-	
-			TweenService:Create(MinimizeCorner, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				CornerRadius = targetMinCornerRadius
-			}):Play()
-	
-			TweenService:Create(MinimizeText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+
+			TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 				TextTransparency = textTransparency
 			}):Play()
-	
-			TweenService:Create(MinimizeIcon, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-				Position = targetMinIconPos,
-				AnchorPoint = targetMinIconAnchor,
-				Rotation = targetMinIconRotation,
-				Size = targetMinIconSize
-			}):Play()
-	
-			for _, tab in ipairs(tabs) do
-				local targetButtonSize = isCollapsed and UDim2.new(0, 36, 0, 36) or UDim2.new(1, 0, 0, 36)
-				local targetCornerRadius = isCollapsed and UDim.new(0, 8) or UDim.new(0, 6)
-	
-				TweenService:Create(tab.Button, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					Size = targetButtonSize
-				}):Play()
-	
-				TweenService:Create(tab.Corner, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					CornerRadius = targetCornerRadius
-				}):Play()
-	
-				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					TextTransparency = textTransparency
-				}):Play()
-	
-				if isCollapsed then
-					if tab.IconLabel then
-						TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-							Position = UDim2.new(0.5, 0, 0.5, 0),
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							Size = UDim2.new(0, 32, 0, 32) -- Made collapsed icons significantly bigger and cleaner
-						}):Play()
-					elseif tab.FallbackLabel then
-						tab.FallbackLabel.Visible = true
-						TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-							Position = UDim2.new(0.5, 0, 0.5, 0),
-							AnchorPoint = Vector2.new(0.5, 0.5),
-							TextTransparency = 0,
-							Size = UDim2.new(0, 32, 0, 32) -- Made collapsed fallback icons significantly bigger and cleaner
-						}):Play()
-					end
-				else
-					if tab.IconLabel then
-						TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-							Position = UDim2.new(0, 10, 0.5, 0),
-							AnchorPoint = Vector2.new(0, 0.5),
-							Size = UDim2.new(0, 28, 0, 28) -- Expanded icon size
-						}):Play()
-					elseif tab.FallbackLabel then
-						TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-							Position = UDim2.new(0, 10, 0.5, 0),
-							AnchorPoint = Vector2.new(0, 0.5),
-							TextTransparency = 1,
-							Size = UDim2.new(0, 28, 0, 28) -- Expanded fallback size
-						}):Play()
-					end
+
+			if isCollapsed then
+				if tab.IconLabel then
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						Size = UDim2.new(0, 32, 0, 32) -- Made collapsed icons significantly bigger and cleaner
+					}):Play()
+				elseif tab.FallbackLabel then
+					tab.FallbackLabel.Visible = true
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = UDim2.new(0.5, 0, 0.5, 0),
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						TextTransparency = 0,
+						Size = UDim2.new(0, 32, 0, 32) -- Made collapsed fallback icons significantly bigger and cleaner
+					}):Play()
+				end
+			else
+				if tab.IconLabel then
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = UDim2.new(0, 10, 0.5, 0),
+						AnchorPoint = Vector2.new(0, 0.5),
+						Size = UDim2.new(0, 28, 0, 28) -- Expanded icon size
+					}):Play()
+				elseif tab.FallbackLabel then
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = UDim2.new(0, 10, 0.5, 0),
+						AnchorPoint = Vector2.new(0, 0.5),
+						TextTransparency = 1,
+						Size = UDim2.new(0, 28, 0, 28) -- Expanded fallback size
+					}):Play()
 				end
 			end
 		end
-	
-		MinimizeButton.MouseButton1Click:Connect(function()
-			toggleSidebar()
-		end)
-	
-		MinimizeButton.MouseEnter:Connect(function()
-			TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
-				BackgroundColor3 = Color3.fromRGB(32, 32, 34)
-			}):Play()
-			TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
-				Color = Color3.fromRGB(52, 52, 56)
-			}):Play()
-		end)
-	
-		MinimizeButton.MouseLeave:Connect(function()
-			TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
-				BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-			}):Play()
-			TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
-				Color = Color3.fromRGB(42, 42, 46)
-			}):Play()
-		end)
 	end
 
+	MinimizeButton.MouseButton1Click:Connect(function()
+		toggleSidebar()
+	end)
+
+	MinimizeButton.MouseEnter:Connect(function()
+		TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
+			BackgroundColor3 = Color3.fromRGB(32, 32, 34)
+		}):Play()
+		TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
+			Color = Color3.fromRGB(52, 52, 56)
+		}):Play()
+	end)
+
+	MinimizeButton.MouseLeave:Connect(function()
+		TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
+			BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		}):Play()
+		TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
+			Color = Color3.fromRGB(42, 42, 46)
+		}):Play()
+	end)
 
 	-- =========================================================================
 	-- FIXED FEATURE: SEPARATED, ENLARGED, INDEPENDENTLY DRAGGABLE LOGO BUTTON
