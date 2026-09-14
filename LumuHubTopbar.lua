@@ -850,8 +850,8 @@ function Astral:MakeWindow(config)
 		CIcon.BackgroundTransparency = 1
 		CIcon.AnchorPoint = Vector2.new(0.5, 0.5)
 		CIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		CIcon.Size = UDim2.new(0, 14, 0, 14)
-		CIcon.Image = Astral.Icons.expand or Astral.Icons.menu_ImageLabel
+		CIcon.Size = UDim2.new(0, 16, 0, 16)
+		CIcon.Image = Astral.Icons.big_arrow_down or Astral.Icons.down_arrow
 		CIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
 		CIcon.ScaleType = Enum.ScaleType.Fit
 		CIcon.ZIndex = 7
@@ -867,8 +867,13 @@ function Astral:MakeWindow(config)
 		end)
 
 		TabsCollapse.MouseButton1Click:Connect(function()
-			MainFrame:SetAttribute("TabCompact", not (MainFrame:GetAttribute("TabCompact") or false))
+			local compact = not (MainFrame:GetAttribute("TabCompact") or false)
+			MainFrame:SetAttribute("TabCompact", compact)
 			applyTabCompact()
+			-- chevron points up when collapsed (click = show names), down when open
+			TweenService:Create(CIcon, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Rotation = compact and 180 or 0
+			}):Play()
 		end)
 	end
 
@@ -1866,7 +1871,8 @@ function Astral:MakeWindow(config)
 				tab.Gradient.Enabled = false
 				-- Topbar active tab: solid accent pill
 				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundColor3 = AccentColor
+					BackgroundColor3 = AccentColor,
+					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Color = AccentColor,
@@ -1885,20 +1891,19 @@ function Astral:MakeWindow(config)
 				tab.Gradient.Enabled = false
 
 				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundTransparency = 1
 				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					Color = Color3.fromRGB(42, 42, 46),
-					Transparency = 0
+					Transparency = 1
 				}):Play()
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					TextColor3 = Color3.fromRGB(180, 180, 185)
+					TextColor3 = Color3.fromRGB(170, 170, 178)
 				}):Play()
 				if tab.IconLabel then
-					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(170, 170, 178)}):Play()
 				end
 				if tab.FallbackLabel then
-					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 170, 178)}):Play()
 				end
 			end
 		end
@@ -1991,7 +1996,7 @@ function Astral:MakeWindow(config)
 		local TabButton = Instance.new("TextButton")
 		TabButton.Name = tabName .. "_TabButton"
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-		TabButton.BackgroundTransparency = 0
+		TabButton.BackgroundTransparency = 1
 		TabButton.BorderSizePixel = 0
 		TabButton.Size = UDim2.new(0, 0, 0, 30)
 		TabButton.AutomaticSize = Enum.AutomaticSize.X
@@ -2015,6 +2020,7 @@ function Astral:MakeWindow(config)
 		TabStroke.Thickness = 1
 		TabStroke.Color = Color3.fromRGB(42, 42, 46)
 		TabStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		TabStroke.Transparency = 1
 		TabStroke.ZIndex = 10
 		TabStroke.Parent = TabButton
 
@@ -2256,34 +2262,47 @@ function Astral:MakeWindow(config)
 
 		table.insert(tabs, tabData)
 
-		-- Hover Effects
+		-- Hover Effects (inactive tabs are transparent: hover shows a soft fill)
 		TabButton.MouseEnter:Connect(function()
-			if pickerOpen or selectorOpen then return end -- FIXED: Disable hover effects when panels are open
+			if pickerOpen or selectorOpen then return end
 			if currentTab ~= tabData then
 				TweenService:Create(TabButton, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(32, 32, 34)
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					BackgroundTransparency = 0.92
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(52, 52, 56)
+					Transparency = 0.85
 				}):Play()
 				TweenService:Create(ButtonText, TweenInfo.new(0.15), {
 					TextColor3 = Color3.fromRGB(255, 255, 255)
 				}):Play()
+				if IconLabel then
+					TweenService:Create(IconLabel, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				end
+				if FallbackLabel then
+					TweenService:Create(FallbackLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				end
 			end
 		end)
 
 		TabButton.MouseLeave:Connect(function()
-			if pickerOpen or selectorOpen then return end -- FIXED: Disable hover effects when panels are open
+			if pickerOpen or selectorOpen then return end
 			if currentTab ~= tabData then
 				TweenService:Create(TabButton, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundTransparency = 1
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(42, 42, 46)
+					Transparency = 1
 				}):Play()
 				TweenService:Create(ButtonText, TweenInfo.new(0.15), {
-					TextColor3 = Color3.fromRGB(180, 180, 185)
+					TextColor3 = Color3.fromRGB(170, 170, 178)
 				}):Play()
+				if IconLabel then
+					TweenService:Create(IconLabel, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(170, 170, 178)}):Play()
+				end
+				if FallbackLabel then
+					TweenService:Create(FallbackLabel, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(170, 170, 178)}):Play()
+				end
 			end
 		end)
 
