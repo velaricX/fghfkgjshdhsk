@@ -690,7 +690,7 @@ function Astral:MakeWindow(config)
 	TabContainer.Position = UDim2.new(0, stripLeft, 0, BarPad)
 	TabContainer.Size = UDim2.new(1, -stripLeft - stripRight, 0, TabBarHeight)
 	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-	TabContainer.ScrollBarThickness = 3
+	TabContainer.ScrollBarThickness = 0
 	TabContainer.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 66)
 	TabContainer.ScrollingDirection = Enum.ScrollingDirection.X
 	TabContainer.ClipsDescendants = true
@@ -745,6 +745,44 @@ function Astral:MakeWindow(config)
 		end
 	end)
 
+	-- Hold left-click and drag the strip left / right to scroll it
+	MainFrame:SetAttribute("TabDragMoved", false)
+	do
+		local dragActive, dragMoved = false, false
+		local dragStartX, dragStartCanvas = 0, 0
+
+		TabContainer.InputBegan:Connect(function(input)
+			if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+			dragActive = true
+			dragMoved = false
+			dragStartX = input.Position.X
+			dragStartCanvas = tabScrollX()
+		end)
+
+		UserInputService.InputChanged:Connect(function(input)
+			if not dragActive then return end
+			if input.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+			local dx = input.Position.X - dragStartX
+			if not dragMoved and math.abs(dx) > 4 then
+				dragMoved = true
+				MainFrame:SetAttribute("TabDragMoved", true)
+			end
+			if dragMoved then
+				local target = math.clamp(dragStartCanvas - dx, 0, tabMaxScroll())
+				TabContainer.CanvasPosition = Vector2.new(target, 0)
+			end
+		end)
+
+		UserInputService.InputEnded:Connect(function(input)
+			if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+			dragActive = false
+			task.delay(0.12, function()
+				dragMoved = false
+				MainFrame:SetAttribute("TabDragMoved", false)
+			end)
+		end)
+	end
+
 
 	-- ===== Collapse button: hide tab names, keep icons only =====
 	local function applyTabCompact()
@@ -763,7 +801,7 @@ function Astral:MakeWindow(config)
 		TabsCollapse.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabsCollapse.BorderSizePixel = 0
 		TabsCollapse.AnchorPoint = Vector2.new(1, 0.5)
-		TabsCollapse.Position = UDim2.new(1, -8, 0, 0.5)
+		TabsCollapse.Position = UDim2.new(1, -8, 0.5, 0)
 		TabsCollapse.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
 		TabsCollapse.Text = ""
 		TabsCollapse.AutoButtonColor = false
@@ -1933,7 +1971,7 @@ function Astral:MakeWindow(config)
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 1
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(0, 0, 0, 30)
+		TabButton.Size = UDim2.new(0, 0, 0, 34)
 		TabButton.AutomaticSize = Enum.AutomaticSize.X
 		TabButton.AutoButtonColor = false
 		TabButton.Text = ""
@@ -1971,8 +2009,8 @@ function Astral:MakeWindow(config)
 		Indicator.Parent = TabButton
 
 		local BtnPadding = Instance.new("UIPadding")
-		BtnPadding.PaddingLeft = UDim.new(0, 10)
-		BtnPadding.PaddingRight = UDim.new(0, 10)
+		BtnPadding.PaddingLeft = UDim.new(0, 12)
+		BtnPadding.PaddingRight = UDim.new(0, 12)
 		BtnPadding.Parent = TabButton
 
 		local BtnLayout = Instance.new("UIListLayout")
@@ -1989,7 +2027,7 @@ function Astral:MakeWindow(config)
 			IconLabel = Instance.new("ImageLabel")
 			IconLabel.Name = "TabIcon"
 			IconLabel.BackgroundTransparency = 1
-			IconLabel.Size = UDim2.new(0, 18, 0, 18)
+			IconLabel.Size = UDim2.new(0, 20, 0, 20)
 			IconLabel.LayoutOrder = 1
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(180, 180, 185)
@@ -2000,11 +2038,11 @@ function Astral:MakeWindow(config)
 			FallbackLabel = Instance.new("TextLabel")
 			FallbackLabel.Name = "FallbackIcon"
 			FallbackLabel.BackgroundTransparency = 1
-			FallbackLabel.Size = UDim2.new(0, 18, 0, 18)
+			FallbackLabel.Size = UDim2.new(0, 20, 0, 20)
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
 			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
-			FallbackLabel.TextSize = 14
+			FallbackLabel.TextSize = 15
 			FallbackLabel.LayoutOrder = 1
 			FallbackLabel.ZIndex = 11
 			FallbackLabel.Parent = TabButton
@@ -2018,7 +2056,7 @@ function Astral:MakeWindow(config)
 		ButtonText.Font = Enum.Font.GothamBold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		ButtonText.TextSize = 13
+		ButtonText.TextSize = 14
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
 		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
 		ButtonText.LayoutOrder = 2
@@ -2242,6 +2280,8 @@ function Astral:MakeWindow(config)
 		end)
 
 		TabButton.MouseButton1Click:Connect(function()
+			-- ignore the click that ends a drag-scroll
+			if MainFrame:GetAttribute("TabDragMoved") then return end
 			if not pickerOpen and not selectorOpen then -- FIXED: Prevent tab switching when panels are open
 				switchTab(tabData)
 			end
