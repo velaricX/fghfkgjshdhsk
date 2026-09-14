@@ -653,7 +653,7 @@ function Astral:MakeWindow(config)
 	-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
 	-- =====================================================================
 	local TabBarTop = 54
-	local TabBarHeight = 38
+	local TabBarHeight = 42
 	local ContentTop = TabBarTop + TabBarHeight + 6
 
 	-- ===== Bar layout: two separate boxes with a gap =====
@@ -728,7 +728,7 @@ function Astral:MakeWindow(config)
 	TabListLayout.Parent = TabContainer
 	TabListLayout.FillDirection = Enum.FillDirection.Horizontal
 	TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	TabListLayout.Padding = UDim.new(0, 6)
+	TabListLayout.Padding = UDim.new(0, 8)
 	TabListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 
@@ -1993,7 +1993,7 @@ function Astral:MakeWindow(config)
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 1
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(0, 0, 0, 34)
+		TabButton.Size = UDim2.new(0, 0, 0, 36)
 		TabButton.AutomaticSize = Enum.AutomaticSize.X
 		TabButton.AutoButtonColor = false
 		TabButton.Text = ""
@@ -2031,15 +2031,15 @@ function Astral:MakeWindow(config)
 		Indicator.Parent = TabButton
 
 		local BtnPadding = Instance.new("UIPadding")
-		BtnPadding.PaddingLeft = UDim.new(0, 12)
-		BtnPadding.PaddingRight = UDim.new(0, 12)
+		BtnPadding.PaddingLeft = UDim.new(0, 14)
+		BtnPadding.PaddingRight = UDim.new(0, 14)
 		BtnPadding.Parent = TabButton
 
 		local BtnLayout = Instance.new("UIListLayout")
 		BtnLayout.FillDirection = Enum.FillDirection.Horizontal
 		BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 		BtnLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		BtnLayout.Padding = UDim.new(0, 6)
+		BtnLayout.Padding = UDim.new(0, 8)
 		BtnLayout.Parent = TabButton
 
 		local IconLabel = nil
