@@ -2944,13 +2944,13 @@ function Astral:MakeWindow(config)
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
 			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-			SliderTrack.Position = icon and UDim2.new(0, 62, 0, 36) or UDim2.new(0, 12, 0, 36)
-			SliderTrack.Size = icon and UDim2.new(1, -82, 0, 14) or UDim2.new(1, -32, 0, 14)
+			SliderTrack.Position = icon and UDim2.new(0, 62, 0, 34) or UDim2.new(0, 12, 0, 34)
+			SliderTrack.Size = icon and UDim2.new(1, -82, 0, 20) or UDim2.new(1, -32, 0, 20)
 			SliderTrack.Text = ""
 			SliderTrack.AutoButtonColor = false
 			SliderTrack.Parent = SliderFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(0, 4)
+			TrackCorner.CornerRadius = UDim.new(0, 10)
 			TrackCorner.Parent = SliderTrack
 			local SliderFill = Instance.new("Frame")
 			SliderFill.Name = "SliderFill"
@@ -2958,17 +2958,17 @@ function Astral:MakeWindow(config)
 			SliderFill.Size = UDim2.new((default - min)/math.max(1,max-min),0,1,0)
 			SliderFill.Parent = SliderTrack
 			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(0, 4)
+			FillCorner.CornerRadius = UDim.new(0, 10)
 			FillCorner.Parent = SliderFill
 			local SliderThumb = Instance.new("Frame")
 			SliderThumb.Name = "SliderThumb"
 			SliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SliderThumb.AnchorPoint = Vector2.new(0.5,0.5)
 			SliderThumb.Position = UDim2.new((default - min)/math.max(1,max-min),0,0.5,0)
-			SliderThumb.Size = UDim2.fromOffset(14,20)
+			SliderThumb.Size = UDim2.fromOffset(20,28)
 			SliderThumb.Parent = SliderTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(0, 3)
+			ThumbCorner.CornerRadius = UDim.new(0, 6)
 			ThumbCorner.Parent = SliderThumb
 			local ThumbStroke = Instance.new("UIStroke")
 			ThumbStroke.Color = Color3.fromRGB(0,0,0)
@@ -3794,25 +3794,50 @@ function Astral:MakeWindow(config)
 				applyStatusLayout()
 			end
 
-			-- Live countdown written into the description: :SetCountdown(300) -> 05:00 ... 00:01 READY
+			-- Live countdown written into the description.
+			--   :SetCountdown(300)                  -> counts DOWN 05:00 -> 00:00
+			--   :SetCountdown(300, "down")          -> same, explicit
+			--   :SetCountdown(0, "up")              -> counts UP 00:00 -> ...
+			--   :SetCountdown(300, function() end)  -> down, callback at zero
+			--   :SetCountdown(0, "up", function() end)
 			local countdownToken = 0
-			function LabelController:SetCountdown(seconds, onDone)
+			local function fmtTime(sec)
+				sec = math.max(0, math.floor(sec))
+				if sec >= 3600 then
+					return string.format("%02d:%02d:%02d", math.floor(sec / 3600), math.floor((sec % 3600) / 60), sec % 60)
+				end
+				return string.format("%02d:%02d", math.floor(sec / 60), sec % 60)
+			end
+			function LabelController:SetCountdown(seconds, modeOrDone, onDone)
+				local mode, done = "down", nil
+				if type(modeOrDone) == "function" then
+					done = modeOrDone
+				elseif type(modeOrDone) == "string" then
+					mode = modeOrDone
+					done = onDone
+				end
 				countdownToken = countdownToken + 1
 				local myToken = countdownToken
+				local value = math.max(0, math.floor(tonumber(seconds) or 0))
 				task.spawn(function()
-					local remaining = math.max(0, math.floor(tonumber(seconds) or 0))
 					while true do
 						if countdownToken ~= myToken then return end
-						if remaining <= 0 then
-							LabelController:SetDescription("READY")
-							break
+						LabelController:SetDescription(fmtTime(value))
+						if mode == "up" then
+							task.wait(1)
+							value = value + 1
+						else
+							if value <= 0 then break end
+							task.wait(1)
+							value = value - 1
 						end
-						LabelController:SetDescription(string.format("%02d:%02d", math.floor(remaining / 60), remaining % 60))
-						task.wait(1)
-						remaining = remaining - 1
 					end
-					if countdownToken == myToken and onDone then task.spawn(onDone) end
+					if mode ~= "up" and countdownToken == myToken and done then task.spawn(done) end
 				end)
+			end
+
+			function LabelController:StopCountdown()
+				countdownToken = countdownToken + 1
 			end
 
 			if labelConfig.Status then
