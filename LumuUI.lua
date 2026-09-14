@@ -603,6 +603,13 @@ function Astral:MakeWindow(config)
 	PremiumLabel.TextYAlignment = Enum.TextYAlignment.Center
 	PremiumLabel.Parent = PremiumBadge
 
+	-- Badge follows the accent color unless an explicit badgecolor was given
+	if not config.badgecolor then
+		onAccentChange(function(c)
+			PremiumBadge.BackgroundColor3 = c
+		end)
+	end
+
 	-- Decorative Alternating Arrows (FIXED: Added TextWrapped = false)
 	local DecoArrows = Instance.new("TextLabel")
 	DecoArrows.Name = "DecoArrows"
@@ -999,7 +1006,7 @@ function Astral:MakeWindow(config)
 		Stroke.Parent = Box
 
 		Box.Focused:Connect(function()
-			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(0, 153, 235)}):Play()
+			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 		end)
 		Box.FocusLost:Connect(function()
 			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(35, 35, 40)}):Play()
@@ -1076,7 +1083,7 @@ function Astral:MakeWindow(config)
 	HexStroke.Parent = HexInput
 
 	HexInput.Focused:Connect(function()
-		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(0, 153, 235)}):Play()
+		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 	end)
 	HexInput.FocusLost:Connect(function()
 		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(35, 35, 40)}):Play()
@@ -1516,7 +1523,7 @@ function Astral:MakeWindow(config)
 				local OptionBtn = Instance.new("TextButton")
 				OptionBtn.Name = optionStr .. "_Option"
 				OptionBtn.Size = UDim2.new(1, 0, 0, 38)
-				OptionBtn.BackgroundColor3 = isSelected and Color3.fromRGB(24, 44, 84) or Color3.fromRGB(18, 18, 22)
+				OptionBtn.BackgroundColor3 = isSelected and Color3.new(AccentColor.R * 0.25, AccentColor.G * 0.25, AccentColor.B * 0.25) or Color3.fromRGB(18, 18, 22)
 				OptionBtn.BorderSizePixel = 0
 				OptionBtn.Text = ""
 				OptionBtn.AutoButtonColor = false
@@ -1528,7 +1535,7 @@ function Astral:MakeWindow(config)
 				OptionCorner.Parent = OptionBtn
 
 				local OptionStroke = Instance.new("UIStroke")
-				OptionStroke.Color = isSelected and Color3.fromRGB(30, 110, 230) or Color3.fromRGB(50, 50, 55)
+				OptionStroke.Color = isSelected and AccentColor or Color3.fromRGB(50, 50, 55)
 				OptionStroke.Thickness = 1
 				OptionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				OptionStroke.Parent = OptionBtn
@@ -1547,7 +1554,7 @@ function Astral:MakeWindow(config)
 				local Indicator = Instance.new("Frame")
 				Indicator.Name = "Indicator"
 				Indicator.Size = UDim2.fromOffset(16, 16)
-				Indicator.BackgroundColor3 = isSelected and Color3.fromRGB(30, 110, 230) or Color3.fromRGB(36, 36, 40)
+				Indicator.BackgroundColor3 = isSelected and AccentColor or Color3.fromRGB(36, 36, 40)
 				Indicator.BorderSizePixel = 0
 				Indicator.LayoutOrder = 1
 				Indicator.ZIndex = 204
@@ -1557,7 +1564,7 @@ function Astral:MakeWindow(config)
 				IndicatorCorner.Parent = Indicator
 				local IndicatorStroke = Instance.new("UIStroke")
 				IndicatorStroke.Thickness = 1
-				IndicatorStroke.Color = isSelected and Color3.fromRGB(30, 110, 230) or Color3.fromRGB(50, 50, 55)
+				IndicatorStroke.Color = isSelected and AccentColor or Color3.fromRGB(50, 50, 55)
 				IndicatorStroke.Parent = Indicator
 				if isSelected then
 					local Check = Instance.new("ImageLabel")
@@ -1577,7 +1584,7 @@ function Astral:MakeWindow(config)
 				OptionLabel.BackgroundTransparency = 1
 				OptionLabel.Font = Enum.Font.GothamBold
 				OptionLabel.Text = optionStr
-				OptionLabel.TextColor3 = isSelected and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(232, 232, 237)
+				OptionLabel.TextColor3 = isSelected and AccentColor or Color3.fromRGB(232, 232, 237)
 				OptionLabel.TextSize = 12
 				OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
 				OptionLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -1587,8 +1594,8 @@ function Astral:MakeWindow(config)
 
 				OptionBtn.MouseButton1Click:Connect(function()
 					-- FIXED: High-performance subtle flash blue effect on click
-					OptionBtn.BackgroundColor3 = Color3.fromRGB(30, 55, 95)
-					OptionStroke.Color = Color3.fromRGB(30, 110, 230)
+					OptionBtn.BackgroundColor3 = Color3.new(AccentColor.R * 0.4, AccentColor.G * 0.4, AccentColor.B * 0.4)
+					OptionStroke.Color = AccentColor
 					
 					task.delay(0.08, function()
 						if isMulti then
@@ -3149,7 +3156,7 @@ function Astral:MakeWindow(config)
 			-- Multi-select count badge (e.g. "3")
 			local CountBadge = Instance.new("Frame")
 			CountBadge.Name = "CountBadge"
-			CountBadge.BackgroundColor3 = Color3.fromRGB(30, 110, 230)
+			CountBadge.BackgroundColor3 = AccentColor
 			CountBadge.BorderSizePixel = 0
 			CountBadge.AnchorPoint = Vector2.new(1, 0.5)
 			CountBadge.Position = UDim2.new(1, -32, 0.5, 0)
@@ -3255,6 +3262,11 @@ function Astral:MakeWindow(config)
 			end)
 
 			registerElement(SelectorFrame, calculatedHeight, selectorConfig.Position)
+
+			-- Count badge follows the accent color
+			onAccentChange(function(c)
+				CountBadge.BackgroundColor3 = c
+			end)
 
 			local SelectorController = {}
 			function SelectorController:Set(value)
