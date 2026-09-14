@@ -5586,6 +5586,353 @@ function Astral:MakeWindow(config)
 			end)
 		end
 
+	-- =========================================================================
+	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	--   local S = Window:AddGameStatus({ Title = "Game Status" })
+	--   S:Set("Server Uptime", "56h")
+	--   S:Countdown("Next Boss", 300)            -- 5m 0s -> 0s
+	--   S:Countdown("Full Moon", 1380, "down")
+	--   S:Countdown("Uptime", 56*3600, "up")
+	-- =========================================================================
+	function Window:AddGameStatus(config)
+		config = config or {}
+		local title = config.Title or "Game Status"
+		local icon = parseIcon(config.Icon or "timer")
+		local panelW = tonumber(config.Width) or 232
+		local showBeta = config.Beta
+		if showBeta == nil then showBeta = true end
+		local enabled = config.Enabled
+		if enabled == nil then enabled = true end
+		local rows = {}
+
+		local Panel = Instance.new("Frame")
+		Panel.Name = "GameStatus"
+		Panel.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+		Panel.BorderSizePixel = 0
+		Panel.Size = UDim2.new(0, panelW, 0, 40)
+		Panel.Position = config.Position or UDim2.new(0, 20, 0, 130)
+		Panel.AutomaticSize = Enum.AutomaticSize.Y
+		Panel.ZIndex = 500
+		Panel.Active = true
+		Panel.Visible = enabled
+		Panel.Parent = ScreenGui
+
+		local PanelCorner = Instance.new("UICorner")
+		PanelCorner.CornerRadius = UDim.new(0, 10)
+		PanelCorner.Parent = Panel
+
+		local PanelStroke = Instance.new("UIStroke")
+		PanelStroke.Color = Color3.fromRGB(45, 45, 52)
+		PanelStroke.Thickness = 1.2
+		PanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		PanelStroke.Parent = Panel
+
+		local PanelLayout = Instance.new("UIListLayout")
+		PanelLayout.FillDirection = Enum.FillDirection.Vertical
+		PanelLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		PanelLayout.Padding = UDim.new(0, 0)
+		PanelLayout.Parent = Panel
+
+		-- Header doubles as the drag handle
+		local Header = Instance.new("Frame")
+		Header.Name = "Header"
+		Header.BackgroundTransparency = 1
+		Header.Size = UDim2.new(1, 0, 0, 34)
+		Header.LayoutOrder = 1
+		Header.ZIndex = 501
+		Header.Active = true
+		Header.Parent = Panel
+
+		local HeaderIcon = Instance.new("ImageLabel")
+		HeaderIcon.Name = "Icon"
+		HeaderIcon.BackgroundTransparency = 1
+		HeaderIcon.AnchorPoint = Vector2.new(0, 0.5)
+		HeaderIcon.Position = UDim2.new(0, 10, 0.5, 0)
+		HeaderIcon.Size = UDim2.new(0, 16, 0, 16)
+		HeaderIcon.ZIndex = 502
+		HeaderIcon.ScaleType = Enum.ScaleType.Fit
+		HeaderIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+		if icon then Astral.ApplyIcon(HeaderIcon, icon) end
+		HeaderIcon.Parent = Header
+
+		local TitleLabel = Instance.new("TextLabel")
+		TitleLabel.Name = "Title"
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
+		TitleLabel.Position = UDim2.new(0, 34, 0.5, 0)
+		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 34 - 76), 1, 0)
+		TitleLabel.Font = Enum.Font.GothamBold
+		TitleLabel.Text = title
+		TitleLabel.TextSize = 13
+		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+		TitleLabel.ZIndex = 502
+		TitleLabel.Parent = Header
+
+		if showBeta then
+			local BetaPill = Instance.new("Frame")
+			BetaPill.Name = "Beta"
+			BetaPill.BackgroundColor3 = Color3.fromRGB(34, 30, 14)
+			BetaPill.BorderSizePixel = 0
+			BetaPill.AnchorPoint = Vector2.new(1, 0.5)
+			BetaPill.Position = UDim2.new(1, -34, 0.5, 0)
+			BetaPill.Size = UDim2.new(0, 42, 0, 16)
+			BetaPill.ZIndex = 502
+			BetaPill.Parent = Header
+
+			local BetaCorner = Instance.new("UICorner")
+			BetaCorner.CornerRadius = UDim.new(0, 4)
+			BetaCorner.Parent = BetaPill
+
+			local BetaStroke = Instance.new("UIStroke")
+			BetaStroke.Color = AccentColor
+			BetaStroke.Thickness = 1
+			BetaStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			BetaStroke.Parent = BetaPill
+
+			local BetaText = Instance.new("TextLabel")
+			BetaText.Name = "Label"
+			BetaText.BackgroundTransparency = 1
+			BetaText.Size = UDim2.new(1, 0, 1, 0)
+			BetaText.Font = Enum.Font.GothamBold
+			BetaText.Text = "BETA"
+			BetaText.TextSize = 9
+			BetaText.TextColor3 = AccentColor
+			BetaText.ZIndex = 503
+			BetaText.Parent = BetaPill
+
+			onAccentChange(function(c)
+				BetaText.TextColor3 = c
+				BetaStroke.Color = c
+			end)
+		end
+
+		local CloseBtn = Instance.new("TextButton")
+		CloseBtn.Name = "Close"
+		CloseBtn.BackgroundTransparency = 1
+		CloseBtn.AnchorPoint = Vector2.new(1, 0.5)
+		CloseBtn.Position = UDim2.new(1, -8, 0.5, 0)
+		CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+		CloseBtn.Text = ""
+		CloseBtn.AutoButtonColor = false
+		CloseBtn.ZIndex = 503
+		CloseBtn.Parent = Header
+
+		local CloseIcon = Instance.new("ImageLabel")
+		CloseIcon.Name = "Icon"
+		CloseIcon.BackgroundTransparency = 1
+		CloseIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		CloseIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		CloseIcon.Size = UDim2.new(0, 12, 0, 12)
+		CloseIcon.Image = Astral.Icons.Close or Astral.Icons.close
+		CloseIcon.ImageColor3 = Color3.fromRGB(150, 150, 158)
+		CloseIcon.ScaleType = Enum.ScaleType.Fit
+		CloseIcon.ZIndex = 504
+		CloseIcon.Parent = CloseBtn
+
+		local Sep = Instance.new("Frame")
+		Sep.Name = "Separator"
+		Sep.BackgroundColor3 = Color3.fromRGB(40, 40, 46)
+		Sep.BorderSizePixel = 0
+		Sep.AnchorPoint = Vector2.new(0.5, 1)
+		Sep.Position = UDim2.new(0.5, 0, 1, 0)
+		Sep.Size = UDim2.new(1, -20, 0, 1)
+		Sep.ZIndex = 502
+		Sep.Parent = Header
+
+		local RowsContainer = Instance.new("Frame")
+		RowsContainer.Name = "Rows"
+		RowsContainer.BackgroundTransparency = 1
+		RowsContainer.Size = UDim2.new(1, 0, 0, 0)
+		RowsContainer.AutomaticSize = Enum.AutomaticSize.Y
+		RowsContainer.LayoutOrder = 2
+		RowsContainer.ZIndex = 501
+		RowsContainer.Parent = Panel
+
+		local RowsLayout = Instance.new("UIListLayout")
+		RowsLayout.FillDirection = Enum.FillDirection.Vertical
+		RowsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		RowsLayout.Padding = UDim.new(0, 3)
+		RowsLayout.Parent = RowsContainer
+
+		local RowsPad = Instance.new("UIPadding")
+		RowsPad.PaddingLeft = UDim.new(0, 10)
+		RowsPad.PaddingRight = UDim.new(0, 10)
+		RowsPad.PaddingTop = UDim.new(0, 3)
+		RowsPad.PaddingBottom = UDim.new(0, 10)
+		RowsPad.Parent = RowsContainer
+
+		local function makeRow(name, value)
+			local Row = Instance.new("Frame")
+			Row.Name = "Row"
+			Row.BackgroundTransparency = 1
+			Row.Size = UDim2.new(1, 0, 0, 20)
+			Row.ZIndex = 501
+			Row.Parent = RowsContainer
+
+			local NameLabel = Instance.new("TextLabel")
+			NameLabel.Name = "Name"
+			NameLabel.BackgroundTransparency = 1
+			NameLabel.AnchorPoint = Vector2.new(0, 0.5)
+			NameLabel.Position = UDim2.new(0, 0, 0.5, 0)
+			NameLabel.Size = UDim2.new(0.55, 0, 1, 0)
+			NameLabel.Font = Enum.Font.Gotham
+			NameLabel.Text = tostring(name)
+			NameLabel.TextSize = 12
+			NameLabel.TextColor3 = Color3.fromRGB(150, 150, 158)
+			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			NameLabel.ZIndex = 502
+			NameLabel.Parent = Row
+
+			local ValueLabel = Instance.new("TextLabel")
+			ValueLabel.Name = "Value"
+			ValueLabel.BackgroundTransparency = 1
+			ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
+			ValueLabel.Position = UDim2.new(1, 0, 0.5, 0)
+			ValueLabel.Size = UDim2.new(0.45, 0, 1, 0)
+			ValueLabel.Font = Enum.Font.GothamBold
+			ValueLabel.Text = tostring(value or "--")
+			ValueLabel.TextSize = 12
+			ValueLabel.TextColor3 = AccentColor
+			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
+			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			ValueLabel.ZIndex = 502
+			ValueLabel.Parent = Row
+
+			onAccentChange(function(c) ValueLabel.TextColor3 = c end)
+
+			return { Frame = Row, Name = NameLabel, Value = ValueLabel, token = 0 }
+		end
+
+		-- Drag the whole panel by its header
+		local dragging, dragStart, startPos = false, nil, nil
+		Header.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				startPos = Panel.Position
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then dragging = false end
+				end)
+			end
+		end)
+		UserInputService.InputChanged:Connect(function(input)
+			if not dragging then return end
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				local dx = input.Position.X - dragStart.X
+				local dy = input.Position.Y - dragStart.Y
+				Panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + dx, startPos.Y.Scale, startPos.Y.Offset + dy)
+			end
+		end)
+
+		CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play() end)
+		CloseBtn.MouseLeave:Connect(function() TweenService:Create(CloseIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(150, 150, 158)}):Play() end)
+		CloseBtn.MouseButton1Click:Connect(function() enabled = false; Panel.Visible = false end)
+
+		local function fmtDuration(sec)
+			sec = math.max(0, math.floor(sec))
+			local h = math.floor(sec / 3600)
+			local m = math.floor((sec % 3600) / 60)
+			local s = sec % 60
+			if h > 0 then return h .. "h " .. m .. "m" end
+			if m > 0 then return m .. "m " .. s .. "s" end
+			return s .. "s"
+		end
+
+		local GameStatus = {}
+
+		function GameStatus:Set(name, value)
+			name = tostring(name)
+			local row = rows[name]
+			if not row then
+				row = makeRow(name, value)
+				rows[name] = row
+			end
+			row.token = (row.token or 0) + 1
+			row.Value.Text = tostring(value)
+			return GameStatus
+		end
+		GameStatus.SetValue = GameStatus.Set
+
+		function GameStatus:Get(name)
+			local r = rows[tostring(name)]
+			return r and r.Value.Text or nil
+		end
+
+		function GameStatus:Remove(name)
+			name = tostring(name)
+			local r = rows[name]
+			if r then pcall(function() r.Frame:Destroy() end); rows[name] = nil end
+			return GameStatus
+		end
+
+		function GameStatus:Clear()
+			for _, r in pairs(rows) do pcall(function() r.Frame:Destroy() end) end
+			rows = {}
+			return GameStatus
+		end
+
+		function GameStatus:SetRows(list)
+			GameStatus:Clear()
+			for _, r in ipairs(list or {}) do
+				if type(r) == "table" then GameStatus:Set(r.Name or r[1], r.Value or r[2]) end
+			end
+			return GameStatus
+		end
+
+		-- Live row timer: GameStatus:Countdown("Next Boss", 300) / (..., "up")
+		function GameStatus:Countdown(name, seconds, mode, onDone)
+			if type(mode) == "function" then onDone = mode; mode = "down" end
+			mode = mode or "down"
+			name = tostring(name)
+			if not rows[name] then GameStatus:Set(name, "") end
+			local row = rows[name]
+			row.token = (row.token or 0) + 1
+			local myToken = row.token
+			local value = math.max(0, math.floor(tonumber(seconds) or 0))
+			task.spawn(function()
+				while true do
+					if row.token ~= myToken then return end
+					row.Value.Text = fmtDuration(value)
+					if mode == "up" then
+						task.wait(1)
+						value = value + 1
+					else
+						if value <= 0 then break end
+						task.wait(1)
+						value = value - 1
+					end
+				end
+				if row.token == myToken and mode ~= "up" and onDone then task.spawn(onDone) end
+			end)
+			return GameStatus
+		end
+
+		function GameStatus:StopCountdown(name)
+			local r = rows[tostring(name)]
+			if r then r.token = (r.token or 0) + 1 end
+			return GameStatus
+		end
+
+		function GameStatus:SetTitle(t) TitleLabel.Text = tostring(t); return GameStatus end
+		function GameStatus:SetPosition(pos) Panel.Position = pos; return GameStatus end
+		function GameStatus:Show() enabled = true; Panel.Visible = true; return GameStatus end
+		function GameStatus:Hide() enabled = false; Panel.Visible = false; return GameStatus end
+		function GameStatus:SetEnabled(v)
+			if v then return GameStatus:Show() end
+			return GameStatus:Hide()
+		end
+		function GameStatus:Toggle() return GameStatus:SetEnabled(not enabled) end
+		function GameStatus:IsEnabled() return enabled end
+		function GameStatus:Destroy() pcall(function() Panel:Destroy() end) end
+
+		if config.Rows then GameStatus:SetRows(config.Rows) end
+
+		return GameStatus
+	end
+
 	return Window
 end
 
