@@ -1694,7 +1694,7 @@ function Astral:MakeWindow(config)
 			
 			if isActive then
 				tab.Gradient.Enabled = true
-				tab.Gradient.Color = ColorSequence.new(AccentColor, AccentColor * 0.5)
+				tab.Gradient.Color = ColorSequence.new(AccentColor, Color3.new(AccentColor.R * 0.5, AccentColor.G * 0.5, AccentColor.B * 0.5))
 				tab.Gradient.Transparency = NumberSequence.new({
 					NumberSequenceKeypoint.new(0, 0),
 					NumberSequenceKeypoint.new(0.7, 0.1),
@@ -2101,7 +2101,11 @@ function Astral:MakeWindow(config)
 		end)
 
 		if tabIndex == 1 then
-			switchTab(tabData)
+			-- Never let a tab-switch error abort the whole UI build
+			local okSwitch, errSwitch = pcall(switchTab, tabData)
+			if not okSwitch then
+				warn("[Astral] first tab switch failed: " .. tostring(errSwitch))
+			end
 		end
 
 		-- Tab Object API
