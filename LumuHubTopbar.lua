@@ -659,9 +659,9 @@ function Astral:MakeWindow(config)
 	-- ===== Bar layout: two separate boxes with a gap =====
 	--   [ tab1 tab2 tab3 ]   [ v ]
 	local BarPad = 4
-	local CollapseW = 34
-	local BoxGap = 8
-	local TabsBoxW = -60 -- window width minus margins + collapse box + gap
+	local CollapseW = 30
+	local BoxGap = 14
+	local TabsBoxW = -(10 + BoxGap + CollapseW + 10) -- left margin + gap + collapse box + right margin
 
 	local TabBarSection = Instance.new("Frame")
 	TabBarSection.Name = "TabsBox"
