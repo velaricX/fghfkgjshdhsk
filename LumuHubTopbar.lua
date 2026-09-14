@@ -656,16 +656,38 @@ function Astral:MakeWindow(config)
 	local TabBarHeight = 44
 	local ContentTop = TabBarTop + TabBarHeight + 6
 
+	-- ===== Bar section: a rounded panel that holds the tabs + arrows =====
+	local BarPad = 4
+	local TabBarSection = Instance.new("Frame")
+	TabBarSection.Name = "TabBarSection"
+	TabBarSection.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+	TabBarSection.BackgroundTransparency = 0.15
+	TabBarSection.BorderSizePixel = 0
+	TabBarSection.Position = UDim2.new(0, 10, 0, TabBarTop - BarPad)
+	TabBarSection.Size = UDim2.new(1, -20, 0, TabBarHeight + BarPad * 2)
+	TabBarSection.ZIndex = 2
+	TabBarSection.Parent = MainFrame
+
+	local TabBarCorner = Instance.new("UICorner")
+	TabBarCorner.CornerRadius = UDim.new(0, 8)
+	TabBarCorner.Parent = TabBarSection
+
+	local TabBarStroke = Instance.new("UIStroke")
+	TabBarStroke.Color = Color3.fromRGB(45, 45, 50)
+	TabBarStroke.Thickness = 1
+	TabBarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	TabBarStroke.Parent = TabBarSection
+
 	-- Horizontal tab strip (leaves room for the left/right arrows)
 	local ArrowW = 26
 	local ArrowGap = 6
-	local stripLeft = 10 + ArrowW + ArrowGap
-	local stripRight = 10 + ArrowW + ArrowGap
+	local stripLeft = 8 + ArrowW + ArrowGap
+	local stripRight = 8 + ArrowW + ArrowGap
 	local TabContainer = Instance.new("ScrollingFrame")
 	TabContainer.Name = "TabContainer"
 	TabContainer.BackgroundTransparency = 1
 	TabContainer.BorderSizePixel = 0
-	TabContainer.Position = UDim2.new(0, stripLeft, 0, TabBarTop)
+	TabContainer.Position = UDim2.new(0, stripLeft, 0, BarPad)
 	TabContainer.Size = UDim2.new(1, -stripLeft - stripRight, 0, TabBarHeight)
 	TabContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
 	TabContainer.ScrollBarThickness = 3
@@ -673,7 +695,7 @@ function Astral:MakeWindow(config)
 	TabContainer.ScrollingDirection = Enum.ScrollingDirection.X
 	TabContainer.ClipsDescendants = true
 	TabContainer.ZIndex = 3
-	TabContainer.Parent = MainFrame
+	TabContainer.Parent = TabBarSection
 
 	local TabListLayout = Instance.new("UIListLayout")
 	TabListLayout.Parent = TabContainer
@@ -722,12 +744,12 @@ function Astral:MakeWindow(config)
 		Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		Btn.BorderSizePixel = 0
 		Btn.AnchorPoint = Vector2.new(anchorX, 0.5)
-		Btn.Position = UDim2.new(xUDim.X.Scale, xUDim.X.Offset, 0, TabBarTop + TabBarHeight / 2)
+		Btn.Position = UDim2.new(xUDim.X.Scale, xUDim.X.Offset, 0, 0.5)
 		Btn.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
 		Btn.Text = ""
 		Btn.AutoButtonColor = false
 		Btn.ZIndex = 6
-		Btn.Parent = MainFrame
+		Btn.Parent = TabBarSection
 
 		local Corner = Instance.new("UICorner")
 		Corner.CornerRadius = UDim.new(0, 6)
@@ -767,8 +789,8 @@ function Astral:MakeWindow(config)
 		return Btn
 	end
 
-	local TabsLeft = makeTabArrow("TabsLeft", Astral.Icons.left_arrow or Astral.Icons.Left, UDim2.new(0, 10, 0, 0), 0, -1)
-	local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -10, 0, 0), 1, 1)
+	local TabsLeft = makeTabArrow("TabsLeft", Astral.Icons.left_arrow or Astral.Icons.Left, UDim2.new(0, 8, 0, 0), 0, -1)
+	local TabsRight = makeTabArrow("TabsRight", Astral.Icons.right_arrow, UDim2.new(1, -8, 0, 0), 1, 1)
 
 	-- Hide an arrow when there is nothing more to scroll that way
 	local function updateTabArrows()
