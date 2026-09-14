@@ -4414,6 +4414,41 @@ function Astral:MakeWindow(config)
 		--     },
 		--   })
 		-- =========================================================================
+		-- =========================================================================
+		-- MULTIBUTTON: card with a grid of clickable buttons.
+		-- Buttons can be text only, icon only, or icon + text.
+		--   Tab:AddMultiButton({
+		--     Title = "Quick Teleports",
+		--     Columns = 2,                     -- optional (default 2)
+		--     ButtonColor = Color3.fromRGB(..),-- optional: all buttons this color
+		--     Buttons = {
+		--       {Title = "sea 1", Callback = function() end},
+		--       {Title = "sea 2", Icon = "star", Callback = function() end},
+		--       {Icon = "chest", Color = "red", Callback = function() end},  -- icon only
+		--     },
+		--   })
+		-- If EVERY button is icon-only they render as big square icon tiles.
+		-- =========================================================================
+		local function parseButtonColor(v)
+			if typeof(v) == "Color3" then return v end
+			if type(v) == "string" then
+				local named = {
+					red = Color3.fromRGB(231, 76, 60),
+					green = Color3.fromRGB(46, 204, 113),
+					blue = Color3.fromRGB(0, 153, 235),
+					cyan = Color3.fromRGB(0, 210, 255),
+					purple = Color3.fromRGB(138, 90, 255),
+					pink = Color3.fromRGB(255, 90, 180),
+					orange = Color3.fromRGB(243, 156, 18),
+					gold = Color3.fromRGB(241, 196, 15),
+					white = Color3.fromRGB(240, 240, 245),
+					dark = Color3.fromRGB(40, 40, 46),
+				}
+				return named[v:lower()]
+			end
+			return nil
+		end
+
 		function TabObject:AddMultiButton(cfg)
 			cfg = cfg or {}
 			local title = cfg.Title or "Multi Button"
@@ -4422,13 +4457,20 @@ function Astral:MakeWindow(config)
 			local items = cfg.Buttons or {}
 			local columns = math.max(1, math.floor(cfg.Columns or 2))
 			local hasDesc = description and description ~= ""
+			local cardButtonColor = parseButtonColor(cfg.ButtonColor)
+
+			-- icon-only mode: every button has no title -> big square tiles
+			local iconOnlyMode = #items > 0
+			for _, it in ipairs(items) do
+				if it and it.Title and it.Title ~= "" then iconOnlyMode = false break end
+			end
 
 			local pad = 10
 			local gap = 10
-			local btnH = 34
+			local btnH = iconOnlyMode and 64 or 34
 			local headerH = hasDesc and 36 or 22
 			local rows = math.max(1, math.ceil(#items / columns))
-			local gridH = rows * btnH + (rows - 1) * 8
+			local gridH = rows * btnH + (rows - 1) * gap
 			local calculatedHeight = pad + headerH + 10 + gridH + pad
 
 			local Card = Instance.new("Frame")
@@ -4531,26 +4573,28 @@ function Astral:MakeWindow(config)
 			local GridLayout = Instance.new("UIGridLayout")
 			if columns <= 1 then
 				GridLayout.CellSize = UDim2.new(1, 0, 0, btnH)
-				GridLayout.CellPadding = UDim2.new(0, 0, 0, 8)
+				GridLayout.CellPadding = UDim2.new(0, 0, 0, gap)
 			else
-				-- shrink cells by the total gap so N columns fit exactly one row
 				local shrink = math.ceil((columns - 1) * gap / columns)
 				GridLayout.CellSize = UDim2.new(1 / columns, -shrink, 0, btnH)
-				GridLayout.CellPadding = UDim2.new(0, gap, 0, 8)
+				GridLayout.CellPadding = UDim2.new(0, gap, 0, gap)
 			end
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.FillDirectionMaxCells = columns
 			GridLayout.Parent = Grid
+
+			local accentButtons = {}
 
 			for i, item in ipairs(items) do
 				item = item or {}
 				local bTitle = item.Title
 				local bIcon = parseIcon(item.Icon)
 				local bCallback = item.Callback or function() end
+				local bColor = parseButtonColor(item.Color) or cardButtonColor
 
 				local Btn = Instance.new("TextButton")
 				Btn.Name = (bTitle or "icon") .. "_MultiBtn"
-				Btn.BackgroundColor3 = AccentColor
+				Btn.BackgroundColor3 = bColor or AccentColor
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
@@ -4558,7 +4602,7 @@ function Astral:MakeWindow(config)
 				Btn.Parent = Grid
 
 				local BtnCorner = Instance.new("UICorner")
-				BtnCorner.CornerRadius = UDim.new(0, 6)
+				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
 
 				local BtnScale = Instance.new("UIScale")
@@ -4585,7 +4629,9 @@ function Astral:MakeWindow(config)
 					local BIcon = Instance.new("ImageLabel")
 					BIcon.Name = "Icon"
 					BIcon.BackgroundTransparency = 1
-					BIcon.Size = UDim2.new(0, 18, 0, 18)
+					-- icon-only tiles get a much bigger icon
+					local iSize = iconOnlyMode and 34 or 18
+					BIcon.Size = UDim2.new(0, iSize, 0, iSize)
 					BIcon.LayoutOrder = 1
 					Astral.ApplyIcon(BIcon, bIcon)
 					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
@@ -4622,25 +4668,57 @@ function Astral:MakeWindow(config)
 					end
 				end)
 				Btn.MouseEnter:Connect(function()
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = AccentColor:Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = (bColor or AccentColor):Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = AccentColor}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = bColor or AccentColor}):Play()
 				end)
 
-				onAccentChange(function(c)
-					Btn.BackgroundColor3 = c
-				end)
+				-- only buttons without an explicit color follow the accent
+				if not bColor then
+					table.insert(accentButtons, Btn)
+					onAccentChange(function(c)
+						Btn.BackgroundColor3 = c
+					end)
+				end
 			end
 
 			registerElement(Card, calculatedHeight, cfg.Position)
 
+			-- Icon-only tiles: make the cells square once the real width is known
+			if iconOnlyMode then
+				GridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+				local function squareUp()
+					local w = Grid.AbsoluteSize.X
+					if w < 10 then return end
+					-- fit the row, but keep tiles a sane size (44..72px)
+					local fit = math.floor((w - (columns - 1) * gap) / columns)
+					local cell = math.clamp(fit, 44, 72)
+					local cellSize = UDim2.new(0, cell, 0, cell)
+					if GridLayout.CellSize ~= cellSize then
+						GridLayout.CellSize = cellSize
+						local newRows = math.max(1, math.ceil(#items / columns))
+						local newGridH = newRows * cell + (newRows - 1) * gap
+						Grid.Size = UDim2.new(1, -pad * 2, 0, newGridH)
+						local newCardH = pad + headerH + 10 + newGridH + pad
+						Card.Size = UDim2.new(1, 0, 0, newCardH)
+						for _, el in ipairs(elements) do
+							if el.Frame == Card then
+								el.Height = newCardH
+								break
+							end
+						end
+						distributeElements()
+					end
+				end
+				Grid:GetPropertyChangedSignal("AbsoluteSize"):Connect(squareUp)
+				task.defer(squareUp)
+			end
+
 			local MultiController = {}
 			function MultiController:SetAccent(color)
-				for _, b in ipairs(Grid:GetChildren()) do
-					if b:IsA("TextButton") then
-						b.BackgroundColor3 = color
-					end
+				for _, b in ipairs(accentButtons) do
+					pcall(function() b.BackgroundColor3 = color end)
 				end
 			end
 			return MultiController
