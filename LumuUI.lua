@@ -4401,11 +4401,256 @@ function Astral:MakeWindow(config)
 			return KeybindController
 		end
 
+		-- =========================================================================
+		-- MULTIBUTTON: card with a grid of clickable buttons.
+		-- Buttons can be text only, icon only, or icon + text.
+		--   Tab:AddMultiButton({
+		--     Title = "Quick Teleports",
+		--     Columns = 2,               -- optional (default 2)
+		--     Buttons = {
+		--       {Title = "sea 1", Callback = function() end},
+		--       {Title = "sea 2", Icon = "star", Callback = function() end},
+		--       {Icon = "chest", Callback = function() end},  -- icon only
+		--     },
+		--   })
+		-- =========================================================================
+		function TabObject:AddMultiButton(cfg)
+			cfg = cfg or {}
+			local title = cfg.Title or "Multi Button"
+			local description = cfg.Description
+			local cardIcon = parseIcon(cfg.Icon)
+			local items = cfg.Buttons or {}
+			local columns = math.max(1, math.floor(cfg.Columns or 2))
+			local hasDesc = description and description ~= ""
+
+			local pad = 10
+			local gap = 10
+			local btnH = 34
+			local headerH = hasDesc and 36 or 22
+			local rows = math.max(1, math.ceil(#items / columns))
+			local gridH = rows * btnH + (rows - 1) * 8
+			local calculatedHeight = pad + headerH + 10 + gridH + pad
+
+			local Card = Instance.new("Frame")
+			Card.Name = title .. "_MultiButton"
+			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BorderSizePixel = 0
+			Card.Size = UDim2.new(1, 0, 0, calculatedHeight)
+
+			local CardCorner = Instance.new("UICorner")
+			CardCorner.CornerRadius = UDim.new(0, 8)
+			CardCorner.Parent = Card
+
+			local CardStroke = Instance.new("UIStroke")
+			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Thickness = 1
+			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			CardStroke.Parent = Card
+
+			-- Optional card icon
+			if cardIcon then
+				local IconContainer = Instance.new("Frame")
+				IconContainer.Name = "IconContainer"
+				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BorderSizePixel = 0
+				IconContainer.Position = UDim2.new(0, pad, 0, pad)
+				IconContainer.Size = UDim2.new(0, 30, 0, 30)
+				IconContainer.Parent = Card
+
+				local IconCorner = Instance.new("UICorner")
+				IconCorner.CornerRadius = UDim.new(0, 6)
+				IconCorner.Parent = IconContainer
+
+				local IconStroke = Instance.new("UIStroke")
+				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Transparency = 0.3
+				IconStroke.Thickness = 1.5
+				IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				IconStroke.Parent = IconContainer
+
+				local IconLabel = Instance.new("ImageLabel")
+				IconLabel.Name = "Icon"
+				IconLabel.BackgroundTransparency = 1
+				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+				IconLabel.Size = UDim2.new(0, 18, 0, 18)
+				Astral.ApplyIcon(IconLabel, cardIcon)
+				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ScaleType = Enum.ScaleType.Fit
+				IconLabel.Parent = IconContainer
+			end
+
+			local textX = cardIcon and (pad + 38) or pad
+			local Header = Instance.new("Frame")
+			Header.Name = "Header"
+			Header.BackgroundTransparency = 1
+			Header.Position = UDim2.new(0, textX, 0, pad)
+			Header.Size = UDim2.new(1, -textX - pad, 0, headerH)
+			Header.Parent = Card
+
+			local HeaderLayout = Instance.new("UIListLayout")
+			HeaderLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			HeaderLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			HeaderLayout.Padding = UDim.new(0, 1)
+			HeaderLayout.Parent = Header
+
+			local TitleLabel = Instance.new("TextLabel")
+			TitleLabel.Name = "Title"
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
+			TitleLabel.Font = Enum.Font.GothamBold
+			tr(TitleLabel, title)
+			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			regText(TitleLabel, 12)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.Parent = Header
+
+			if hasDesc then
+				local DescLabel = Instance.new("TextLabel")
+				DescLabel.Name = "Description"
+				DescLabel.BackgroundTransparency = 1
+				DescLabel.Size = UDim2.new(1, 0, 0, 16)
+				DescLabel.Font = Enum.Font.Gotham
+				DescLabel.Text = description
+				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				regText(DescLabel, 10)
+				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+				DescLabel.Parent = Header
+			end
+
+			-- Button grid
+			local Grid = Instance.new("Frame")
+			Grid.Name = "ButtonGrid"
+			Grid.BackgroundTransparency = 1
+			Grid.Position = UDim2.new(0, pad, 0, pad + headerH + 10)
+			Grid.Size = UDim2.new(1, -pad * 2, 0, gridH)
+			Grid.Parent = Card
+
+			local GridLayout = Instance.new("UIGridLayout")
+			if columns <= 1 then
+				GridLayout.CellSize = UDim2.new(1, 0, 0, btnH)
+				GridLayout.CellPadding = UDim2.new(0, 0, 0, 8)
+			else
+				-- shrink cells by the total gap so N columns fit exactly one row
+				local shrink = math.ceil((columns - 1) * gap / columns)
+				GridLayout.CellSize = UDim2.new(1 / columns, -shrink, 0, btnH)
+				GridLayout.CellPadding = UDim2.new(0, gap, 0, 8)
+			end
+			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			GridLayout.FillDirectionMaxCells = columns
+			GridLayout.Parent = Grid
+
+			for i, item in ipairs(items) do
+				item = item or {}
+				local bTitle = item.Title
+				local bIcon = parseIcon(item.Icon)
+				local bCallback = item.Callback or function() end
+
+				local Btn = Instance.new("TextButton")
+				Btn.Name = (bTitle or "icon") .. "_MultiBtn"
+				Btn.BackgroundColor3 = AccentColor
+				Btn.BorderSizePixel = 0
+				Btn.Text = ""
+				Btn.AutoButtonColor = false
+				Btn.LayoutOrder = i
+				Btn.Parent = Grid
+
+				local BtnCorner = Instance.new("UICorner")
+				BtnCorner.CornerRadius = UDim.new(0, 6)
+				BtnCorner.Parent = Btn
+
+				local BtnScale = Instance.new("UIScale")
+				BtnScale.Scale = 1
+				BtnScale.Parent = Btn
+
+				-- Centered content row: icon and/or text
+				local Content = Instance.new("Frame")
+				Content.Name = "Content"
+				Content.BackgroundTransparency = 1
+				Content.Size = UDim2.new(1, -12, 1, 0)
+				Content.Position = UDim2.new(0, 6, 0, 0)
+				Content.Parent = Btn
+
+				local ContentLayout = Instance.new("UIListLayout")
+				ContentLayout.FillDirection = Enum.FillDirection.Horizontal
+				ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+				ContentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+				ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+				ContentLayout.Padding = UDim.new(0, 6)
+				ContentLayout.Parent = Content
+
+				if bIcon then
+					local BIcon = Instance.new("ImageLabel")
+					BIcon.Name = "Icon"
+					BIcon.BackgroundTransparency = 1
+					BIcon.Size = UDim2.new(0, 18, 0, 18)
+					BIcon.LayoutOrder = 1
+					Astral.ApplyIcon(BIcon, bIcon)
+					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					BIcon.ScaleType = Enum.ScaleType.Fit
+					BIcon.Parent = Content
+				end
+
+				if bTitle and bTitle ~= "" then
+					local BLabel = Instance.new("TextLabel")
+					BLabel.Name = "Label"
+					BLabel.BackgroundTransparency = 1
+					BLabel.Size = UDim2.new(0, 0, 1, 0)
+					BLabel.AutomaticSize = Enum.AutomaticSize.X
+					BLabel.Font = Enum.Font.GothamBold
+					BLabel.Text = bTitle
+					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					BLabel.TextSize = 12
+					BLabel.TextXAlignment = Enum.TextXAlignment.Center
+					BLabel.LayoutOrder = 2
+					BLabel.Parent = Content
+				end
+
+				Btn.MouseButton1Click:Connect(function()
+					task.spawn(bCallback)
+				end)
+				Btn.InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						TweenService:Create(BtnScale, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 0.95}):Play()
+					end
+				end)
+				Btn.InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+					end
+				end)
+				Btn.MouseEnter:Connect(function()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = AccentColor:Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
+				end)
+				Btn.MouseLeave:Connect(function()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = AccentColor}):Play()
+				end)
+
+				onAccentChange(function(c)
+					Btn.BackgroundColor3 = c
+				end)
+			end
+
+			registerElement(Card, calculatedHeight, cfg.Position)
+
+			local MultiController = {}
+			function MultiController:SetAccent(color)
+				for _, b in ipairs(Grid:GetChildren()) do
+					if b:IsA("TextButton") then
+						b.BackgroundColor3 = color
+					end
+				end
+			end
+			return MultiController
+		end
+
 		-- Fault tolerance: one bad element can never kill the whole UI build.
 		-- Any failing Add* call is skipped and reported instead of aborting.
 		do
 			local addNames = {"AddButton", "AddToggle", "AddTick", "AddSlider", "AddTextbox",
-				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard"}
+				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton"}
 			for _, addName in ipairs(addNames) do
 				local orig = TabObject[addName]
 				if type(orig) == "function" then
