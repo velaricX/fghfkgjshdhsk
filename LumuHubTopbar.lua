@@ -5774,7 +5774,7 @@ function Astral:MakeWindow(config)
 		TitleLabel.BackgroundTransparency = 1
 		TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
 		TitleLabel.Position = UDim2.new(0, 34, 0.5, 0)
-		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 34 - 76), 1, 0)
+		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 34 - 62), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
 		TitleLabel.Text = title
 		TitleLabel.TextSize = 13
@@ -5790,7 +5790,7 @@ function Astral:MakeWindow(config)
 			BetaPill.BackgroundColor3 = Color3.fromRGB(34, 30, 14)
 			BetaPill.BorderSizePixel = 0
 			BetaPill.AnchorPoint = Vector2.new(1, 0.5)
-			BetaPill.Position = UDim2.new(1, -34, 0.5, 0)
+			BetaPill.Position = UDim2.new(1, -10, 0.5, 0)
 			BetaPill.Size = UDim2.new(0, 42, 0, 16)
 			BetaPill.ZIndex = 502
 			BetaPill.Parent = Header
@@ -5821,29 +5821,6 @@ function Astral:MakeWindow(config)
 				BetaStroke.Color = c
 			end)
 		end
-
-		local CloseBtn = Instance.new("TextButton")
-		CloseBtn.Name = "Close"
-		CloseBtn.BackgroundTransparency = 1
-		CloseBtn.AnchorPoint = Vector2.new(1, 0.5)
-		CloseBtn.Position = UDim2.new(1, -8, 0.5, 0)
-		CloseBtn.Size = UDim2.new(0, 20, 0, 20)
-		CloseBtn.Text = ""
-		CloseBtn.AutoButtonColor = false
-		CloseBtn.ZIndex = 503
-		CloseBtn.Parent = Header
-
-		local CloseIcon = Instance.new("ImageLabel")
-		CloseIcon.Name = "Icon"
-		CloseIcon.BackgroundTransparency = 1
-		CloseIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-		CloseIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		CloseIcon.Size = UDim2.new(0, 12, 0, 12)
-		CloseIcon.Image = Astral.Icons.Close or Astral.Icons.close
-		CloseIcon.ImageColor3 = Color3.fromRGB(150, 150, 158)
-		CloseIcon.ScaleType = Enum.ScaleType.Fit
-		CloseIcon.ZIndex = 504
-		CloseIcon.Parent = CloseBtn
 
 		local Sep = Instance.new("Frame")
 		Sep.Name = "Separator"
@@ -5940,10 +5917,6 @@ function Astral:MakeWindow(config)
 				Panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + dx, startPos.Y.Scale, startPos.Y.Offset + dy)
 			end
 		end)
-
-		CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play() end)
-		CloseBtn.MouseLeave:Connect(function() TweenService:Create(CloseIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(150, 150, 158)}):Play() end)
-		CloseBtn.MouseButton1Click:Connect(function() enabled = false; Panel.Visible = false end)
 
 		local function fmtDuration(sec)
 			sec = math.max(0, math.floor(sec))
