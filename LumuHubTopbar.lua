@@ -759,7 +759,7 @@ function Astral:MakeWindow(config)
 	local function scrollTabs(delta)
 		local target = math.clamp(tabScrollX() + delta, 0, tabMaxScroll())
 		pcall(function()
-			TweenService:Create(TabContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			TweenService:Create(TabContainer, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 				CanvasPosition = Vector2.new(target, 0)
 			}):Play()
 		end)
@@ -768,18 +768,20 @@ function Astral:MakeWindow(config)
 	-- Mouse wheel scrolls the strip horizontally while hovering it
 	TabContainer.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseWheel then
-			scrollTabs(-input.Position.Z * 60)
+			scrollTabs(-input.Position.Z * 120)
 		end
 	end)
 
-	-- Hold left-click and drag the strip left / right to scroll it
+	-- Hold left-click (or touch) and drag the strip left / right to scroll it.
+	-- DragGain > 1 makes the strip travel further than the cursor so it feels fast.
+	local DragGain = 2.2
 	MainFrame:SetAttribute("TabDragMoved", false)
 	do
 		local dragActive, dragMoved = false, false
 		local dragStartX, dragStartCanvas = 0, 0
 
 		TabContainer.InputBegan:Connect(function(input)
-			if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+			if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
 			dragActive = true
 			dragMoved = false
 			dragStartX = input.Position.X
@@ -788,9 +790,9 @@ function Astral:MakeWindow(config)
 
 		UserInputService.InputChanged:Connect(function(input)
 			if not dragActive then return end
-			if input.UserInputType ~= Enum.UserInputType.MouseMovement then return end
-			local dx = input.Position.X - dragStartX
-			if not dragMoved and math.abs(dx) > 4 then
+			if input.UserInputType ~= Enum.UserInputType.MouseMovement and input.UserInputType ~= Enum.UserInputType.Touch then return end
+			local dx = (input.Position.X - dragStartX) * DragGain
+			if not dragMoved and math.abs(dx) > 3 then
 				dragMoved = true
 				MainFrame:SetAttribute("TabDragMoved", true)
 			end
@@ -801,9 +803,9 @@ function Astral:MakeWindow(config)
 		end)
 
 		UserInputService.InputEnded:Connect(function(input)
-			if input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+			if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
 			dragActive = false
-			task.delay(0.12, function()
+			task.delay(0.06, function()
 				dragMoved = false
 				MainFrame:SetAttribute("TabDragMoved", false)
 			end)
@@ -5708,22 +5710,48 @@ function Astral:MakeWindow(config)
 	--   S:Countdown("Full Moon", 1380, "down")
 	--   S:Countdown("Uptime", 56*3600, "up")
 	-- =========================================================================
+	-- =========================================================================
+	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	--   local S = Window:AddGameStatus({ Title = "Game Status" })
+	--   S:Set("Server Uptime", "56h")
+	--   S:SetRow("Next Boss", { Value = "5m", Icon = "timer", Color = "gold" })
+	--   S:Countdown("Next Full Moon", 1380)
+	-- =========================================================================
 	function Window:AddGameStatus(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
-		local panelW = tonumber(config.Width) or 232
+		local panelW = tonumber(config.Width) or 268
+		local rowH = tonumber(config.RowHeight) or 27
 		local showBeta = config.Beta
 		if showBeta == nil then showBeta = true end
 		local enabled = config.Enabled
 		if enabled == nil then enabled = true end
 		local rows = {}
 
+		local NAMED = {
+			red = Color3.fromRGB(231, 76, 60),
+			green = Color3.fromRGB(46, 204, 113),
+			blue = Color3.fromRGB(0, 153, 235),
+			cyan = Color3.fromRGB(0, 210, 255),
+			purple = Color3.fromRGB(138, 90, 255),
+			pink = Color3.fromRGB(255, 90, 180),
+			orange = Color3.fromRGB(243, 156, 18),
+			gold = Color3.fromRGB(241, 196, 15),
+			white = Color3.fromRGB(240, 240, 245),
+			gray = Color3.fromRGB(160, 160, 168),
+		}
+		local function parseColor(v)
+			if typeof(v) == "Color3" then return v end
+			if type(v) == "string" then return NAMED[v:lower()] end
+			return nil
+		end
+
 		local Panel = Instance.new("Frame")
 		Panel.Name = "GameStatus"
-		Panel.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 		Panel.BorderSizePixel = 0
-		Panel.Size = UDim2.new(0, panelW, 0, 40)
+		Panel.Size = UDim2.new(0, panelW, 0, 44)
 		Panel.Position = config.Position or UDim2.new(0, 20, 0, 130)
 		Panel.AutomaticSize = Enum.AutomaticSize.Y
 		Panel.ZIndex = 500
@@ -5732,11 +5760,11 @@ function Astral:MakeWindow(config)
 		Panel.Parent = ScreenGui
 
 		local PanelCorner = Instance.new("UICorner")
-		PanelCorner.CornerRadius = UDim.new(0, 10)
+		PanelCorner.CornerRadius = UDim.new(0, 12)
 		PanelCorner.Parent = Panel
 
 		local PanelStroke = Instance.new("UIStroke")
-		PanelStroke.Color = Color3.fromRGB(45, 45, 52)
+		PanelStroke.Color = Color3.fromRGB(52, 52, 62)
 		PanelStroke.Thickness = 1.2
 		PanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		PanelStroke.Parent = Panel
@@ -5750,8 +5778,9 @@ function Astral:MakeWindow(config)
 		-- Header doubles as the drag handle
 		local Header = Instance.new("Frame")
 		Header.Name = "Header"
-		Header.BackgroundTransparency = 1
-		Header.Size = UDim2.new(1, 0, 0, 34)
+		Header.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+		Header.BorderSizePixel = 0
+		Header.Size = UDim2.new(1, 0, 0, 40)
 		Header.LayoutOrder = 1
 		Header.ZIndex = 501
 		Header.Active = true
@@ -5761,8 +5790,8 @@ function Astral:MakeWindow(config)
 		HeaderIcon.Name = "Icon"
 		HeaderIcon.BackgroundTransparency = 1
 		HeaderIcon.AnchorPoint = Vector2.new(0, 0.5)
-		HeaderIcon.Position = UDim2.new(0, 10, 0.5, 0)
-		HeaderIcon.Size = UDim2.new(0, 16, 0, 16)
+		HeaderIcon.Position = UDim2.new(0, 12, 0.5, 0)
+		HeaderIcon.Size = UDim2.new(0, 18, 0, 18)
 		HeaderIcon.ZIndex = 502
 		HeaderIcon.ScaleType = Enum.ScaleType.Fit
 		HeaderIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
@@ -5773,11 +5802,11 @@ function Astral:MakeWindow(config)
 		TitleLabel.Name = "Title"
 		TitleLabel.BackgroundTransparency = 1
 		TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-		TitleLabel.Position = UDim2.new(0, 34, 0.5, 0)
-		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 34 - 62), 1, 0)
+		TitleLabel.Position = UDim2.new(0, 38, 0.5, 0)
+		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 38 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
 		TitleLabel.Text = title
-		TitleLabel.TextSize = 13
+		TitleLabel.TextSize = 14
 		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5790,13 +5819,13 @@ function Astral:MakeWindow(config)
 			BetaPill.BackgroundColor3 = Color3.fromRGB(34, 30, 14)
 			BetaPill.BorderSizePixel = 0
 			BetaPill.AnchorPoint = Vector2.new(1, 0.5)
-			BetaPill.Position = UDim2.new(1, -10, 0.5, 0)
-			BetaPill.Size = UDim2.new(0, 42, 0, 16)
+			BetaPill.Position = UDim2.new(1, -12, 0.5, 0)
+			BetaPill.Size = UDim2.new(0, 46, 0, 18)
 			BetaPill.ZIndex = 502
 			BetaPill.Parent = Header
 
 			local BetaCorner = Instance.new("UICorner")
-			BetaCorner.CornerRadius = UDim.new(0, 4)
+			BetaCorner.CornerRadius = UDim.new(0, 5)
 			BetaCorner.Parent = BetaPill
 
 			local BetaStroke = Instance.new("UIStroke")
@@ -5811,7 +5840,7 @@ function Astral:MakeWindow(config)
 			BetaText.Size = UDim2.new(1, 0, 1, 0)
 			BetaText.Font = Enum.Font.GothamBold
 			BetaText.Text = "BETA"
-			BetaText.TextSize = 9
+			BetaText.TextSize = 10
 			BetaText.TextColor3 = AccentColor
 			BetaText.ZIndex = 503
 			BetaText.Parent = BetaPill
@@ -5824,7 +5853,7 @@ function Astral:MakeWindow(config)
 
 		local Sep = Instance.new("Frame")
 		Sep.Name = "Separator"
-		Sep.BackgroundColor3 = Color3.fromRGB(40, 40, 46)
+		Sep.BackgroundColor3 = Color3.fromRGB(44, 44, 52)
 		Sep.BorderSizePixel = 0
 		Sep.AnchorPoint = Vector2.new(0.5, 1)
 		Sep.Position = UDim2.new(0.5, 0, 1, 0)
@@ -5844,34 +5873,48 @@ function Astral:MakeWindow(config)
 		local RowsLayout = Instance.new("UIListLayout")
 		RowsLayout.FillDirection = Enum.FillDirection.Vertical
 		RowsLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		RowsLayout.Padding = UDim.new(0, 3)
+		RowsLayout.Padding = UDim.new(0, 4)
 		RowsLayout.Parent = RowsContainer
 
 		local RowsPad = Instance.new("UIPadding")
-		RowsPad.PaddingLeft = UDim.new(0, 10)
-		RowsPad.PaddingRight = UDim.new(0, 10)
-		RowsPad.PaddingTop = UDim.new(0, 3)
-		RowsPad.PaddingBottom = UDim.new(0, 10)
+		RowsPad.PaddingLeft = UDim.new(0, 12)
+		RowsPad.PaddingRight = UDim.new(0, 12)
+		RowsPad.PaddingTop = UDim.new(0, 6)
+		RowsPad.PaddingBottom = UDim.new(0, 12)
 		RowsPad.Parent = RowsContainer
 
-		local function makeRow(name, value)
+		local ICON_GAP = 24
+
+		local function makeRow(name, value, iconAsset, colorOverride)
 			local Row = Instance.new("Frame")
 			Row.Name = "Row"
 			Row.BackgroundTransparency = 1
-			Row.Size = UDim2.new(1, 0, 0, 20)
+			Row.Size = UDim2.new(1, 0, 0, rowH)
 			Row.ZIndex = 501
 			Row.Parent = RowsContainer
+
+			local IconLabel = Instance.new("ImageLabel")
+			IconLabel.Name = "Icon"
+			IconLabel.BackgroundTransparency = 1
+			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
+			IconLabel.Position = UDim2.new(0, 0, 0.5, 0)
+			IconLabel.Size = UDim2.new(0, 17, 0, 17)
+			IconLabel.Visible = false
+			IconLabel.ScaleType = Enum.ScaleType.Fit
+			IconLabel.ImageColor3 = colorOverride or Color3.fromRGB(205, 205, 214)
+			IconLabel.ZIndex = 502
+			IconLabel.Parent = Row
 
 			local NameLabel = Instance.new("TextLabel")
 			NameLabel.Name = "Name"
 			NameLabel.BackgroundTransparency = 1
 			NameLabel.AnchorPoint = Vector2.new(0, 0.5)
 			NameLabel.Position = UDim2.new(0, 0, 0.5, 0)
-			NameLabel.Size = UDim2.new(0.55, 0, 1, 0)
+			NameLabel.Size = UDim2.new(0.58, 0, 1, 0)
 			NameLabel.Font = Enum.Font.Gotham
 			NameLabel.Text = tostring(name)
-			NameLabel.TextSize = 12
-			NameLabel.TextColor3 = Color3.fromRGB(150, 150, 158)
+			NameLabel.TextSize = 13
+			NameLabel.TextColor3 = Color3.fromRGB(162, 162, 172)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			NameLabel.ZIndex = 502
@@ -5882,19 +5925,49 @@ function Astral:MakeWindow(config)
 			ValueLabel.BackgroundTransparency = 1
 			ValueLabel.AnchorPoint = Vector2.new(1, 0.5)
 			ValueLabel.Position = UDim2.new(1, 0, 0.5, 0)
-			ValueLabel.Size = UDim2.new(0.45, 0, 1, 0)
+			ValueLabel.Size = UDim2.new(0.42, 0, 1, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.Text = tostring(value or "--")
-			ValueLabel.TextSize = 12
-			ValueLabel.TextColor3 = AccentColor
+			ValueLabel.TextSize = 13
+			ValueLabel.TextColor3 = colorOverride or AccentColor
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			ValueLabel.ZIndex = 502
 			ValueLabel.Parent = Row
 
-			onAccentChange(function(c) ValueLabel.TextColor3 = c end)
+			local row = { Frame = Row, Name = NameLabel, Value = ValueLabel, Icon = IconLabel, color = colorOverride, token = 0 }
+			onAccentChange(function(c)
+				if not row.color then row.Value.TextColor3 = c end
+			end)
+			return row
+		end
 
-			return { Frame = Row, Name = NameLabel, Value = ValueLabel, token = 0 }
+		local function applyRow(row, opts)
+			opts = opts or {}
+			if opts.Icon ~= nil then
+				local asset = parseIcon(opts.Icon)
+				if asset then
+					Astral.ApplyIcon(row.Icon, asset)
+					row.Icon.Visible = true
+					row.Name.Position = UDim2.new(0, ICON_GAP, 0.5, 0)
+					row.Name.Size = UDim2.new(0.58, -ICON_GAP, 1, 0)
+				else
+					row.Icon.Visible = false
+					row.Name.Position = UDim2.new(0, 0, 0.5, 0)
+					row.Name.Size = UDim2.new(0.58, 0, 1, 0)
+				end
+			end
+			if opts.Color ~= nil then
+				row.color = parseColor(opts.Color)
+				row.Value.TextColor3 = row.color or AccentColor
+				row.Icon.ImageColor3 = row.color or Color3.fromRGB(205, 205, 214)
+			end
+			if opts.Value ~= nil then
+				row.Value.Text = tostring(opts.Value)
+			end
+			if opts.Name ~= nil then
+				row.Name.Text = tostring(opts.Name)
+			end
 		end
 
 		-- Drag the whole panel by its header
@@ -5930,18 +6003,36 @@ function Astral:MakeWindow(config)
 
 		local GameStatus = {}
 
-		function GameStatus:Set(name, value)
+		function GameStatus:SetRow(name, opts)
 			name = tostring(name)
+			opts = opts or {}
 			local row = rows[name]
 			if not row then
-				row = makeRow(name, value)
+				row = makeRow(name, opts.Value, nil, parseColor(opts.Color))
 				rows[name] = row
 			end
 			row.token = (row.token or 0) + 1
-			row.Value.Text = tostring(value)
+			applyRow(row, opts)
 			return GameStatus
 		end
+
+		function GameStatus:Set(name, value)
+			if type(value) == "table" then return GameStatus:SetRow(name, value) end
+			return GameStatus:SetRow(name, { Value = value })
+		end
 		GameStatus.SetValue = GameStatus.Set
+
+		function GameStatus:SetColor(name, color)
+			local r = rows[tostring(name)]
+			if r then applyRow(r, { Color = color }) end
+			return GameStatus
+		end
+
+		function GameStatus:SetIcon(name, iconInput)
+			local r = rows[tostring(name)]
+			if r then applyRow(r, { Icon = iconInput }) end
+			return GameStatus
+		end
 
 		function GameStatus:Get(name)
 			local r = rows[tostring(name)]
@@ -5964,7 +6055,14 @@ function Astral:MakeWindow(config)
 		function GameStatus:SetRows(list)
 			GameStatus:Clear()
 			for _, r in ipairs(list or {}) do
-				if type(r) == "table" then GameStatus:Set(r.Name or r[1], r.Value or r[2]) end
+				if type(r) == "table" then
+					local nm = r.Name or r[1]
+					if type(r[2]) == "table" then
+						GameStatus:SetRow(nm, r[2])
+					else
+						GameStatus:SetRow(nm, { Value = r.Value or r[2], Icon = r.Icon, Color = r.Color })
+					end
+				end
 			end
 			return GameStatus
 		end
@@ -6004,6 +6102,11 @@ function Astral:MakeWindow(config)
 		end
 
 		function GameStatus:SetTitle(t) TitleLabel.Text = tostring(t); return GameStatus end
+		function GameStatus:SetTitleIcon(iconInput)
+			local asset = parseIcon(iconInput)
+			if asset then Astral.ApplyIcon(HeaderIcon, asset) end
+			return GameStatus
+		end
 		function GameStatus:SetPosition(pos) Panel.Position = pos; return GameStatus end
 		function GameStatus:Show() enabled = true; Panel.Visible = true; return GameStatus end
 		function GameStatus:Hide() enabled = false; Panel.Visible = false; return GameStatus end
@@ -6019,6 +6122,7 @@ function Astral:MakeWindow(config)
 
 		return GameStatus
 	end
+
 
 	return Window
 end
