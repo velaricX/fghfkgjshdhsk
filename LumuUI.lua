@@ -3808,21 +3808,37 @@ function Astral:MakeWindow(config)
 				end
 				return string.format("%02d:%02d", math.floor(sec / 60), sec % 60)
 			end
-			function LabelController:SetCountdown(seconds, modeOrDone, onDone)
-				local mode, done = "down", nil
-				if type(modeOrDone) == "function" then
-					done = modeOrDone
-				elseif type(modeOrDone) == "string" then
-					mode = modeOrDone
+			-- Options table form lets you control the wording + where it shows:
+			--   label:SetCountdown(300, { Prefix = "Respawns in ", Suffix = "", Where = "description" })
+			--   Where = "description" (default) or "badge"
+			function LabelController:SetCountdown(seconds, modeOrOpts, onDone)
+				local mode, done, prefix, suffix, where = "down", nil, "", "", "description"
+				if type(modeOrOpts) == "function" then
+					done = modeOrOpts
+				elseif type(modeOrOpts) == "string" then
+					mode = modeOrOpts
 					done = onDone
+				elseif type(modeOrOpts) == "table" then
+					mode = modeOrOpts.Mode or "down"
+					done = modeOrOpts.OnDone or onDone
+					prefix = modeOrOpts.Prefix or ""
+					suffix = modeOrOpts.Suffix or ""
+					where = modeOrOpts.Where or "description"
 				end
 				countdownToken = countdownToken + 1
 				local myToken = countdownToken
 				local value = math.max(0, math.floor(tonumber(seconds) or 0))
+				local function write(txt)
+					if where == "badge" then
+						LabelController:SetStatus("waiting", prefix .. txt .. suffix)
+					else
+						LabelController:SetDescription(prefix .. txt .. suffix)
+					end
+				end
 				task.spawn(function()
 					while true do
 						if countdownToken ~= myToken then return end
-						LabelController:SetDescription(fmtTime(value))
+						write(fmtTime(value))
 						if mode == "up" then
 							task.wait(1)
 							value = value + 1

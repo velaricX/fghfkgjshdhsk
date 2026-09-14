@@ -1124,11 +1124,30 @@ function Astral:MakeWindow(config)
 	-- RGB Inputs
 	local RGBContainer = Instance.new("Frame")
 	RGBContainer.Name = "RGBContainer"
-	RGBContainer.BackgroundTransparency = 1
-	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight)
-	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding)
+	RGBContainer.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	RGBContainer.BackgroundTransparency = 0
+	RGBContainer.BorderSizePixel = 0
+	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight + 10)
+	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5)
 	RGBContainer.ZIndex = 202
 	RGBContainer.Parent = ColorPickerPanel
+
+	local RGBCorner = Instance.new("UICorner")
+	RGBCorner.CornerRadius = UDim.new(0, 8)
+	RGBCorner.Parent = RGBContainer
+
+	local RGBStroke = Instance.new("UIStroke")
+	RGBStroke.Color = Color3.fromRGB(52, 52, 60)
+	RGBStroke.Thickness = 1
+	RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	RGBStroke.Parent = RGBContainer
+
+	local RGBPad = Instance.new("UIPadding")
+	RGBPad.PaddingLeft = UDim.new(0, 6)
+	RGBPad.PaddingRight = UDim.new(0, 6)
+	RGBPad.PaddingTop = UDim.new(0, 5)
+	RGBPad.PaddingBottom = UDim.new(0, 5)
+	RGBPad.Parent = RGBContainer
 
 	-- RGB Inputs: one real horizontal layout (no manual math, no dup padding)
 	local RGBLayout = Instance.new("UIListLayout")
@@ -1186,11 +1205,30 @@ function Astral:MakeWindow(config)
 	-- Hex row: caption + input aligned on one clean line
 	local HexRow = Instance.new("Frame")
 	HexRow.Name = "HexRow"
-	HexRow.BackgroundTransparency = 1
-	HexRow.Size = UDim2.new(1, -24, 0, inputHeight)
-	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding + inputHeight + padding)
+	HexRow.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	HexRow.BackgroundTransparency = 0
+	HexRow.BorderSizePixel = 0
+	HexRow.Size = UDim2.new(1, -24, 0, inputHeight + 10)
+	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5 + inputHeight + 10 + 6)
 	HexRow.ZIndex = 202
 	HexRow.Parent = ColorPickerPanel
+
+	local HexCardCorner = Instance.new("UICorner")
+	HexCardCorner.CornerRadius = UDim.new(0, 8)
+	HexCardCorner.Parent = HexRow
+
+	local HexCardStroke = Instance.new("UIStroke")
+	HexCardStroke.Color = Color3.fromRGB(52, 52, 60)
+	HexCardStroke.Thickness = 1
+	HexCardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	HexCardStroke.Parent = HexRow
+
+	local HexCardPad = Instance.new("UIPadding")
+	HexCardPad.PaddingLeft = UDim.new(0, 6)
+	HexCardPad.PaddingRight = UDim.new(0, 6)
+	HexCardPad.PaddingTop = UDim.new(0, 5)
+	HexCardPad.PaddingBottom = UDim.new(0, 5)
+	HexCardPad.Parent = HexRow
 
 	local HexRowLayout = Instance.new("UIListLayout")
 	HexRowLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -1607,18 +1645,29 @@ function Astral:MakeWindow(config)
 	-- Options Scroll Frame
 	local OptionsScroll = Instance.new("ScrollingFrame")
 	OptionsScroll.Name = "OptionsScroll"
-	OptionsScroll.BackgroundTransparency = 1
+	OptionsScroll.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+	OptionsScroll.BackgroundTransparency = 0
 	OptionsScroll.BorderSizePixel = 0
-	OptionsScroll.ScrollBarThickness = 2
+	OptionsScroll.ScrollBarThickness = 3
 	OptionsScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 75)
 	OptionsScroll.ZIndex = 202
 	OptionsScroll.Parent = SelectorPanel
 
+	local OptionsCorner = Instance.new("UICorner")
+	OptionsCorner.CornerRadius = UDim.new(0, 8)
+	OptionsCorner.Parent = OptionsScroll
+
+	local OptionsStroke = Instance.new("UIStroke")
+	OptionsStroke.Color = Color3.fromRGB(52, 52, 60)
+	OptionsStroke.Thickness = 1
+	OptionsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	OptionsStroke.Parent = OptionsScroll
+
 	local OptionsPadding = Instance.new("UIPadding")
-	OptionsPadding.PaddingLeft = UDim.new(0, 4)
-	OptionsPadding.PaddingRight = UDim.new(0, 4)
-	OptionsPadding.PaddingTop = UDim.new(0, 4)
-	OptionsPadding.PaddingBottom = UDim.new(0, 4)
+	OptionsPadding.PaddingLeft = UDim.new(0, 6)
+	OptionsPadding.PaddingRight = UDim.new(0, 6)
+	OptionsPadding.PaddingTop = UDim.new(0, 6)
+	OptionsPadding.PaddingBottom = UDim.new(0, 6)
 	OptionsPadding.Parent = OptionsScroll
 
 	local OptionsList = Instance.new("UIListLayout")
@@ -4010,21 +4059,37 @@ function Astral:MakeWindow(config)
 				end
 				return string.format("%02d:%02d", math.floor(sec / 60), sec % 60)
 			end
-			function LabelController:SetCountdown(seconds, modeOrDone, onDone)
-				local mode, done = "down", nil
-				if type(modeOrDone) == "function" then
-					done = modeOrDone
-				elseif type(modeOrDone) == "string" then
-					mode = modeOrDone
+			-- Options table form lets you control the wording + where it shows:
+			--   label:SetCountdown(300, { Prefix = "Respawns in ", Suffix = "", Where = "description" })
+			--   Where = "description" (default) or "badge"
+			function LabelController:SetCountdown(seconds, modeOrOpts, onDone)
+				local mode, done, prefix, suffix, where = "down", nil, "", "", "description"
+				if type(modeOrOpts) == "function" then
+					done = modeOrOpts
+				elseif type(modeOrOpts) == "string" then
+					mode = modeOrOpts
 					done = onDone
+				elseif type(modeOrOpts) == "table" then
+					mode = modeOrOpts.Mode or "down"
+					done = modeOrOpts.OnDone or onDone
+					prefix = modeOrOpts.Prefix or ""
+					suffix = modeOrOpts.Suffix or ""
+					where = modeOrOpts.Where or "description"
 				end
 				countdownToken = countdownToken + 1
 				local myToken = countdownToken
 				local value = math.max(0, math.floor(tonumber(seconds) or 0))
+				local function write(txt)
+					if where == "badge" then
+						LabelController:SetStatus("waiting", prefix .. txt .. suffix)
+					else
+						LabelController:SetDescription(prefix .. txt .. suffix)
+					end
+				end
 				task.spawn(function()
 					while true do
 						if countdownToken ~= myToken then return end
-						LabelController:SetDescription(fmtTime(value))
+						write(fmtTime(value))
 						if mode == "up" then
 							task.wait(1)
 							value = value + 1
@@ -4090,6 +4155,13 @@ function Astral:MakeWindow(config)
 			ParaLayout.Padding = UDim.new(0, 8)
 			ParaLayout.Parent = ParaFrame
 
+			local ParaPad = Instance.new("UIPadding")
+			ParaPad.PaddingLeft = UDim.new(0, 12)
+			ParaPad.PaddingRight = UDim.new(0, 12)
+			ParaPad.PaddingTop = UDim.new(0, 12)
+			ParaPad.PaddingBottom = UDim.new(0, 12)
+			ParaPad.Parent = ParaFrame
+
 			-- Image (if provided)
 			if hasImage then
 				local ImageContainer = Instance.new("Frame")
@@ -4116,34 +4188,56 @@ function Astral:MakeWindow(config)
 			local TextContainer = Instance.new("Frame")
 			TextContainer.Name = "TextContainer"
 			TextContainer.BackgroundTransparency = 1
-			TextContainer.Size = UDim2.new(1, -24, 0, 50)
-			TextContainer.Position = UDim2.new(0, 12, 0, 0)
+			TextContainer.Size = UDim2.new(1, 0, 0, 0)
+			TextContainer.AutomaticSize = Enum.AutomaticSize.Y
 			TextContainer.LayoutOrder = 2
 			TextContainer.Parent = ParaFrame
 
-			local TextPadding = Instance.new("UIPadding")
-			TextPadding.PaddingLeft = UDim.new(0, 12)
-			TextPadding.PaddingRight = UDim.new(0, 12)
-			TextPadding.PaddingBottom = UDim.new(0, 8)
-			TextPadding.Parent = TextContainer
-
 			local TextLayout = Instance.new("UIListLayout")
 			TextLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			TextLayout.Padding = UDim.new(0, 4)
+			TextLayout.Padding = UDim.new(0, 6)
 			TextLayout.Parent = TextContainer
+
+			-- Title row (optional icon + title on one line)
+			local TitleRow = Instance.new("Frame")
+			TitleRow.Name = "TitleRow"
+			TitleRow.BackgroundTransparency = 1
+			TitleRow.Size = UDim2.new(1, 0, 0, 22)
+			TitleRow.LayoutOrder = 1
+			TitleRow.Parent = TextContainer
+
+			local TitleRowLayout = Instance.new("UIListLayout")
+			TitleRowLayout.FillDirection = Enum.FillDirection.Horizontal
+			TitleRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			TitleRowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			TitleRowLayout.Padding = UDim.new(0, 8)
+			TitleRowLayout.Parent = TitleRow
+
+			if icon then
+				local IconLabel = Instance.new("ImageLabel")
+				IconLabel.Name = "Icon"
+				IconLabel.BackgroundTransparency = 1
+				IconLabel.Size = UDim2.new(0, 18, 0, 18)
+				IconLabel.LayoutOrder = 1
+				IconLabel.ScaleType = Enum.ScaleType.Fit
+				Astral.ApplyIcon(IconLabel, icon)
+				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.Parent = TitleRow
+			end
 
 			-- Title
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
+			TitleLabel.Size = UDim2.new(1, (icon and -26 or 0), 1, 0)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			regText(TitleLabel, 14)
+			regText(TitleLabel, 15)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-			TitleLabel.LayoutOrder = 1
-			TitleLabel.Parent = TextContainer
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.LayoutOrder = 2
+			TitleLabel.Parent = TitleRow
 
 			-- Description
 			local DescLabel = Instance.new("TextLabel")
@@ -4153,18 +4247,20 @@ function Astral:MakeWindow(config)
 			DescLabel.AutomaticSize = Enum.AutomaticSize.Y
 			DescLabel.Font = Enum.Font.Gotham
 			DescLabel.Text = description
-			DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-			regText(DescLabel, 10)
+			DescLabel.TextColor3 = Color3.fromRGB(175, 175, 182)
+			regText(DescLabel, 12)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
+			DescLabel.LineHeight = 1.15
 			DescLabel.LayoutOrder = 2
 			DescLabel.Parent = TextContainer
 
 			-- Adjust frame height dynamically based on text size
 			local function adjustHeight()
 				local textHeight = TextLayout.AbsoluteContentSize.Y
-				local imageOffset = hasImage and 138 or 12
-				local totalHeight = imageOffset + textHeight + 16
+				local imageOffset = hasImage and 162 or 24
+				local totalHeight = imageOffset + textHeight
 				ParaFrame.Size = UDim2.new(1, 0, 0, totalHeight)
 				-- Update masonry layout height
 				for _, item in ipairs(elements) do
@@ -4619,16 +4715,16 @@ function Astral:MakeWindow(config)
 			-- Keybind Button (Right Side)
 			local KeybindButton = Instance.new("TextButton")
 			KeybindButton.Name = "KeybindButton"
-			KeybindButton.BackgroundColor3 = Color3.fromRGB(20, 20, 22) -- Dark background matching image
+			KeybindButton.BackgroundColor3 = Color3.fromRGB(34, 34, 40)
 			KeybindButton.BorderSizePixel = 0
 			KeybindButton.AnchorPoint = Vector2.new(1, 0.5)
 			KeybindButton.Position = UDim2.new(1, -12, 0.5, 0)
-			KeybindButton.Size = UDim2.new(0, 0, 0, 32) -- Dynamic width
+			KeybindButton.Size = UDim2.new(0, 0, 0, 34) -- Dynamic width
 			KeybindButton.AutomaticSize = Enum.AutomaticSize.X
 			KeybindButton.Font = Enum.Font.GothamBold
 			KeybindButton.Text = default.Name
 			KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-			KeybindButton.TextSize = 12
+			KeybindButton.TextSize = 13
 			KeybindButton.AutoButtonColor = false
 			KeybindButton.Parent = KeybindFrame
 
@@ -4636,10 +4732,16 @@ function Astral:MakeWindow(config)
 			ButtonCorner.CornerRadius = UDim.new(0, 8)
 			ButtonCorner.Parent = KeybindButton
 
-			-- No outline on the key box at all (flat, like the value boxes)
+			-- Clear outline so the key box is easy to see on the dark card
+			local ButtonStroke = Instance.new("UIStroke")
+			ButtonStroke.Color = Color3.fromRGB(70, 70, 80)
+			ButtonStroke.Thickness = 1.2
+			ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			ButtonStroke.Parent = KeybindButton
+
 			local ButtonPadding = Instance.new("UIPadding")
-			ButtonPadding.PaddingLeft = UDim.new(0, 16)
-			ButtonPadding.PaddingRight = UDim.new(0, 16)
+			ButtonPadding.PaddingLeft = UDim.new(0, 18)
+			ButtonPadding.PaddingRight = UDim.new(0, 18)
 			ButtonPadding.Parent = KeybindButton
 
 			local currentKey = default
@@ -4670,15 +4772,16 @@ function Astral:MakeWindow(config)
 			end
 
 			local function stopListeningVisual()
-				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(20, 20, 22)}):Play()
+				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(34, 34, 40)}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 80)}):Play()
 			end
 
 			local function startListening()
 				if listening then return end
 				listening = true
 				KeybindButton.Text = "..."
-				-- Clear any stuck hover glow (no white stroke while binding, hover only)
-				stopListeningVisual()
+				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = AccentColor}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 				sinkGameInput()
 
 				if inputConnection then inputConnection:Disconnect() end
@@ -4724,6 +4827,17 @@ function Astral:MakeWindow(config)
 			KeybindFrame.MouseLeave:Connect(function()
 				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
 				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+			end)
+
+			-- Key box hover: accent outline so it reads as clickable
+			KeybindButton.MouseEnter:Connect(function()
+				if listening then return end
+				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(44, 44, 52)}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
+			end)
+			KeybindButton.MouseLeave:Connect(function()
+				if listening then return end
+				stopListeningVisual()
 			end)
 
 			registerElement(KeybindFrame, calculatedHeight, keybindConfig.Position)
