@@ -656,15 +656,20 @@ function Astral:MakeWindow(config)
 	local TabBarHeight = 38
 	local ContentTop = TabBarTop + TabBarHeight + 6
 
-	-- ===== Bar section: a rounded panel that holds the tabs + arrows =====
+	-- ===== Bar layout: two separate boxes with a gap =====
+	--   [ tab1 tab2 tab3 ]   [ v ]
 	local BarPad = 4
+	local CollapseW = 34
+	local BoxGap = 8
+	local TabsBoxW = -60 -- window width minus margins + collapse box + gap
+
 	local TabBarSection = Instance.new("Frame")
-	TabBarSection.Name = "TabBarSection"
+	TabBarSection.Name = "TabsBox"
 	TabBarSection.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 	TabBarSection.BackgroundTransparency = 0.15
 	TabBarSection.BorderSizePixel = 0
 	TabBarSection.Position = UDim2.new(0, 10, 0, TabBarTop - BarPad)
-	TabBarSection.Size = UDim2.new(1, -20, 0, TabBarHeight + BarPad * 2)
+	TabBarSection.Size = UDim2.new(1, TabsBoxW, 0, TabBarHeight + BarPad * 2)
 	TabBarSection.ZIndex = 2
 	TabBarSection.Parent = MainFrame
 
@@ -678,11 +683,33 @@ function Astral:MakeWindow(config)
 	TabBarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	TabBarStroke.Parent = TabBarSection
 
-	-- Horizontal tab strip (leaves room for the left/right arrows)
+	-- Separate box for the collapse toggle, to the right with a gap
+	local CollapseBox = Instance.new("Frame")
+	CollapseBox.Name = "CollapseBox"
+	CollapseBox.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+	CollapseBox.BackgroundTransparency = 0.15
+	CollapseBox.BorderSizePixel = 0
+	CollapseBox.AnchorPoint = Vector2.new(1, 0)
+	CollapseBox.Position = UDim2.new(1, -10, 0, TabBarTop - BarPad)
+	CollapseBox.Size = UDim2.new(0, CollapseW, 0, TabBarHeight + BarPad * 2)
+	CollapseBox.ZIndex = 2
+	CollapseBox.Parent = MainFrame
+
+	local CollapseBoxCorner = Instance.new("UICorner")
+	CollapseBoxCorner.CornerRadius = UDim.new(0, 8)
+	CollapseBoxCorner.Parent = CollapseBox
+
+	local CollapseBoxStroke = Instance.new("UIStroke")
+	CollapseBoxStroke.Color = Color3.fromRGB(45, 45, 50)
+	CollapseBoxStroke.Thickness = 1
+	CollapseBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	CollapseBoxStroke.Parent = CollapseBox
+
+	-- Horizontal tab strip (fills the tabs box)
 	local ArrowW = 26
 	local ArrowGap = 6
-	local stripLeft = 8
-	local stripRight = 8 + ArrowW + 6 -- room for the collapse toggle only
+	local stripLeft = 6
+	local stripRight = 6
 	local TabContainer = Instance.new("ScrollingFrame")
 	TabContainer.Name = "TabContainer"
 	TabContainer.BackgroundTransparency = 1
@@ -799,24 +826,19 @@ function Astral:MakeWindow(config)
 		local TabsCollapse = Instance.new("TextButton")
 		TabsCollapse.Name = "TabsCollapse"
 		TabsCollapse.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		TabsCollapse.BackgroundTransparency = 1
 		TabsCollapse.BorderSizePixel = 0
-		TabsCollapse.AnchorPoint = Vector2.new(1, 0.5)
-		TabsCollapse.Position = UDim2.new(1, -8, 0.5, 0)
-		TabsCollapse.Size = UDim2.new(0, ArrowW, 0, TabBarHeight - 8)
+		TabsCollapse.AnchorPoint = Vector2.new(0.5, 0.5)
+		TabsCollapse.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TabsCollapse.Size = UDim2.new(1, -8, 1, -8)
 		TabsCollapse.Text = ""
 		TabsCollapse.AutoButtonColor = false
 		TabsCollapse.ZIndex = 6
-		TabsCollapse.Parent = TabBarSection
+		TabsCollapse.Parent = CollapseBox
 
 		local CCorner = Instance.new("UICorner")
 		CCorner.CornerRadius = UDim.new(0, 6)
 		CCorner.Parent = TabsCollapse
-
-		local CStroke = Instance.new("UIStroke")
-		CStroke.Color = Color3.fromRGB(42, 42, 46)
-		CStroke.Thickness = 1
-		CStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		CStroke.Parent = TabsCollapse
 
 		local CIcon = Instance.new("ImageLabel")
 		CIcon.Name = "Icon"
