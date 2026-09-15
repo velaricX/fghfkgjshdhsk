@@ -1997,6 +1997,7 @@ function Astral:MakeWindow(config)
 	local Window = {}
 
 	function Window:AddCategory(name)
+		name = tostring(name or "Category")
 		layoutOrderCounter = layoutOrderCounter + 1
 
 		-- In the topbar design categories are small inline labels in the tab strip
@@ -5313,6 +5314,7 @@ function Astral:MakeWindow(config)
 	end
 
 	function Window:SetBackground(urlOrId)
+		if type(urlOrId) ~= "string" or urlOrId == "" then return end
 		if urlOrId:match("^https?://") then
 			BackgroundImage.Image = bgFunc(urlOrId)
 			BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255)
@@ -5457,10 +5459,12 @@ function Astral:MakeWindow(config)
 		}
 
 		function Window:Notify(config)
+			config = config or {}
 			local nType = config.Type or "good"
-			local title = config.Title or ""
-			local message = config.Message or ""
-			local duration = config.Duration or 10
+			local title = tostring(config.Title or "")
+			local message = tostring(config.Message or "")
+			local duration = tonumber(config.Duration) or 10
+			if duration <= 0 then duration = 1 end
 			local actions = config.Actions or {}
 			local hasActions = #actions > 0
 			local tColor = notifTypeColors[nType] or notifTypeColors.good
