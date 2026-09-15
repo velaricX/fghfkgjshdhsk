@@ -759,7 +759,7 @@ function Astral:MakeWindow(config)
 	local function scrollTabs(delta)
 		local target = math.clamp(tabScrollX() + delta, 0, tabMaxScroll())
 		pcall(function()
-			TweenService:Create(TabContainer, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			TweenService:Create(TabContainer, TweenInfo.new(0.11, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 				CanvasPosition = Vector2.new(target, 0)
 			}):Play()
 		end)
@@ -768,13 +768,13 @@ function Astral:MakeWindow(config)
 	-- Mouse wheel scrolls the strip horizontally while hovering it
 	TabContainer.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseWheel then
-			scrollTabs(-input.Position.Z * 120)
+			scrollTabs(-input.Position.Z * 220)
 		end
 	end)
 
 	-- Hold left-click (or touch) and drag the strip left / right to scroll it.
 	-- DragGain > 1 makes the strip travel further than the cursor so it feels fast.
-	local DragGain = 2.2
+	local DragGain = 4.5
 	MainFrame:SetAttribute("TabDragMoved", false)
 	do
 		local dragActive, dragMoved = false, false
