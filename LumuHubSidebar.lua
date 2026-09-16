@@ -3154,15 +3154,14 @@ function Astral:MakeWindow(config)
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			ValueLabel.Parent = ValueBox
 
-			-- Multi-select count badge (e.g. "3")
+			-- Multi-select count badge (perfect circle, like the toggle knob)
 			local CountBadge = Instance.new("Frame")
 			CountBadge.Name = "CountBadge"
 			CountBadge.BackgroundColor3 = AccentColor
 			CountBadge.BorderSizePixel = 0
 			CountBadge.AnchorPoint = Vector2.new(1, 0.5)
-			CountBadge.Position = UDim2.new(1, -32, 0.5, 0)
-			CountBadge.Size = UDim2.new(0, 0, 0, 18)
-			CountBadge.AutomaticSize = Enum.AutomaticSize.X
+			CountBadge.Position = UDim2.new(1, -34, 0.5, 0)
+			CountBadge.Size = UDim2.new(0, 20, 0, 20)
 			CountBadge.Visible = false
 			CountBadge.ZIndex = 12
 			CountBadge.Parent = ValueBox
@@ -3171,18 +3170,15 @@ function Astral:MakeWindow(config)
 			BadgeCorner.CornerRadius = UDim.new(1, 0)
 			BadgeCorner.Parent = CountBadge
 
-			local BadgePadding = Instance.new("UIPadding")
-			BadgePadding.PaddingLeft = UDim.new(0, 8)
-			BadgePadding.PaddingRight = UDim.new(0, 8)
-			BadgePadding.Parent = CountBadge
-
 			local BadgeLabel = Instance.new("TextLabel")
 			BadgeLabel.BackgroundTransparency = 1
 			BadgeLabel.Size = UDim2.new(1, 0, 1, 0)
 			BadgeLabel.Font = Enum.Font.GothamBold
 			BadgeLabel.Text = ""
 			BadgeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			BadgeLabel.TextSize = 10
+			BadgeLabel.TextSize = 11
+			BadgeLabel.TextXAlignment = Enum.TextXAlignment.Center
+			BadgeLabel.ZIndex = 13
 			BadgeLabel.Parent = CountBadge
 
 			local function selectedList()
@@ -3208,7 +3204,7 @@ function Astral:MakeWindow(config)
 				end
 				if multi then
 					CountBadge.Visible = #list > 0
-					BadgeLabel.Text = tostring(#list)
+					BadgeLabel.Text = (#list > 9) and "9+" or tostring(#list)
 				else
 					CountBadge.Visible = false
 				end
@@ -3569,7 +3565,7 @@ function Astral:MakeWindow(config)
 			local icon = parseIcon(labelConfig.Icon)
 			local callback = labelConfig.Callback or function() end
 			local titleSize = tonumber(labelConfig.TextSize) or 14
-			local descSize = tonumber(labelConfig.DescSize) or 11
+			local descSize = tonumber(labelConfig.DescSize) or 13
 
 			local hasDesc = description and description ~= ""
 			local calculatedHeight = 64
@@ -3849,7 +3845,12 @@ function Astral:MakeWindow(config)
 							value = value - 1
 						end
 					end
-					if mode ~= "up" and countdownToken == myToken and done then task.spawn(done) end
+					if mode ~= "up" and countdownToken == myToken then
+						if where == "badge" then
+							LabelController:SetStatus("good", "SPAWNED")
+						end
+						if done then task.spawn(done) end
+					end
 				end)
 			end
 
@@ -3905,6 +3906,13 @@ function Astral:MakeWindow(config)
 			ParaLayout.Padding = UDim.new(0, 8)
 			ParaLayout.Parent = ParaFrame
 
+			local ParaPad = Instance.new("UIPadding")
+			ParaPad.PaddingLeft = UDim.new(0, 12)
+			ParaPad.PaddingRight = UDim.new(0, 12)
+			ParaPad.PaddingTop = UDim.new(0, 12)
+			ParaPad.PaddingBottom = UDim.new(0, 12)
+			ParaPad.Parent = ParaFrame
+
 			-- Image (if provided)
 			if hasImage then
 				local ImageContainer = Instance.new("Frame")
@@ -3931,34 +3939,56 @@ function Astral:MakeWindow(config)
 			local TextContainer = Instance.new("Frame")
 			TextContainer.Name = "TextContainer"
 			TextContainer.BackgroundTransparency = 1
-			TextContainer.Size = UDim2.new(1, -24, 0, 50)
-			TextContainer.Position = UDim2.new(0, 12, 0, 0)
+			TextContainer.Size = UDim2.new(1, 0, 0, 0)
+			TextContainer.AutomaticSize = Enum.AutomaticSize.Y
 			TextContainer.LayoutOrder = 2
 			TextContainer.Parent = ParaFrame
 
-			local TextPadding = Instance.new("UIPadding")
-			TextPadding.PaddingLeft = UDim.new(0, 12)
-			TextPadding.PaddingRight = UDim.new(0, 12)
-			TextPadding.PaddingBottom = UDim.new(0, 8)
-			TextPadding.Parent = TextContainer
-
 			local TextLayout = Instance.new("UIListLayout")
 			TextLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			TextLayout.Padding = UDim.new(0, 4)
+			TextLayout.Padding = UDim.new(0, 6)
 			TextLayout.Parent = TextContainer
+
+			-- Title row (optional icon + title on one line)
+			local TitleRow = Instance.new("Frame")
+			TitleRow.Name = "TitleRow"
+			TitleRow.BackgroundTransparency = 1
+			TitleRow.Size = UDim2.new(1, 0, 0, 26)
+			TitleRow.LayoutOrder = 1
+			TitleRow.Parent = TextContainer
+
+			local TitleRowLayout = Instance.new("UIListLayout")
+			TitleRowLayout.FillDirection = Enum.FillDirection.Horizontal
+			TitleRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			TitleRowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			TitleRowLayout.Padding = UDim.new(0, 8)
+			TitleRowLayout.Parent = TitleRow
+
+			if icon then
+				local IconLabel = Instance.new("ImageLabel")
+				IconLabel.Name = "Icon"
+				IconLabel.BackgroundTransparency = 1
+				IconLabel.Size = UDim2.new(0, 24, 0, 24)
+				IconLabel.LayoutOrder = 1
+				IconLabel.ScaleType = Enum.ScaleType.Fit
+				Astral.ApplyIcon(IconLabel, icon)
+				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.Parent = TitleRow
+			end
 
 			-- Title
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
+			TitleLabel.Size = UDim2.new(1, (icon and -34 or 0), 1, 0)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			regText(TitleLabel, 14)
+			regText(TitleLabel, 16)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-			TitleLabel.LayoutOrder = 1
-			TitleLabel.Parent = TextContainer
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.LayoutOrder = 2
+			TitleLabel.Parent = TitleRow
 
 			-- Description
 			local DescLabel = Instance.new("TextLabel")
@@ -3968,18 +3998,20 @@ function Astral:MakeWindow(config)
 			DescLabel.AutomaticSize = Enum.AutomaticSize.Y
 			DescLabel.Font = Enum.Font.Gotham
 			DescLabel.Text = description
-			DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-			regText(DescLabel, 10)
+			DescLabel.TextColor3 = Color3.fromRGB(175, 175, 182)
+			regText(DescLabel, 13)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
+			DescLabel.LineHeight = 1.18
 			DescLabel.LayoutOrder = 2
 			DescLabel.Parent = TextContainer
 
 			-- Adjust frame height dynamically based on text size
 			local function adjustHeight()
 				local textHeight = TextLayout.AbsoluteContentSize.Y
-				local imageOffset = hasImage and 138 or 12
-				local totalHeight = imageOffset + textHeight + 16
+				local imageOffset = hasImage and 162 or 24
+				local totalHeight = imageOffset + textHeight
 				ParaFrame.Size = UDim2.new(1, 0, 0, totalHeight)
 				-- Update masonry layout height
 				for _, item in ipairs(elements) do
