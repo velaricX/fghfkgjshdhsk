@@ -571,9 +571,41 @@ function KeySystem:Create(config)
 	local title = config.Title or "LumuHub"
 	local subTitle = config.SubTitle or "Key System"
 	local windowWidth = tonumber(config.Width) or 430
-	local checkFn = config.CheckKey
 	local unlocked = false
 	local busy = false
+
+	-- ---------- server verification ----------
+	-- VerifyUrl = "https://lumuhub.top/api/verify"  ->  ...?key=KEY&script=ID
+	-- the server must answer "valid" / "invalid" (or JSON {"valid":true})
+	local verifyUrl = config.VerifyUrl
+	local scriptId = config.ScriptId
+
+	local function verifyOnServer(key)
+		local url = tostring(verifyUrl)
+		if url == "" then return false end
+		local encoded = tostring(key)
+		pcall(function() encoded = HttpService:UrlEncode(tostring(key)) end)
+		url = url .. (string.find(url, "?", 1, true) and "&" or "?") .. "key=" .. encoded
+		if scriptId and tostring(scriptId) ~= "" then
+			url = url .. "&script=" .. tostring(scriptId)
+		end
+		local ok, res = pcall(function() return game:HttpGet(url) end)
+		if not ok or res == nil then return false end
+		local text = tostring(res):gsub("%s+", "")
+		local lower = string.lower(text)
+		if lower == "valid" or lower == "true" then return true end
+		if lower == "invalid" or lower == "false" then return false end
+		if string.sub(text, 1, 1) == "{" then
+			local ok2, data = pcall(function() return HttpService:JSONDecode(text) end)
+			if ok2 and type(data) == "table" then
+				return data.valid == true or data.status == "valid"
+			end
+		end
+		return false
+	end
+
+	local checkFn = config.CheckKey
+	if type(checkFn) ~= "function" and verifyUrl then checkFn = verifyOnServer end
 
 	local screenGui = newScreenGui("LumuKeySystem")
 	local internalNotify = createNotifier(screenGui)
@@ -839,6 +871,19 @@ function KeySystem:Create(config)
 	KeyInput.ClearTextOnFocus = false
 	KeyInput.ZIndex = 103
 	KeyInput.Parent = InputCard
+
+	-- prefill from the loader (getgenv().LUMU_KEY / _G.LUMU_KEY) if present
+	do
+		local prefill = nil
+		pcall(function()
+			if getgenv and getgenv().LUMU_KEY then prefill = getgenv().LUMU_KEY end
+			if (prefill == nil or prefill == "") and _G and _G.LUMU_KEY then prefill = _G.LUMU_KEY end
+		end)
+		if prefill ~= nil and tostring(prefill) ~= "" then
+			KeyInput.Text = tostring(prefill)
+			setStatus("idle", "Key loaded. Press Submit.")
+		end
+	end
 
 	local PasteButton = Instance.new("TextButton")
 	PasteButton.Name = "PasteButton"
