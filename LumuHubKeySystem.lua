@@ -218,8 +218,10 @@ function Draw.key(container, color)
 	round(tooth, 1)
 end
 
--- Renders either a real sprite/image or the drawn fallback into a square frame.
-local function renderIcon(holder, sprite, fallbackFn, color)
+-- Renders a real image or the drawn fallback into a holder frame.
+-- mode "fill"  -> image covers the whole holder (for app-icon style assets)
+-- mode "fit"   -> image is centred and scaled to fit (for glyph assets)
+local function renderIcon(holder, sprite, fallbackFn, color, mode)
 	holder:ClearAllChildren()
 	local asset = parseIcon(sprite)
 	if asset then
@@ -227,10 +229,11 @@ local function renderIcon(holder, sprite, fallbackFn, color)
 		img.Name = "Sprite"
 		img.BackgroundTransparency = 1
 		img.Size = UDim2.fromScale(1, 1)
-		img.ScaleType = Enum.ScaleType.Fit
+		img.ScaleType = (mode == "fill") and Enum.ScaleType.Stretch or Enum.ScaleType.Fit
 		img.ZIndex = (holder.ZIndex or 1) + 2
 		applyIcon(img, asset)
-		img.ImageColor3 = color or Color3.fromRGB(255, 255, 255)
+		-- never tint a real brand icon: keep its original colours
+		img.ImageColor3 = (mode == "fill") and Color3.fromRGB(255, 255, 255) or (color or Color3.fromRGB(255, 255, 255))
 		img.Parent = holder
 		return img
 	elseif fallbackFn then
@@ -419,10 +422,11 @@ function KeySystem:CreateLoading(config)
 	logoInner.BackgroundTransparency = 1
 	logoInner.AnchorPoint = Vector2.new(0.5, 0.5)
 	logoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
-	logoInner.Size = UDim2.new(0, 38, 0, 38)
+	local loadingLogo = parseIcon(config.Icon or 71513269699943)
+	logoInner.Size = loadingLogo and UDim2.new(1, -10, 1, -10) or UDim2.new(0, 38, 0, 38)
 	logoInner.ZIndex = 403
 	logoInner.Parent = LogoHolder
-	renderIcon(logoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255))
+	renderIcon(logoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255), loadingLogo and "fill" or "fit")
 
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.BackgroundTransparency = 1
@@ -716,10 +720,11 @@ function KeySystem:Create(config)
 	LogoInner.BackgroundTransparency = 1
 	LogoInner.AnchorPoint = Vector2.new(0.5, 0.5)
 	LogoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
-	LogoInner.Size = UDim2.new(0, 34, 0, 34)
+	local headerLogo = parseIcon(config.Icon or 71513269699943)
+	LogoInner.Size = headerLogo and UDim2.new(1, -10, 1, -10) or UDim2.new(0, 34, 0, 34)
 	LogoInner.ZIndex = 103
 	LogoInner.Parent = LogoBox
-	renderIcon(LogoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255))
+	renderIcon(LogoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255), headerLogo and "fill" or "fit")
 
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.Name = "Title"
@@ -1040,7 +1045,7 @@ function KeySystem:Create(config)
 	socialLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	socialLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 	socialLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	socialLayout.Padding = UDim.new(0, 32)
+	socialLayout.Padding = UDim.new(0, 42)
 	socialLayout.Parent = SocialRow
 
 	local function makeSocial(name, labelText, url, brandColor, sprite, fallbackFn, order)
@@ -1064,13 +1069,18 @@ function KeySystem:Create(config)
 		btn.Name = name .. "Button"
 		btn.BackgroundColor3 = CARD
 		btn.BorderSizePixel = 0
-		btn.Size = UDim2.new(0, 48, 0, 48)
+		btn.Size = UDim2.new(0, 54, 0, 54)
 		btn.Text = ""
 		btn.AutoButtonColor = false
+		btn.ClipsDescendants = true
 		btn.LayoutOrder = 1
 		btn.ZIndex = 102
 		btn.Parent = column
-		round(btn, 0.25)
+		round(btn, 0.23)
+
+		local btnScale = Instance.new("UIScale")
+		btnScale.Scale = 1
+		btnScale.Parent = btn
 
 		local stroke = Instance.new("UIStroke")
 		stroke.Color = BORDER
@@ -1078,15 +1088,16 @@ function KeySystem:Create(config)
 		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		stroke.Parent = btn
 
+		local asset = parseIcon(sprite)
 		local iconHolder = Instance.new("Frame")
 		iconHolder.Name = "Inner"
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		iconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		iconHolder.Size = UDim2.new(0, 26, 0, 26)
+		iconHolder.Size = asset and UDim2.fromScale(1, 1) or UDim2.new(0, 28, 0, 28)
 		iconHolder.ZIndex = 103
 		iconHolder.Parent = btn
-		renderIcon(iconHolder, sprite, fallbackFn, brandColor)
+		renderIcon(iconHolder, sprite, fallbackFn, brandColor, asset and "fill" or "fit")
 
 		local caption = Instance.new("TextLabel")
 		caption.Name = "Caption"
@@ -1094,7 +1105,7 @@ function KeySystem:Create(config)
 		caption.Size = UDim2.new(1, 0, 0, 15)
 		caption.Font = Enum.Font.Gotham
 		caption.Text = labelText
-		caption.TextSize = 11
+		caption.TextSize = 12
 		caption.TextColor3 = TEXT_DIM
 		caption.LayoutOrder = 2
 		caption.ZIndex = 103
@@ -1102,11 +1113,13 @@ function KeySystem:Create(config)
 
 		btn.MouseEnter:Connect(function()
 			TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = CARD_HOVER }):Play()
+			TweenService:Create(btnScale, TweenInfo.new(0.15), { Scale = 1.07 }):Play()
 			TweenService:Create(stroke, TweenInfo.new(0.15), { Color = brandColor }):Play()
 			TweenService:Create(caption, TweenInfo.new(0.15), { TextColor3 = brandColor }):Play()
 		end)
 		btn.MouseLeave:Connect(function()
 			TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = CARD }):Play()
+			TweenService:Create(btnScale, TweenInfo.new(0.15), { Scale = 1 }):Play()
 			TweenService:Create(stroke, TweenInfo.new(0.15), { Color = BORDER }):Play()
 			TweenService:Create(caption, TweenInfo.new(0.15), { TextColor3 = TEXT_DIM }):Play()
 		end)
