@@ -387,7 +387,7 @@ function KeySystem:CreateLoading(config)
 	Card.BorderSizePixel = 0
 	Card.AnchorPoint = Vector2.new(0.5, 0.5)
 	Card.Position = UDim2.new(0.5, 0, 0.5, 0)
-	Card.Size = UDim2.new(0, 380, 0, 178)
+	Card.Size = UDim2.new(0, 380, 0, 210)
 	Card.ZIndex = 401
 	Card.Parent = Backdrop
 	round(Card, 0.09)
@@ -398,10 +398,36 @@ function KeySystem:CreateLoading(config)
 	cardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	cardStroke.Parent = Card
 
+	local LogoHolder = Instance.new("Frame")
+	LogoHolder.Name = "Logo"
+	LogoHolder.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+	LogoHolder.BorderSizePixel = 0
+	LogoHolder.AnchorPoint = Vector2.new(0.5, 0)
+	LogoHolder.Position = UDim2.new(0.5, 0, 0, 26)
+	LogoHolder.Size = UDim2.new(0, 58, 0, 58)
+	LogoHolder.ZIndex = 402
+	LogoHolder.Parent = Card
+	round(LogoHolder, 0.24)
+
+	local logoStroke = Instance.new("UIStroke")
+	logoStroke.Color = accent
+	logoStroke.Thickness = 1.5
+	logoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	logoStroke.Parent = LogoHolder
+
+	local logoInner = Instance.new("Frame")
+	logoInner.BackgroundTransparency = 1
+	logoInner.AnchorPoint = Vector2.new(0.5, 0.5)
+	logoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
+	logoInner.Size = UDim2.new(0, 38, 0, 38)
+	logoInner.ZIndex = 403
+	logoInner.Parent = LogoHolder
+	renderIcon(logoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255))
+
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.BackgroundTransparency = 1
 	TitleLabel.AnchorPoint = Vector2.new(0.5, 0)
-	TitleLabel.Position = UDim2.new(0.5, 0, 0, 36)
+	TitleLabel.Position = UDim2.new(0.5, 0, 0, 94)
 	TitleLabel.Size = UDim2.new(1, -40, 0, 22)
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.Text = tostring(title)
@@ -414,7 +440,7 @@ function KeySystem:CreateLoading(config)
 	StatusLabel.Name = "Status"
 	StatusLabel.BackgroundTransparency = 1
 	StatusLabel.AnchorPoint = Vector2.new(0.5, 0)
-	StatusLabel.Position = UDim2.new(0.5, 0, 0, 64)
+	StatusLabel.Position = UDim2.new(0.5, 0, 0, 120)
 	StatusLabel.Size = UDim2.new(1, -40, 0, 18)
 	StatusLabel.Font = Enum.Font.Gotham
 	StatusLabel.Text = tostring(subtitle)
@@ -429,7 +455,7 @@ function KeySystem:CreateLoading(config)
 	Track.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
 	Track.BorderSizePixel = 0
 	Track.AnchorPoint = Vector2.new(0.5, 0.5)
-	Track.Position = UDim2.new(0.5, 0, 0, 108)
+	Track.Position = UDim2.new(0.5, 0, 0, 158)
 	Track.Size = UDim2.new(1, -64, 0, 6)
 	Track.ZIndex = 402
 	Track.Parent = Card
@@ -448,7 +474,7 @@ function KeySystem:CreateLoading(config)
 	Dots.Name = "Dots"
 	Dots.BackgroundTransparency = 1
 	Dots.AnchorPoint = Vector2.new(0.5, 0)
-	Dots.Position = UDim2.new(0.5, 0, 0, 132)
+	Dots.Position = UDim2.new(0.5, 0, 0, 176)
 	Dots.Size = UDim2.new(0, 44, 0, 8)
 	Dots.ZIndex = 402
 	Dots.Parent = Card
@@ -636,12 +662,39 @@ function KeySystem:Create(config)
 	headerSep.ZIndex = 102
 	headerSep.Parent = Header
 
+	local LogoBox = Instance.new("Frame")
+	LogoBox.Name = "LogoBox"
+	LogoBox.BackgroundColor3 = Color3.fromRGB(38, 38, 46)
+	LogoBox.BorderSizePixel = 0
+	LogoBox.AnchorPoint = Vector2.new(0, 0.5)
+	LogoBox.Position = UDim2.new(0, 20, 0.5, 0)
+	LogoBox.Size = UDim2.new(0, 48, 0, 48)
+	LogoBox.ZIndex = 102
+	LogoBox.Parent = Header
+	round(LogoBox, 0.22)
+
+	local logoStroke = Instance.new("UIStroke")
+	logoStroke.Color = accent
+	logoStroke.Thickness = 1.4
+	logoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	logoStroke.Parent = LogoBox
+
+	local LogoInner = Instance.new("Frame")
+	LogoInner.Name = "LogoInner"
+	LogoInner.BackgroundTransparency = 1
+	LogoInner.AnchorPoint = Vector2.new(0.5, 0.5)
+	LogoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
+	LogoInner.Size = UDim2.new(0, 34, 0, 34)
+	LogoInner.ZIndex = 103
+	LogoInner.Parent = LogoBox
+	renderIcon(LogoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255))
+
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.Name = "Title"
 	TitleLabel.BackgroundTransparency = 1
 	TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-	TitleLabel.Position = UDim2.new(0, 22, 0.5, -10)
-	TitleLabel.Size = UDim2.new(1, -44, 0, 22)
+	TitleLabel.Position = UDim2.new(0, 80, 0.5, -10)
+	TitleLabel.Size = UDim2.new(1, -100, 0, 22)
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.Text = tostring(title)
 	TitleLabel.TextSize = 20
@@ -655,8 +708,8 @@ function KeySystem:Create(config)
 	SubTitleLabel.Name = "SubTitle"
 	SubTitleLabel.BackgroundTransparency = 1
 	SubTitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-	SubTitleLabel.Position = UDim2.new(0, 22, 0.5, 10)
-	SubTitleLabel.Size = UDim2.new(1, -44, 0, 17)
+	SubTitleLabel.Position = UDim2.new(0, 80, 0.5, 10)
+	SubTitleLabel.Size = UDim2.new(1, -100, 0, 17)
 	SubTitleLabel.Font = Enum.Font.Gotham
 	SubTitleLabel.Text = tostring(subTitle)
 	SubTitleLabel.TextSize = 12
@@ -1026,8 +1079,8 @@ function KeySystem:Create(config)
 		return btn
 	end
 
-	makeSocial("Discord", "Discord", config.Discord, DISCORD_COLOR, config.DiscordIcon or 10367063073, Draw.discord, 1)
-	makeSocial("YouTube", "YouTube", config.YouTube, YOUTUBE_COLOR, config.YouTubeIcon or 124349003011863, Draw.play, 2)
+	makeSocial("Discord", "Discord", config.Discord, DISCORD_COLOR, config.DiscordIcon or 113638305642892, Draw.discord, 1)
+	makeSocial("YouTube", "YouTube", config.YouTube, YOUTUBE_COLOR, config.YouTubeIcon or 75220704845772, Draw.play, 2)
 
 	-- ========================================================================
 	-- behaviour
