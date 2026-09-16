@@ -123,6 +123,20 @@ function Draw.cross(container, color)
 	makeBar(container, 0.62, 0.14, -45, color, 0.5, 0.5)
 end
 
+function Draw.bang(container, color)
+	local bar = newBox(container, color)
+	bar.AnchorPoint = Vector2.new(0.5, 0.5)
+	bar.Position = UDim2.fromScale(0.5, 0.34)
+	bar.Size = UDim2.fromScale(0.17, 0.44)
+	round(bar, 1)
+
+	local dot = newBox(container, color)
+	dot.AnchorPoint = Vector2.new(0.5, 0.5)
+	dot.Position = UDim2.fromScale(0.5, 0.80)
+	dot.Size = UDim2.fromScale(0.17, 0.17)
+	round(dot, 1)
+end
+
 function Draw.clipboard(container, color)
 	local body = newBox(container, color)
 	body.BackgroundTransparency = 1
@@ -255,109 +269,270 @@ end
 -- ============================================================================
 -- Notifications (toasts with a drawn status mark)
 -- ============================================================================
+-- Notification system -- copied from the main Lumu UI
+-- (bottom-right stack, icon box, title + message, progress bar, action buttons)
 local function createNotifier(screenGui)
-	local stack = Instance.new("Frame")
-	stack.Name = "Toasts"
-	stack.BackgroundTransparency = 1
-	stack.AnchorPoint = Vector2.new(1, 0)
-	stack.Position = UDim2.new(1, -18, 0, 18)
-	stack.Size = UDim2.new(0, 290, 0, 0)
-	stack.AutomaticSize = Enum.AutomaticSize.Y
-	stack.ZIndex = 900
-	stack.Parent = screenGui
+	local viewportX = 1280
+	pcall(function()
+		local cam = workspace.CurrentCamera
+		if cam then viewportX = cam.ViewportSize.X end
+	end)
+	local notifW = math.min(300, math.floor(viewportX * 0.3))
+	if notifW < 150 then notifW = 150 end
 
-	local layout = Instance.new("UIListLayout")
-	layout.FillDirection = Enum.FillDirection.Vertical
-	layout.SortOrder = Enum.SortOrder.LayoutOrder
-	layout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-	layout.Padding = UDim.new(0, 8)
-	layout.Parent = stack
+	local Container = Instance.new("Frame")
+	Container.Name = "NotificationContainer"
+	Container.Size = UDim2.new(0, notifW + 20, 0, 0)
+	Container.Position = UDim2.new(1, -12, 1, -12)
+	Container.AnchorPoint = Vector2.new(1, 1)
+	Container.BackgroundTransparency = 1
+	Container.AutomaticSize = Enum.AutomaticSize.Y
+	Container.ZIndex = 200
+	Container.Parent = screenGui
 
-	local palette = { good = GOOD, bad = BAD, warning = WARN, info = ACCENT }
-	local marks = { good = Draw.check, bad = Draw.cross, warning = Draw.cross, info = Draw.check }
+	local NotifLayout = Instance.new("UIListLayout")
+	NotifLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+	NotifLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+	NotifLayout.Padding = UDim.new(0, 8)
+	NotifLayout.Parent = Container
 
-	return function(kind, title, message)
-		local color = palette[kind] or ACCENT
-		local card = Instance.new("Frame")
-		card.BackgroundColor3 = CARD
-		card.BorderSizePixel = 0
-		card.Size = UDim2.new(0, 290, 0, 64)
-		card.ZIndex = 901
-		card.Parent = stack
+	local TYPE_COLORS = {
+		good = Color3.fromRGB(46, 204, 113),
+		warning = Color3.fromRGB(241, 196, 15),
+		bad = Color3.fromRGB(231, 76, 60),
+		info = ACCENT,
+	}
+	local TYPE_ICONS = { good = "Checkmark", warning = "Warning", bad = "Close", info = "Warning" }
+	local TYPE_FALLBACK = { good = Draw.check, warning = Draw.bang, bad = Draw.cross, info = Draw.bang }
 
-		round(card, 0.18)
+	return function(a, b, c, d, e)
+		local cfg
+		if type(a) == "table" then
+			cfg = a
+		else
+			cfg = { Type = a, Title = b, Message = c, Duration = d, Actions = e }
+		end
 
-		local stroke = Instance.new("UIStroke")
-		stroke.Color = color
-		stroke.Transparency = 0.6
-		stroke.Thickness = 1.2
-		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		stroke.Parent = card
+		local kind = tostring(cfg.Type or "info"):lower()
+		local tColor = TYPE_COLORS[kind] or TYPE_COLORS.info
+		local actions = cfg.Actions
+		local hasActions = type(actions) == "table" and #actions > 0
+		local notifH = hasActions and 100 or 76
+		local duration = tonumber(cfg.Duration) or 5
+		if duration <= 0 then duration = 1 end
 
-		local bar = Instance.new("Frame")
-		bar.BackgroundColor3 = color
-		bar.BorderSizePixel = 0
-		bar.Position = UDim2.new(0, 0, 0, 12)
-		bar.Size = UDim2.new(0, 3, 1, -24)
-		bar.ZIndex = 902
-		bar.Parent = card
-		round(bar, 1)
+		local Frame = Instance.new("Frame")
+		Frame.Size = UDim2.new(0, notifW, 0, notifH)
+		Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		Frame.BorderSizePixel = 0
+		Frame.ZIndex = 200
+		Frame.ClipsDescendants = true
+		Frame.Parent = Container
 
-		local markHolder = Instance.new("Frame")
-		markHolder.Name = "Mark"
-		markHolder.BackgroundTransparency = 1
-		markHolder.AnchorPoint = Vector2.new(0, 0.5)
-		markHolder.Position = UDim2.new(0, 16, 0.5, 0)
-		markHolder.Size = UDim2.new(0, 22, 0, 22)
-		markHolder.ZIndex = 902
-		markHolder.Parent = card
-		local markFn = marks[kind] or Draw.check
-		markFn(markHolder, color)
+		local Corner = Instance.new("UICorner")
+		Corner.CornerRadius = UDim.new(0, 10)
+		Corner.Parent = Frame
 
-		local titleLabel = Instance.new("TextLabel")
-		titleLabel.BackgroundTransparency = 1
-		titleLabel.Position = UDim2.new(0, 48, 0, 12)
-		titleLabel.Size = UDim2.new(1, -60, 0, 17)
-		titleLabel.Font = Enum.Font.GothamBold
-		titleLabel.Text = tostring(title or "")
-		titleLabel.TextSize = 13
-		titleLabel.TextColor3 = TEXT
-		titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-		titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-		titleLabel.ZIndex = 902
-		titleLabel.Parent = card
+		local Stroke = Instance.new("UIStroke")
+		Stroke.Thickness = 1
+		Stroke.Color = Color3.fromRGB(45, 45, 50)
+		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		Stroke.Parent = Frame
 
-		local msgLabel = Instance.new("TextLabel")
-		msgLabel.BackgroundTransparency = 1
-		msgLabel.Position = UDim2.new(0, 48, 0, 31)
-		msgLabel.Size = UDim2.new(1, -60, 0, 24)
-		msgLabel.Font = Enum.Font.Gotham
-		msgLabel.Text = tostring(message or "")
-		msgLabel.TextSize = 11
-		msgLabel.TextColor3 = TEXT_DIM
-		msgLabel.TextXAlignment = Enum.TextXAlignment.Left
-		msgLabel.TextYAlignment = Enum.TextYAlignment.Top
-		msgLabel.TextWrapped = true
-		msgLabel.TextTruncate = Enum.TextTruncate.AtEnd
-		msgLabel.ZIndex = 902
-		msgLabel.Parent = card
+		-- icon box (matches the UI IconContainer style)
+		local IconFrame = Instance.new("Frame")
+		IconFrame.Size = UDim2.fromOffset(38, 38)
+		IconFrame.Position = UDim2.new(0, 22, 0, hasActions and 12 or 19)
+		IconFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
+		IconFrame.BorderSizePixel = 0
+		IconFrame.ZIndex = 200
+		IconFrame.Parent = Frame
 
-		card.Position = UDim2.new(1, 44, 0, 0)
-		card.BackgroundTransparency = 1
-		stroke.Transparency = 1
-		TweenService:Create(card, TweenInfo.new(0.24, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		local IconCorner = Instance.new("UICorner")
+		IconCorner.CornerRadius = UDim.new(0, 8)
+		IconCorner.Parent = IconFrame
+
+		local IconStroke = Instance.new("UIStroke")
+		IconStroke.Thickness = 1
+		IconStroke.Color = Color3.fromRGB(50, 50, 55)
+		IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		IconStroke.Parent = IconFrame
+
+		local IconHolder = Instance.new("Frame")
+		IconHolder.Name = "Icon"
+		IconHolder.BackgroundTransparency = 1
+		IconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
+		IconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
+		IconHolder.Size = UDim2.fromOffset(20, 20)
+		IconHolder.ZIndex = 201
+		IconHolder.Parent = IconFrame
+		renderIcon(IconHolder, parseIcon(TYPE_ICONS[kind]) or cfg.Icon, TYPE_FALLBACK[kind] or Draw.bang, Color3.fromRGB(255, 255, 255), "fit")
+
+		-- text
+		local TextFrame = Instance.new("Frame")
+		TextFrame.Size = UDim2.new(1, -108, 0, hasActions and 40 or 44)
+		TextFrame.Position = UDim2.new(0, 70, 0, hasActions and 10 or 12)
+		TextFrame.BackgroundTransparency = 1
+		TextFrame.ZIndex = 200
+		TextFrame.Parent = Frame
+
+		local TitleLabel = Instance.new("TextLabel")
+		TitleLabel.Size = UDim2.new(1, -6, 0, 18)
+		TitleLabel.BackgroundTransparency = 1
+		TitleLabel.Font = Enum.Font.GothamBold
+		TitleLabel.Text = tostring(cfg.Title or "")
+		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TitleLabel.TextSize = 12
+		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+		TitleLabel.ZIndex = 200
+		TitleLabel.Parent = TextFrame
+
+		local DescLabel = Instance.new("TextLabel")
+		DescLabel.Size = UDim2.new(1, -6, 0, hasActions and 20 or 24)
+		DescLabel.Position = UDim2.new(0, 0, 0, 19)
+		DescLabel.BackgroundTransparency = 1
+		DescLabel.Font = Enum.Font.Gotham
+		DescLabel.Text = tostring(cfg.Message or "")
+		DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+		DescLabel.TextSize = 11
+		DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+		DescLabel.TextYAlignment = Enum.TextYAlignment.Top
+		DescLabel.TextWrapped = true
+		DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+		DescLabel.ZIndex = 200
+		DescLabel.Parent = TextFrame
+
+		-- bottom progress bar
+		local ProgressTrack = Instance.new("Frame")
+		ProgressTrack.Name = "ProgressTrack"
+		ProgressTrack.Size = UDim2.new(1, -32, 0, 2)
+		ProgressTrack.Position = UDim2.new(0, 16, 1, -6)
+		ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+		ProgressTrack.BorderSizePixel = 0
+		ProgressTrack.ZIndex = 201
+		ProgressTrack.Parent = Frame
+		round(ProgressTrack, 1)
+
+		local ProgressFill = Instance.new("Frame")
+		ProgressFill.Name = "ProgressFill"
+		ProgressFill.Size = UDim2.new(1, 0, 1, 0)
+		ProgressFill.BackgroundColor3 = Color3.fromRGB(120, 120, 125)
+		ProgressFill.BorderSizePixel = 0
+		ProgressFill.ZIndex = 202
+		ProgressFill.Parent = ProgressTrack
+		round(ProgressFill, 1)
+
+		local dismiss
+
+		if hasActions then
+			local btnRow = Instance.new("Frame")
+			btnRow.Size = UDim2.new(1, -86, 0, 26)
+			btnRow.Position = UDim2.new(0, 70, 0, 58)
+			btnRow.BackgroundTransparency = 1
+			btnRow.ZIndex = 200
+			btnRow.Parent = Frame
+
+			local BtnLayout = Instance.new("UIListLayout")
+			BtnLayout.FillDirection = Enum.FillDirection.Horizontal
+			BtnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			BtnLayout.Padding = UDim.new(0, 8)
+			BtnLayout.Parent = btnRow
+
+			for i, action in ipairs(actions) do
+				local aType = tostring(action.Type or kind):lower()
+				local aColor = TYPE_COLORS[aType] or tColor
+				local isPrimary = (i == 1)
+
+				local Btn = Instance.new("TextButton")
+				Btn.Size = UDim2.new(0, 72, 0, 26)
+				Btn.BackgroundColor3 = isPrimary and aColor or Color3.fromRGB(36, 36, 40)
+				Btn.BorderSizePixel = 0
+				Btn.Font = Enum.Font.GothamBold
+				Btn.Text = tostring(action.Text or "")
+				Btn.TextColor3 = isPrimary and Color3.fromRGB(15, 15, 15) or Color3.fromRGB(255, 255, 255)
+				Btn.TextSize = 11
+				Btn.AutoButtonColor = false
+				Btn.ZIndex = 200
+				Btn.Parent = btnRow
+				round(Btn, 0.23)
+
+				if not isPrimary then
+					local BtnStroke = Instance.new("UIStroke")
+					BtnStroke.Thickness = 1
+					BtnStroke.Color = Color3.fromRGB(50, 50, 55)
+					BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					BtnStroke.Parent = Btn
+				end
+
+				local BtnScale = Instance.new("UIScale")
+				BtnScale.Scale = 1
+				BtnScale.Parent = Btn
+
+				Btn.MouseEnter:Connect(function()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Scale = 1.04 }):Play()
+				end)
+				Btn.MouseLeave:Connect(function()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+				end)
+				Btn.MouseButton1Down:Connect(function()
+					TweenService:Create(BtnScale, TweenInfo.new(0.08), { Scale = 0.96 }):Play()
+				end)
+				Btn.MouseButton1Up:Connect(function()
+					TweenService:Create(BtnScale, TweenInfo.new(0.12), { Scale = 1.04 }):Play()
+				end)
+				Btn.MouseButton1Click:Connect(function()
+					if type(action) == "table" and type(action.Callback) == "function" then
+						task.spawn(action.Callback)
+					end
+					dismiss()
+				end)
+			end
+		end
+
+		-- hover highlight like UI cards
+		Frame.MouseEnter:Connect(function()
+			TweenService:Create(Stroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(70, 70, 75) }):Play()
+		end)
+		Frame.MouseLeave:Connect(function()
+			TweenService:Create(Stroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(45, 45, 50) }):Play()
+		end)
+
+		-- slide in from the right
+		Frame.Position = UDim2.new(0, notifW + 24, 0, 0)
+		Frame.BackgroundTransparency = 1
+		TweenService:Create(Frame, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Position = UDim2.new(0, 0, 0, 0),
 			BackgroundTransparency = 0,
 		}):Play()
-		TweenService:Create(stroke, TweenInfo.new(0.24), { Transparency = 0.6 }):Play()
 
-		task.delay(4.5, function()
-			TweenService:Create(card, TweenInfo.new(0.2), {
-				Position = UDim2.new(1, 44, 0, 0),
+		local closed = false
+		dismiss = function()
+			if closed then return end
+			closed = true
+			TweenService:Create(Frame, TweenInfo.new(0.24, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+				Position = UDim2.new(0, notifW + 24, 0, 0),
 				BackgroundTransparency = 1,
 			}):Play()
-			task.wait(0.25)
-			pcall(function() card:Destroy() end)
+			task.delay(0.28, function()
+				pcall(function() Frame:Destroy() end)
+			end)
+		end
+
+		TweenService:Create(ProgressFill, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+			Size = UDim2.new(0, 0, 1, 0),
+		}):Play()
+
+		task.spawn(function()
+			local elapsed = 0
+			while elapsed < duration do
+				if closed or not Frame.Parent then return end
+				task.wait(0.1)
+				elapsed = elapsed + 0.1
+			end
+			dismiss()
 		end)
 	end
 end
@@ -390,7 +565,7 @@ function KeySystem:CreateLoading(config)
 	Card.BorderSizePixel = 0
 	Card.AnchorPoint = Vector2.new(0.5, 0.5)
 	Card.Position = UDim2.new(0.5, 0, 0.5, 0)
-	Card.Size = UDim2.new(0, 380, 0, 210)
+	Card.Size = UDim2.new(0, 380, 0, 178)
 	Card.ZIndex = 401
 	Card.Parent = Backdrop
 	round(Card, 0.09)
@@ -401,37 +576,10 @@ function KeySystem:CreateLoading(config)
 	cardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	cardStroke.Parent = Card
 
-	local LogoHolder = Instance.new("Frame")
-	LogoHolder.Name = "Logo"
-	LogoHolder.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
-	LogoHolder.BorderSizePixel = 0
-	LogoHolder.AnchorPoint = Vector2.new(0.5, 0)
-	LogoHolder.Position = UDim2.new(0.5, 0, 0, 26)
-	LogoHolder.Size = UDim2.new(0, 58, 0, 58)
-	LogoHolder.ZIndex = 402
-	LogoHolder.Parent = Card
-	round(LogoHolder, 0.24)
-
-	local logoStroke = Instance.new("UIStroke")
-	logoStroke.Color = accent
-	logoStroke.Thickness = 1.5
-	logoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	logoStroke.Parent = LogoHolder
-
-	local logoInner = Instance.new("Frame")
-	logoInner.BackgroundTransparency = 1
-	logoInner.AnchorPoint = Vector2.new(0.5, 0.5)
-	logoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
-	local loadingLogo = parseIcon(config.Icon or 71513269699943)
-	logoInner.Size = loadingLogo and UDim2.new(1, -10, 1, -10) or UDim2.new(0, 38, 0, 38)
-	logoInner.ZIndex = 403
-	logoInner.Parent = LogoHolder
-	renderIcon(logoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255), loadingLogo and "fill" or "fit")
-
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.BackgroundTransparency = 1
 	TitleLabel.AnchorPoint = Vector2.new(0.5, 0)
-	TitleLabel.Position = UDim2.new(0.5, 0, 0, 94)
+	TitleLabel.Position = UDim2.new(0.5, 0, 0, 36)
 	TitleLabel.Size = UDim2.new(1, -40, 0, 22)
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.Text = tostring(title)
@@ -444,7 +592,7 @@ function KeySystem:CreateLoading(config)
 	StatusLabel.Name = "Status"
 	StatusLabel.BackgroundTransparency = 1
 	StatusLabel.AnchorPoint = Vector2.new(0.5, 0)
-	StatusLabel.Position = UDim2.new(0.5, 0, 0, 120)
+	StatusLabel.Position = UDim2.new(0.5, 0, 0, 64)
 	StatusLabel.Size = UDim2.new(1, -40, 0, 18)
 	StatusLabel.Font = Enum.Font.Gotham
 	StatusLabel.Text = tostring(subtitle)
@@ -459,7 +607,7 @@ function KeySystem:CreateLoading(config)
 	Track.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
 	Track.BorderSizePixel = 0
 	Track.AnchorPoint = Vector2.new(0.5, 0.5)
-	Track.Position = UDim2.new(0.5, 0, 0, 158)
+	Track.Position = UDim2.new(0.5, 0, 0, 108)
 	Track.Size = UDim2.new(1, -64, 0, 6)
 	Track.ZIndex = 402
 	Track.Parent = Card
@@ -478,7 +626,7 @@ function KeySystem:CreateLoading(config)
 	Dots.Name = "Dots"
 	Dots.BackgroundTransparency = 1
 	Dots.AnchorPoint = Vector2.new(0.5, 0)
-	Dots.Position = UDim2.new(0.5, 0, 0, 176)
+	Dots.Position = UDim2.new(0.5, 0, 0, 132)
 	Dots.Size = UDim2.new(0, 44, 0, 8)
 	Dots.ZIndex = 402
 	Dots.Parent = Card
@@ -625,11 +773,12 @@ function KeySystem:Create(config)
 		end
 	end)
 
-	local notify = function(kind, titleText, message)
+	local notify = function(kind, titleText, message, duration, actions)
+		local cfg = { Type = kind, Title = titleText, Message = message, Duration = duration or 5, Actions = actions }
 		if sharedNotify then
-			sharedNotify:Send({ Type = kind, Title = titleText, Message = message, Duration = 5 })
+			sharedNotify:Send(cfg)
 		else
-			internalNotify(kind, titleText, message)
+			internalNotify(cfg)
 		end
 	end
 
@@ -698,45 +847,17 @@ function KeySystem:Create(config)
 	headerSep.ZIndex = 102
 	headerSep.Parent = Header
 
-	local LogoBox = Instance.new("Frame")
-	LogoBox.Name = "LogoBox"
-	LogoBox.BackgroundColor3 = Color3.fromRGB(38, 38, 46)
-	LogoBox.BorderSizePixel = 0
-	LogoBox.AnchorPoint = Vector2.new(0, 0.5)
-	LogoBox.Position = UDim2.new(0, 20, 0.5, 0)
-	LogoBox.Size = UDim2.new(0, 48, 0, 48)
-	LogoBox.ZIndex = 102
-	LogoBox.Parent = Header
-	round(LogoBox, 0.22)
-
-	local logoStroke = Instance.new("UIStroke")
-	logoStroke.Color = accent
-	logoStroke.Thickness = 1.4
-	logoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	logoStroke.Parent = LogoBox
-
-	local LogoInner = Instance.new("Frame")
-	LogoInner.Name = "LogoInner"
-	LogoInner.BackgroundTransparency = 1
-	LogoInner.AnchorPoint = Vector2.new(0.5, 0.5)
-	LogoInner.Position = UDim2.new(0.5, 0, 0.5, 0)
-	local headerLogo = parseIcon(config.Icon or 71513269699943)
-	LogoInner.Size = headerLogo and UDim2.new(1, -10, 1, -10) or UDim2.new(0, 34, 0, 34)
-	LogoInner.ZIndex = 103
-	LogoInner.Parent = LogoBox
-	renderIcon(LogoInner, config.Icon or 71513269699943, Draw.key, Color3.fromRGB(255, 255, 255), headerLogo and "fill" or "fit")
-
 	local TitleLabel = Instance.new("TextLabel")
 	TitleLabel.Name = "Title"
 	TitleLabel.BackgroundTransparency = 1
-	TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-	TitleLabel.Position = UDim2.new(0, 80, 0.5, -10)
-	TitleLabel.Size = UDim2.new(1, -100, 0, 22)
+	TitleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	TitleLabel.Position = UDim2.new(0.5, 0, 0.5, -10)
+	TitleLabel.Size = UDim2.new(1, -40, 0, 22)
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.Text = tostring(title)
 	TitleLabel.TextSize = 20
 	TitleLabel.TextColor3 = TEXT
-	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 	TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 	TitleLabel.ZIndex = 103
 	TitleLabel.Parent = Header
@@ -744,14 +865,14 @@ function KeySystem:Create(config)
 	local SubTitleLabel = Instance.new("TextLabel")
 	SubTitleLabel.Name = "SubTitle"
 	SubTitleLabel.BackgroundTransparency = 1
-	SubTitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-	SubTitleLabel.Position = UDim2.new(0, 80, 0.5, 10)
-	SubTitleLabel.Size = UDim2.new(1, -100, 0, 17)
+	SubTitleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	SubTitleLabel.Position = UDim2.new(0.5, 0, 0.5, 10)
+	SubTitleLabel.Size = UDim2.new(1, -40, 0, 17)
 	SubTitleLabel.Font = Enum.Font.Gotham
 	SubTitleLabel.Text = tostring(subTitle)
 	SubTitleLabel.TextSize = 12
 	SubTitleLabel.TextColor3 = TEXT_DIM
-	SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 	SubTitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 	SubTitleLabel.ZIndex = 103
 	SubTitleLabel.Parent = Header
