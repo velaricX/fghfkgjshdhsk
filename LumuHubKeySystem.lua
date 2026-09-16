@@ -322,9 +322,17 @@ local function createNotifier(screenGui)
 		local duration = tonumber(cfg.Duration) or 5
 		if duration <= 0 then duration = 1 end
 
+		local function mix(base, color, amount)
+			return Color3.fromRGB(
+				math.floor(base.R * 255 * (1 - amount) + color.R * 255 * amount),
+				math.floor(base.G * 255 * (1 - amount) + color.G * 255 * amount),
+				math.floor(base.B * 255 * (1 - amount) + color.B * 255 * amount)
+			)
+		end
+
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.new(0, notifW, 0, notifH)
-		Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tColor, 0.22)
 		Frame.BorderSizePixel = 0
 		Frame.ZIndex = 200
 		Frame.ClipsDescendants = true
@@ -335,16 +343,27 @@ local function createNotifier(screenGui)
 		Corner.Parent = Frame
 
 		local Stroke = Instance.new("UIStroke")
-		Stroke.Thickness = 1
-		Stroke.Color = Color3.fromRGB(45, 45, 50)
+		Stroke.Thickness = 1.4
+		Stroke.Color = tColor
+		Stroke.Transparency = 0.35
 		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		Stroke.Parent = Frame
+
+		local AccentBar = Instance.new("Frame")
+		AccentBar.Name = "AccentBar"
+		AccentBar.BackgroundColor3 = tColor
+		AccentBar.BorderSizePixel = 0
+		AccentBar.Position = UDim2.new(0, 0, 0, 12)
+		AccentBar.Size = UDim2.new(0, 3, 1, -24)
+		AccentBar.ZIndex = 202
+		AccentBar.Parent = Frame
+		round(AccentBar, 1)
 
 		-- icon box (matches the UI IconContainer style)
 		local IconFrame = Instance.new("Frame")
 		IconFrame.Size = UDim2.fromOffset(38, 38)
 		IconFrame.Position = UDim2.new(0, 22, 0, hasActions and 12 or 19)
-		IconFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
+		IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tColor, 0.28)
 		IconFrame.BorderSizePixel = 0
 		IconFrame.ZIndex = 200
 		IconFrame.Parent = Frame
@@ -354,8 +373,9 @@ local function createNotifier(screenGui)
 		IconCorner.Parent = IconFrame
 
 		local IconStroke = Instance.new("UIStroke")
-		IconStroke.Thickness = 1
-		IconStroke.Color = Color3.fromRGB(50, 50, 55)
+		IconStroke.Thickness = 1.2
+		IconStroke.Color = tColor
+		IconStroke.Transparency = 0.4
 		IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		IconStroke.Parent = IconFrame
 
@@ -367,7 +387,7 @@ local function createNotifier(screenGui)
 		IconHolder.Size = UDim2.fromOffset(20, 20)
 		IconHolder.ZIndex = 201
 		IconHolder.Parent = IconFrame
-		renderIcon(IconHolder, parseIcon(TYPE_ICONS[kind]) or cfg.Icon, TYPE_FALLBACK[kind] or Draw.bang, Color3.fromRGB(255, 255, 255), "fit")
+		renderIcon(IconHolder, parseIcon(TYPE_ICONS[kind]) or cfg.Icon, TYPE_FALLBACK[kind] or Draw.bang, tColor, "fit")
 
 		-- text
 		local TextFrame = Instance.new("Frame")
@@ -1215,10 +1235,10 @@ function KeySystem:Create(config)
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		iconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		iconHolder.Size = asset and UDim2.fromScale(1, 1) or UDim2.new(0, 34, 0, 34)
+		iconHolder.Size = asset and UDim2.new(1, -8, 1, -8) or UDim2.new(0, 34, 0, 34)
 		iconHolder.ZIndex = 103
 		iconHolder.Parent = btn
-		renderIcon(iconHolder, sprite, fallbackFn, brandColor, asset and "fill" or "fit")
+		renderIcon(iconHolder, sprite, fallbackFn, brandColor, "fit")
 
 		local caption = Instance.new("TextLabel")
 		caption.Name = "Caption"

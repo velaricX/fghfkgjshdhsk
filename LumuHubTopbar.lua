@@ -5472,9 +5472,19 @@ function Astral:MakeWindow(config)
 			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
 			local notifH = hasActions and 100 or 76
 
+			-- type colour drives the whole card so good/warning/bad read instantly
+			local tc = tColor.bg
+			local function mix(base, color, amount)
+				return Color3.fromRGB(
+					math.floor(base.R * 255 * (1 - amount) + color.R * 255 * amount),
+					math.floor(base.G * 255 * (1 - amount) + color.G * 255 * amount),
+					math.floor(base.B * 255 * (1 - amount) + color.B * 255 * amount)
+				)
+			end
+
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(0, notifW, 0, notifH)
-			Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tc, 0.22)
 			Frame.BorderSizePixel = 0
 			Frame.ZIndex = 200
 			Frame.ClipsDescendants = true
@@ -5485,16 +5495,30 @@ function Astral:MakeWindow(config)
 			Corner.Parent = Frame
 
 			local Stroke = Instance.new("UIStroke")
-			Stroke.Thickness = 1
-			Stroke.Color = Color3.fromRGB(45, 45, 50)
+			Stroke.Thickness = 1.4
+			Stroke.Color = tc
+			Stroke.Transparency = 0.35
 			Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Stroke.Parent = Frame
+
+			local AccentBar = Instance.new("Frame")
+			AccentBar.Name = "AccentBar"
+			AccentBar.BackgroundColor3 = tc
+			AccentBar.BorderSizePixel = 0
+			AccentBar.Position = UDim2.new(0, 0, 0, 12)
+			AccentBar.Size = UDim2.new(0, 3, 1, -24)
+			AccentBar.ZIndex = 202
+			AccentBar.Parent = Frame
+
+			local AccentBarCorner = Instance.new("UICorner")
+			AccentBarCorner.CornerRadius = UDim.new(1, 0)
+			AccentBarCorner.Parent = AccentBar
 
 			-- Icon (matches UI IconContainer style)
 			local IconFrame = Instance.new("Frame")
 			IconFrame.Size = UDim2.fromOffset(38, 38)
 			IconFrame.Position = UDim2.new(0, 22, 0, hasActions and 12 or 19)
-			IconFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 36)
+			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
 			IconFrame.ZIndex = 200
 			IconFrame.Parent = Frame
@@ -5504,8 +5528,9 @@ function Astral:MakeWindow(config)
 			IconCorner.Parent = IconFrame
 
 			local IconStroke = Instance.new("UIStroke")
-			IconStroke.Thickness = 1
-			IconStroke.Color = Color3.fromRGB(50, 50, 55)
+			IconStroke.Thickness = 1.2
+			IconStroke.Color = tc
+			IconStroke.Transparency = 0.4
 			IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			IconStroke.Parent = IconFrame
 
@@ -5515,7 +5540,7 @@ function Astral:MakeWindow(config)
 			Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Icon.BackgroundTransparency = 1
 			Astral.ApplyIcon(Icon, tIcon)
-			Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			Icon.ImageColor3 = tc
 			Icon.ZIndex = 200
 			Icon.Parent = IconFrame
 

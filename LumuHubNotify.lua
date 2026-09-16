@@ -206,9 +206,17 @@ function Notify:Send(config)
 	local hasActions = type(actions) == "table" and #actions > 0
 	local height = hasActions and 104 or (message ~= "" and 66 or 50)
 
+	local function mix(base, col, amount)
+		return Color3.fromRGB(
+			math.floor(base.R * 255 * (1 - amount) + col.R * 255 * amount),
+			math.floor(base.G * 255 * (1 - amount) + col.G * 255 * amount),
+			math.floor(base.B * 255 * (1 - amount) + col.B * 255 * amount)
+		)
+	end
+
 	local card = Instance.new("Frame")
 	card.Name = "Toast"
-	card.BackgroundColor3 = CARD
+	card.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), color, 0.22)
 	card.BorderSizePixel = 0
 	card.Size = UDim2.new(0, Notify.Width, 0, height)
 	card.ZIndex = 901
@@ -217,8 +225,8 @@ function Notify:Send(config)
 
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = color
-	stroke.Transparency = 0.6
-	stroke.Thickness = 1.2
+	stroke.Transparency = 0.35
+	stroke.Thickness = 1.4
 	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	stroke.Parent = card
 
