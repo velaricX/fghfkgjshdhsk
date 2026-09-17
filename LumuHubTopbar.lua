@@ -304,9 +304,13 @@ local function makeElementDraggable(guiObject, dragHandle)
 
 	dragHandle.InputBegan:Connect(function(input)
 		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			-- yield if the Game Status panel grabbed this same press (it sits above)
+			local okS, sT = pcall(function() return guiObject:GetAttribute("StatusDragT") end)
+			if okS and sT and os.clock() - sT < 0.3 then return end
 			dragging = true
 			dragStart = input.Position
 			startPos = guiObject.Position
+			pcall(function() guiObject:SetAttribute("MainDragT", os.clock()) end)
 
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
@@ -324,6 +328,10 @@ local function makeElementDraggable(guiObject, dragHandle)
 
 	UserInputService.InputChanged:Connect(function(input)
 		if input == dragInput and dragging then
+			-- abort mid-press if the status panel grabbed after us
+			local okS, sT = pcall(function() return guiObject:GetAttribute("StatusDragT") end)
+			local okM, mT = pcall(function() return guiObject:GetAttribute("MainDragT") end)
+			if okS and okM and sT and mT and sT > mT then dragging = false return end
 			update(input)
 		end
 	end)
@@ -792,7 +800,7 @@ function Astral:MakeWindow(config)
 	-- =====================================================================
 	-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
 	-- =====================================================================
-	local TabBarTop = 58
+	local TabBarTop = 54
 	local TabBarHeight = 48
 	local ContentTop = TabBarTop + TabBarHeight + 10
 
@@ -2454,8 +2462,8 @@ function Astral:MakeWindow(config)
 			if pickerOpen or selectorOpen then return end
 			if currentTab ~= tabData then
 				TweenService:Create(TabButton, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-					BackgroundTransparency = 0.92
+					BackgroundColor3 = AccentColor,
+					BackgroundTransparency = 0.88
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
 					Transparency = 0.85
@@ -4151,7 +4159,7 @@ function Astral:MakeWindow(config)
 			local STATUS_DEFS = {
 				good    = { Icon = "Checkmark", Color = Color3.fromRGB(46, 204, 113),  Text = "SPAWNED" },
 				bad     = { Icon = "Close",     Color = Color3.fromRGB(231, 76, 60),   Text = "NOT SPAWNED" },
-				waiting = { Icon = "timer",     Color = Color3.fromRGB(241, 196, 15),  Text = "WAITING" },
+				waiting = { Icon = "timer",     Color = Color3.fromRGB(245, 158, 11),  Text = "WAITING" },
 			}
 			local function tint(c, f)
 				return Color3.fromRGB(math.floor(c.R * 255 * f), math.floor(c.G * 255 * f), math.floor(c.B * 255 * f))
@@ -5051,7 +5059,7 @@ function Astral:MakeWindow(config)
 					purple = Color3.fromRGB(138, 90, 255),
 					pink = Color3.fromRGB(255, 90, 180),
 					orange = Color3.fromRGB(243, 156, 18),
-					gold = Color3.fromRGB(241, 196, 15),
+					gold = Color3.fromRGB(245, 158, 11),
 					white = Color3.fromRGB(240, 240, 245),
 					dark = Color3.fromRGB(40, 40, 46),
 				}
@@ -5366,7 +5374,7 @@ function Astral:MakeWindow(config)
 
 	-- LOGO TOGGLE BUTTON (Completely Independent ScreenGui Element)
 	-- Smaller footprint (was oversized), slightly bigger on mobile for touch
-	local logoSize = IsMobile and 64 or 60
+	local logoSize = IsMobile and 64 or 72
 	-- Default logo, change per window with Logo = "rbxassetid://..." in CreateWindow config
 	local logoAsset = config.Logo or "rbxassetid://134909842242325"
 	local LogoButton = Instance.new("TextButton")
@@ -5394,8 +5402,8 @@ function Astral:MakeWindow(config)
 	LogoCorner.Parent = LogoButton
 
 	local LogoStroke = Instance.new("UIStroke")
-	LogoStroke.Color = Color3.fromRGB(0, 153, 235) -- Accent blue ring (follows theme)
-	LogoStroke.Thickness = 2.5
+	LogoStroke.Color = Color3.fromRGB(58, 58, 66) -- Neutral ring (no accent)
+	LogoStroke.Thickness = 1.5
 	LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	LogoStroke.Parent = LogoButton
 
@@ -5584,7 +5592,7 @@ function Astral:MakeWindow(config)
 		end
 		-- recolor tab strokes + logo ring (not registered, direct refs)
 		for _, td in ipairs(tabs) do pcall(function() if td.Stroke then td.Stroke.Color = color end end) end
-		pcall(function() LogoStroke.Color = color end)
+		pcall(function() end) -- ring stays neutral
 		-- refresh active tab gradient with the new accent
 		if currentTab then
 			pcall(function()
@@ -5612,7 +5620,7 @@ function Astral:MakeWindow(config)
 		-- ==========================================
 		local notifTypeColors = {
 			good = {bg = Color3.fromRGB(46, 204, 113)},
-			warning = {bg = Color3.fromRGB(241, 196, 15)},
+			warning = {bg = Color3.fromRGB(245, 158, 11)},
 			bad = {bg = Color3.fromRGB(231, 76, 60)}
 		}
 		local notifTypeIcons = {
@@ -5940,7 +5948,7 @@ function Astral:MakeWindow(config)
 			purple = Color3.fromRGB(138, 90, 255),
 			pink = Color3.fromRGB(255, 90, 180),
 			orange = Color3.fromRGB(243, 156, 18),
-			gold = Color3.fromRGB(241, 196, 15),
+			gold = Color3.fromRGB(245, 158, 11),
 			white = Color3.fromRGB(240, 240, 245),
 			gray = Color3.fromRGB(160, 160, 168),
 		}
@@ -6206,6 +6214,7 @@ function Astral:MakeWindow(config)
 		local dragging, dragStart, startPos = false, nil, nil
 		Header.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				pcall(function() MainFrame:SetAttribute("StatusDragT", os.clock()) end)
 				dragging = true
 				dragStart = input.Position
 				startPos = Panel.Position

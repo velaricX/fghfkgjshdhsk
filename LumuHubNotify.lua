@@ -25,7 +25,7 @@ local TEXT_DIM = Color3.fromRGB(160, 160, 168)
 
 local GOOD = Color3.fromRGB(46, 204, 113)
 local BAD = Color3.fromRGB(231, 76, 60)
-local WARN = Color3.fromRGB(241, 196, 15)
+local WARN = Color3.fromRGB(245, 158, 11)
 local INFO = ACCENT
 
 local PALETTE = { good = GOOD, bad = BAD, warning = WARN, info = INFO, success = GOOD, error = BAD }

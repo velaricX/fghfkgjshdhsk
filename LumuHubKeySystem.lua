@@ -38,7 +38,7 @@ local TEXT_DIM = Color3.fromRGB(160, 160, 168)
 
 local GOOD = Color3.fromRGB(46, 204, 113)
 local BAD = Color3.fromRGB(231, 76, 60)
-local WARN = Color3.fromRGB(241, 196, 15)
+local WARN = Color3.fromRGB(245, 158, 11)
 
 local DISCORD_COLOR = Color3.fromRGB(88, 101, 242)
 local YOUTUBE_COLOR = Color3.fromRGB(255, 0, 0)
@@ -307,7 +307,7 @@ local function createMainNotify(screenGui, getAccent)
 
 	local TYPE_COLORS = {
 		good = Color3.fromRGB(46, 204, 113),
-		warning = Color3.fromRGB(241, 196, 15),
+		warning = Color3.fromRGB(245, 158, 11),
 		bad = Color3.fromRGB(231, 76, 60),
 		info = nil,
 	}
