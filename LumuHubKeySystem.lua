@@ -1219,7 +1219,7 @@ function KeySystem:Create(config)
 		local column = Instance.new("Frame")
 		column.Name = name .. "Column"
 		column.BackgroundTransparency = 1
-		column.Size = UDim2.new(0, 96, 0, 0)
+		column.Size = UDim2.new(0, 80, 0, 0)
 		column.AutomaticSize = Enum.AutomaticSize.Y
 		column.LayoutOrder = order
 		column.ZIndex = 102
@@ -1236,7 +1236,7 @@ function KeySystem:Create(config)
 		btn.Name = name .. "Button"
 		btn.BackgroundColor3 = CARD
 		btn.BorderSizePixel = 0
-		btn.Size = UDim2.new(0, 74, 0, 74)
+		btn.Size = UDim2.new(0, 56, 0, 56)
 		btn.Text = ""
 		btn.AutoButtonColor = false
 		btn.ClipsDescendants = true
@@ -1260,10 +1260,10 @@ function KeySystem:Create(config)
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		iconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		iconHolder.Size = UDim2.new(1, 0, 1, 0)
+		iconHolder.Size = UDim2.new(1, -18, 1, -18)
 		iconHolder.ZIndex = 103
 		iconHolder.Parent = btn
-		renderBrandIcon(iconHolder, sprite, fallbackFn, brandColor, "fill")
+		renderBrandIcon(iconHolder, sprite, fallbackFn, brandColor, "fit")
 
 		local caption = Instance.new("TextLabel")
 		caption.Name = "Caption"
