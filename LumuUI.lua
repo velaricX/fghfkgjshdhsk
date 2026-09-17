@@ -396,7 +396,8 @@ local THEME_SWAP = {
 	["52,52,60"] = { "36,48,76", "58,40,90", "80,40,42", "37,80,40", "33,77,85", "88,59,32", "92,42,69", "71,82,101", "77,56,38" },
 	["54,54,62"] = { "36,48,76", "58,40,90", "80,40,42", "37,80,40", "33,77,85", "88,59,32", "92,42,69", "71,82,101", "77,56,38" },
 	["70,70,75"] = { "55,70,105", "85,60,130", "115,58,60", "52,108,56", "46,106,118", "122,82,44", "128,58,96", "99,114,141", "107,78,52" },
-}
+	["205,205,214"] = { "148,160,190", "185,175,210", "210,180,180", "180,210,180", "175,205,215", "215,195,175", "215,185,205", "185,195,215", "210,190,170" },
+	["70,70,80"] = { "55,70,105", "85,60,130", "115,58,60", "52,108,56", "46,106,118", "122,82,44", "128,58,96", "99,114,141", "107,78,52" },}
 local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2, Crimson = 3, Forest = 4, Ocean = 5, Sunset = 6, Rose = 7, Slate = 8, Coffee = 9, Custom = -1 }
 local CustomThemeValues = nil -- darkKey -> "r,g,b" string, built by SetCustomTheme
 local CurrentThemeName = "Dark"
@@ -2284,6 +2285,10 @@ function Astral:MakeWindow(config)
 			frame.Size = UDim2.new(1,0,0,height)
 			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced})
 			table.insert(tabData.Elements, elements[#elements])
+			-- if a non-dark theme is active, theme this new element too (idempotent)
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+				applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+			end
 			updateCanvas()
 		end
 
@@ -6350,6 +6355,9 @@ function Astral:MakeWindow(config)
 
 		if config.Rows then GameStatus:SetRows(config.Rows) end
 
+		if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
 
 		return GameStatus
 	end
