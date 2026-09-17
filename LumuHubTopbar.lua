@@ -2689,7 +2689,7 @@ function Astral:MakeWindow(config)
 			SwitchThumb.Size = UDim2.new(0, 28, 0, 28)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(1, 0)
+			ThumbCorner.CornerRadius = UDim.new(0, 8)
 			ThumbCorner.Parent = SwitchThumb
 			local enabled = default
 			local function toggle(state)
