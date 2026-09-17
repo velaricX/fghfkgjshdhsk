@@ -352,6 +352,132 @@ local function getRelativePosition(guiObject, input)
 end
 
 -- ============================================================================
+-- ============================================================================
+-- THEMES: Dark (default build) / Light / Midnight.
+-- Window:SetTheme(name) recolors every surface + text by value.
+-- Anything currently bound to the accent color is left untouched.
+-- Index: 1 = Light, 2 = Midnight (0 = Dark = the source keys themselves).
+-- ============================================================================
+local THEME_SWAP = {
+	["12,12,14"] = { "230,230,238", "5,7,15" },
+	["26,26,30"] = { "255,255,255", "12,16,29" },
+	["18,18,22"] = { "244,244,250", "9,12,23" },
+	["16,16,18"] = { "238,238,246", "8,11,21" },
+	["20,20,24"] = { "236,236,244", "11,15,27" },
+	["22,22,26"] = { "240,240,248", "13,18,32" },
+	["30,30,36"] = { "226,226,236", "19,25,43" },
+	["28,28,34"] = { "226,226,236", "19,25,43" },
+	["36,36,40"] = { "218,218,228", "25,33,55" },
+	["32,32,36"] = { "233,233,242", "17,23,39" },
+	["35,35,40"] = { "208,208,218", "29,39,63" },
+	["45,45,50"] = { "203,203,213", "31,43,69" },
+	["50,50,55"] = { "192,192,204", "39,53,83" },
+	["38,38,44"] = { "210,210,220", "28,38,60" },
+	["52,52,60"] = { "198,198,210", "36,48,76" },
+	["54,54,62"] = { "198,198,210", "36,48,76" },
+	["70,70,75"] = { "170,170,185", "55,70,105" },
+	["255,255,255"] = { "18,18,26", "231,237,255" },
+	["160,160,165"] = { "92,92,106", "146,158,188" },
+	["150,150,158"] = { "92,92,106", "146,158,188" },
+	["162,162,172"] = { "92,92,106", "146,158,188" },
+	["165,165,176"] = { "92,92,106", "146,158,188" },
+	["175,175,182"] = { "92,92,106", "146,158,188" },
+	["170,170,178"] = { "105,105,120", "158,170,200" },
+	["180,180,185"] = { "118,118,134", "148,160,190" },
+	["120,120,125"] = { "138,138,152", "118,130,163" },
+	["110,110,118"] = { "138,138,152", "118,130,163" },
+	["100,100,105"] = { "138,138,152", "118,130,163" },
+	["15,15,15"] = { "235,235,242", "8,11,20" },
+}
+local THEME_INDEX = { Dark = 0, Light = 1, Midnight = 2 }
+local CurrentThemeName = "Dark"
+
+local function parseThemeRGB(s)
+	local r, g, b = string.match(s, "^(%d+),(%d+),(%d+)$")
+	return Color3.fromRGB(tonumber(r) or 0, tonumber(g) or 0, tonumber(b) or 0)
+end
+
+local function themeKeyOf(c)
+	return math.floor(c.R * 255 + 0.5) .. "," .. math.floor(c.G * 255 + 0.5) .. "," .. math.floor(c.B * 255 + 0.5)
+end
+
+-- File-scope theme applier (kept out of MakeWindow to respect the 200-local limit).
+-- Returns the new theme name on success, nil on failure.
+local function applyThemeToGui(screenGui, accentColor, fromName, toName)
+	local target = THEME_INDEX[toName]
+	if target == nil then return nil end
+	local current = THEME_INDEX[fromName] or 0
+	if target == current then return toName end
+
+	local function valFor(srcKey, idx)
+		if idx == 0 then return parseThemeRGB(srcKey) end
+		local pair = THEME_SWAP[srcKey]
+		if not pair then return nil end
+		return parseThemeRGB(pair[idx])
+	end
+
+	local remap = {}
+	for srcKey in pairs(THEME_SWAP) do
+		local oldC = valFor(srcKey, current)
+		local newC = valFor(srcKey, target)
+		if oldC and newC then remap[themeKeyOf(oldC)] = newC end
+	end
+
+	local accentKey = themeKeyOf(accentColor)
+
+	local function swapProp(obj, prop, allowWhite)
+		local ok, val = pcall(function() return obj[prop] end)
+		if not ok or typeof(val) ~= "Color3" then return end
+		local key = themeKeyOf(val)
+		if key == accentKey then return end
+		if not allowWhite and key == "255,255,255" then return end
+		local to = remap[key]
+		if to then pcall(function() obj[prop] = to end) end
+	end
+
+	for _, d in ipairs(screenGui:GetDescendants()) do
+		if d:IsA("GuiObject") then
+			swapProp(d, "BackgroundColor3", false)
+			if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
+				swapProp(d, "TextColor3", true)
+				swapProp(d, "PlaceholderColor3", true)
+			elseif d:IsA("ImageLabel") or d:IsA("ImageButton") then
+				swapProp(d, "ImageColor3", false)
+			end
+		elseif d:IsA("UIStroke") then
+			swapProp(d, "Color", true)
+		end
+	end
+
+	return toName
+end
+
+-- Live hover helpers: evaluated when a hover FIRES, so they always match
+-- the current theme. Use these instead of hardcoded dark literals.
+local function themeCardBG(t)
+	if t == "Light" then return Color3.fromRGB(255, 255, 255) end
+	if t == "Midnight" then return Color3.fromRGB(12, 16, 29) end
+	return Color3.fromRGB(26, 26, 30)
+end
+
+local function themeHoverBG(t)
+	if t == "Light" then return Color3.fromRGB(218, 218, 228) end
+	if t == "Midnight" then return Color3.fromRGB(25, 33, 55) end
+	return Color3.fromRGB(36, 36, 40)
+end
+
+local function themeStroke(t)
+	if t == "Light" then return Color3.fromRGB(192, 192, 204) end
+	if t == "Midnight" then return Color3.fromRGB(39, 53, 83) end
+	return Color3.fromRGB(50, 50, 55)
+end
+
+local function themeStrokeHover(t)
+	if t == "Light" then return Color3.fromRGB(170, 170, 185) end
+	if t == "Midnight" then return Color3.fromRGB(55, 70, 105) end
+	return Color3.fromRGB(70, 70, 75)
+end
+
 function Astral:MakeWindow(config)
 	config = config or {}
 	-- Accent engine FIRST: panels and elements below hook into it during build
@@ -1640,12 +1766,12 @@ function Astral:MakeWindow(config)
 
 				OptionBtn.MouseEnter:Connect(function()
 					if not isSelected then
-						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(30, 30, 36)}):Play()
+						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(CurrentThemeName)}):Play()
 					end
 				end)
 				OptionBtn.MouseLeave:Connect(function()
 					if not isSelected then
-						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 32, 36)}):Play()
+						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(CurrentThemeName)}):Play()
 					end
 				end)
 			end
@@ -2105,7 +2231,7 @@ function Astral:MakeWindow(config)
 			if pickerOpen or selectorOpen then return end -- FIXED: Disable hover effects when panels are open
 			if currentTab ~= tabData then
 				TweenService:Create(TabButton, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
 					Color = Color3.fromRGB(42, 42, 46)
@@ -2318,14 +2444,14 @@ function Astral:MakeWindow(config)
 			end)
 			ButtonFrame.MouseEnter:Connect(function()
 				if locked then return end
-				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 			end)
 			ButtonFrame.MouseLeave:Connect(function()
 				if locked then return end
-				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(160, 160, 165)}):Play()
 			end)
 
@@ -2443,6 +2569,12 @@ function Astral:MakeWindow(config)
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(0, 8)
 			TrackCorner.Parent = SwitchTrack
+
+			local TrackStroke = Instance.new("UIStroke")
+			TrackStroke.Color = Color3.fromRGB(62, 62, 72)
+			TrackStroke.Thickness = 1.2
+			TrackStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			TrackStroke.Parent = SwitchTrack
 			local SwitchThumb = Instance.new("Frame")
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -2464,12 +2596,12 @@ function Astral:MakeWindow(config)
 			end
 			ToggleFrame.MouseButton1Click:Connect(function() toggle() end)
 			ToggleFrame.MouseEnter:Connect(function()
-				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			ToggleFrame.MouseLeave:Connect(function()
-				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 			end)
 			registerElement(ToggleFrame, calculatedHeight, toggleConfig.Position)
 
@@ -2675,19 +2807,19 @@ function Astral:MakeWindow(config)
 
 			TickFrame.MouseEnter:Connect(function()
 				TweenService:Create(TickFrame, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(TickStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(65, 65, 75)
+					Color = themeStrokeHover(Window.ThemeName or "Dark")
 				}):Play()
 			end)
 
 			TickFrame.MouseLeave:Connect(function()
 				TweenService:Create(TickFrame, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(TickStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(50, 50, 55)
+					Color = themeStroke(Window.ThemeName or "Dark")
 				}):Play()
 			end)
 
@@ -2846,19 +2978,19 @@ function Astral:MakeWindow(config)
 
 			PickerFrame.MouseEnter:Connect(function()
 				TweenService:Create(PickerFrame, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(PickerStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(65, 65, 75)
+					Color = themeStrokeHover(Window.ThemeName or "Dark")
 				}):Play()
 			end)
 
 			PickerFrame.MouseLeave:Connect(function()
 				TweenService:Create(PickerFrame, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(PickerStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(50, 50, 55)
+					Color = themeStroke(Window.ThemeName or "Dark")
 				}):Play()
 			end)
 
@@ -3266,12 +3398,12 @@ function Astral:MakeWindow(config)
 			end)
 
 			ValueBox.MouseEnter:Connect(function()
-				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			ValueBox.MouseLeave:Connect(function()
-				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 			end)
 
 			registerElement(SelectorFrame, calculatedHeight, selectorConfig.Position)
@@ -3507,14 +3639,14 @@ function Astral:MakeWindow(config)
 			end)
 
 			TextboxFrame.MouseEnter:Connect(function()
-				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 130, 135)}):Play()
 			end)
 
 			TextboxFrame.MouseLeave:Connect(function()
-				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 				if not InputBox:IsFocused() then
 					TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(100, 100, 105)}):Play()
 				end
@@ -3751,13 +3883,13 @@ function Astral:MakeWindow(config)
 
 			-- Hover white effect like toggle (good UI)
 			LabelFrame.MouseEnter:Connect(function()
-				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local s = IconContainer and IconContainer:FindFirstChild("UIStroke"); if s then TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0}):Play() end end)
 			end)
 			LabelFrame.MouseLeave:Connect(function()
-				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 50)}):Play()
+				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local s = IconContainer and IconContainer:FindFirstChild("UIStroke"); if s then TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.3}):Play() end end)
 			end)
 
@@ -4044,13 +4176,13 @@ function Astral:MakeWindow(config)
 
 			-- hover white effect like toggle (good UI)
 			ParaFrame.MouseEnter:Connect(function()
-				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0}):Play() end end end)
 			end)
 			ParaFrame.MouseLeave:Connect(function()
-				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = Color3.fromRGB(32, 32, 36)}):Play()
+				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeCardBG(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0.3}):Play() end end end)
 			end)
 
@@ -4590,18 +4722,18 @@ function Astral:MakeWindow(config)
 
 			-- Hover effects (identical to toggle/button rows)
 			KeybindFrame.MouseEnter:Connect(function()
-				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			KeybindFrame.MouseLeave:Connect(function()
-				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(50, 50, 55)}):Play()
+				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
+				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 			end)
 
 			-- Key box hover: accent outline so it reads as clickable
 			KeybindButton.MouseEnter:Connect(function()
 				if listening then return end
-				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(44, 44, 52)}):Play()
+				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 			end)
 			KeybindButton.MouseLeave:Connect(function()
@@ -5147,7 +5279,7 @@ function Astral:MakeWindow(config)
 
 	MinimizeButton.MouseLeave:Connect(function()
 		TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
-			BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 		}):Play()
 		TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
 			Color = Color3.fromRGB(42, 42, 46)
@@ -5387,6 +5519,19 @@ function Astral:MakeWindow(config)
 		end
 	end
 
+	function Window:SetTheme(name)
+		local result = applyThemeToGui(ScreenGui, AccentColor, Window.ThemeName or "Dark", name)
+		if result then
+			Window.ThemeName = result
+			CurrentThemeName = result
+			return true
+		end
+		return false
+	end
+
+	function Window:GetTheme()
+		return Window.ThemeName or "Dark"
+	end
 	
 		-- ==========================================
 		-- NOTIFICATION SYSTEM
@@ -5624,10 +5769,10 @@ function Astral:MakeWindow(config)
 
 			-- Hover highlight like UI cards
 			Frame.MouseEnter:Connect(function()
-				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 75)}):Play()
+				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			Frame.MouseLeave:Connect(function()
-				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 45, 50)}):Play()
+				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 			end)
 
 			-- Slide in from right side
@@ -5705,8 +5850,8 @@ function Astral:MakeWindow(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
-		local panelW = tonumber(config.Width) or 268
-		local rowH = tonumber(config.RowHeight) or 28
+		local panelW = tonumber(config.Width) or 276
+		local rowH = tonumber(config.RowHeight) or 30
 		local showBeta = config.Beta
 		if showBeta == nil then showBeta = true end
 		local enabled = config.Enabled
@@ -5770,7 +5915,7 @@ function Astral:MakeWindow(config)
 		Header.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
 		Header.BackgroundTransparency = 0.35
 		Header.BorderSizePixel = 0
-		Header.Size = UDim2.new(1, 0, 0, 42)
+		Header.Size = UDim2.new(1, 0, 0, 44)
 		Header.LayoutOrder = 1
 		Header.ZIndex = 501
 		Header.Active = true
@@ -5797,7 +5942,7 @@ function Astral:MakeWindow(config)
 		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 39 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
 		TitleLabel.Text = title
-		TitleLabel.TextSize = 14
+		TitleLabel.TextSize = 15
 		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5919,7 +6064,7 @@ function Astral:MakeWindow(config)
 			NameLabel.Size = UDim2.new(0.58, 0, 1, 0)
 			NameLabel.Font = Enum.Font.Gotham
 			NameLabel.Text = tostring(name)
-			NameLabel.TextSize = 13
+			NameLabel.TextSize = 14
 			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5934,7 +6079,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Size = UDim2.new(0.42, 0, 1, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.Text = tostring(value or "--")
-			ValueLabel.TextSize = 13
+			ValueLabel.TextSize = 14
 			ValueLabel.TextColor3 = colorOverride or AccentColor
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6150,6 +6295,11 @@ function Astral:MakeWindow(config)
 
 
 
+	Window.ThemeName = "Dark"
+	if config.Theme and type(config.Theme) == "string" then
+		local initial = applyThemeToGui(ScreenGui, AccentColor, "Dark", config.Theme)
+		if initial then Window.ThemeName = initial; CurrentThemeName = initial end
+	end
 
 	return Window
 end
