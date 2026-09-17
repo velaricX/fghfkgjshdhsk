@@ -668,7 +668,7 @@ function Astral:MakeWindow(config)
 	-- =====================================================================
 	local TabBarTop = 62
 	local TabBarHeight = 48
-	local ContentTop = TabBarTop + TabBarHeight + 6
+	local ContentTop = TabBarTop + TabBarHeight + 10
 
 	-- ===== Bar layout: two separate boxes with a gap =====
 	--   [ tab1 tab2 tab3 ]   [ v ]
@@ -2417,7 +2417,7 @@ function Astral:MakeWindow(config)
 
 			local ButtonFrame = Instance.new("TextButton")
 			ButtonFrame.Name = title .. "_Button"
-			ButtonFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			ButtonFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 39)
 			ButtonFrame.BorderSizePixel = 0
 			ButtonFrame.Size = UDim2.new(1, 0, 0, calculatedHeight)
 			ButtonFrame.Text = ""
@@ -2509,8 +2509,8 @@ function Astral:MakeWindow(config)
 			local ActionArrow = Instance.new("ImageLabel")
 			ActionArrow.Name = "ActionArrow"
 			ActionArrow.BackgroundTransparency = 1
-			ActionArrow.Position = UDim2.new(1, -32, 0.5, -8)
-			ActionArrow.Size = UDim2.new(0, 16, 0, 16)
+			ActionArrow.Position = UDim2.new(1, -34, 0.5, -10)
+			ActionArrow.Size = UDim2.new(0, 20, 0, 20)
 			ActionArrow.Image = Astral.Icons.right_arrow
 			ActionArrow.ImageColor3 = Color3.fromRGB(160, 160, 165)
 			ActionArrow.ScaleType = Enum.ScaleType.Fit
@@ -2685,34 +2685,12 @@ function Astral:MakeWindow(config)
 				DescLabel.TextWrapped = true
 				DescLabel.Parent = TextContainer
 			end
-			-- Holder behind the switch so it stands out on the card
-			local SwitchHolder = Instance.new("Frame")
-			SwitchHolder.Name = "SwitchHolder"
-			SwitchHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-			SwitchHolder.BorderSizePixel = 0
-			SwitchHolder.AnchorPoint = Vector2.new(1, 0.5)
-			SwitchHolder.Position = UDim2.new(1, -8, 0.5, 0)
-			SwitchHolder.Size = UDim2.new(0, 76, 0, 40)
-			SwitchHolder.ZIndex = 10
-			SwitchHolder.Parent = ToggleFrame
-
-			local SwitchHolderCorner = Instance.new("UICorner")
-			SwitchHolderCorner.CornerRadius = UDim.new(0, 12)
-			SwitchHolderCorner.Parent = SwitchHolder
-
-			local SwitchHolderStroke = Instance.new("UIStroke")
-			SwitchHolderStroke.Color = Color3.fromRGB(60, 60, 70)
-			SwitchHolderStroke.Thickness = 1.2
-			SwitchHolderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			SwitchHolderStroke.Parent = SwitchHolder
-
 			local SwitchTrack = Instance.new("Frame")
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
 			SwitchTrack.Position = UDim2.new(1, -80, 0.5, -16)
 			SwitchTrack.Size = UDim2.new(0, 68, 0, 32)
-			SwitchTrack.ZIndex = 11
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(0, 8)
@@ -2869,27 +2847,6 @@ function Astral:MakeWindow(config)
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
 				DescLabel.Parent = TextContainer -- FIXED: Corrected parent to TextContainer
 			end
-
-			-- Holder behind the checkbox so it stands out on the card
-			local CheckboxHolder = Instance.new("Frame")
-			CheckboxHolder.Name = "CheckboxHolder"
-			CheckboxHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-			CheckboxHolder.BorderSizePixel = 0
-			CheckboxHolder.AnchorPoint = Vector2.new(1, 0.5)
-			CheckboxHolder.Position = UDim2.new(1, -8, 0.5, 0)
-			CheckboxHolder.Size = UDim2.new(0, 52, 0, 52)
-			CheckboxHolder.ZIndex = 10
-			CheckboxHolder.Parent = TickFrame
-
-			local CheckboxHolderCorner = Instance.new("UICorner")
-			CheckboxHolderCorner.CornerRadius = UDim.new(0, 12)
-			CheckboxHolderCorner.Parent = CheckboxHolder
-
-			local CheckboxHolderStroke = Instance.new("UIStroke")
-			CheckboxHolderStroke.Color = Color3.fromRGB(60, 60, 70)
-			CheckboxHolderStroke.Thickness = 1.2
-			CheckboxHolderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			CheckboxHolderStroke.Parent = CheckboxHolder
 
 			-- Checkbox Container (Enlarged & Moved Left to avoid border)
 			local Checkbox = Instance.new("Frame")
@@ -4773,39 +4730,10 @@ function Astral:MakeWindow(config)
 			TitleLabel.TextWrapped = false
 			TitleLabel.Parent = TextContainer
 
-			-- Keybind Button (Right Side)
-			-- Holder behind the key button so it stands out on the card
-			local KeyHolder = Instance.new("Frame")
-			KeyHolder.Name = "KeyHolder"
-			KeyHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-			KeyHolder.BorderSizePixel = 0
-			KeyHolder.AnchorPoint = Vector2.new(1, 0.5)
-			KeyHolder.Position = UDim2.new(1, -8, 0.5, 0)
-			KeyHolder.Size = UDim2.new(0, 0, 0, 42)
-			KeyHolder.AutomaticSize = Enum.AutomaticSize.X
-			KeyHolder.ZIndex = 10
-			KeyHolder.Parent = KeybindFrame
-
-			local KeyHolderCorner = Instance.new("UICorner")
-			KeyHolderCorner.CornerRadius = UDim.new(0, 12)
-			KeyHolderCorner.Parent = KeyHolder
-
-			local KeyHolderStroke = Instance.new("UIStroke")
-			KeyHolderStroke.Color = Color3.fromRGB(60, 60, 70)
-			KeyHolderStroke.Thickness = 1.2
-			KeyHolderStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			KeyHolderStroke.Parent = KeyHolder
-
-			local KeyHolderPad = Instance.new("UIPadding")
-			KeyHolderPad.PaddingLeft = UDim.new(0, 4)
-			KeyHolderPad.PaddingRight = UDim.new(0, 4)
-			KeyHolderPad.PaddingTop = UDim.new(0, 4)
-			KeyHolderPad.PaddingBottom = UDim.new(0, 4)
-			KeyHolderPad.Parent = KeyHolder
 
 			local KeybindButton = Instance.new("TextButton")
 			KeybindButton.Name = "KeybindButton"
-			KeybindButton.BackgroundColor3 = Color3.fromRGB(34, 34, 40)
+			KeybindButton.BackgroundColor3 = Color3.fromRGB(42, 42, 50)
 			KeybindButton.BorderSizePixel = 0
 			KeybindButton.AnchorPoint = Vector2.new(1, 0.5)
 			KeybindButton.Position = UDim2.new(1, -12, 0.5, 0)
@@ -4816,7 +4744,6 @@ function Astral:MakeWindow(config)
 			KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 			KeybindButton.TextSize = 13
 			KeybindButton.AutoButtonColor = false
-			KeybindButton.ZIndex = 11
 			KeybindButton.Parent = KeybindFrame
 
 			local ButtonCorner = Instance.new("UICorner")
@@ -4834,16 +4761,6 @@ function Astral:MakeWindow(config)
 			ButtonPadding.PaddingLeft = UDim.new(0, 18)
 			ButtonPadding.PaddingRight = UDim.new(0, 18)
 			ButtonPadding.Parent = KeybindButton
-
-			-- keep the holder wrapped around the button as its width changes
-			local function syncKeyHolder()
-				local w = 60
-				pcall(function() w = KeybindButton.AbsoluteSize.X end)
-				if w < 10 then w = 60 end
-				KeyHolder.Size = UDim2.new(0, w + 8, 0, 42)
-			end
-			KeybindButton:GetPropertyChangedSignal("AbsoluteSize"):Connect(syncKeyHolder)
-			task.spawn(syncKeyHolder)
 
 			local currentKey = default
 			local listening = false
