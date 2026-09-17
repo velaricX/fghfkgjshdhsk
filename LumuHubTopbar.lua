@@ -652,8 +652,8 @@ function Astral:MakeWindow(config)
 	-- =====================================================================
 	-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
 	-- =====================================================================
-	local TabBarTop = 54
-	local TabBarHeight = 42
+	local TabBarTop = 62
+	local TabBarHeight = 48
 	local ContentTop = TabBarTop + TabBarHeight + 6
 
 	-- ===== Bar layout: two separate boxes with a gap =====
@@ -847,7 +847,7 @@ function Astral:MakeWindow(config)
 		CIcon.BackgroundTransparency = 1
 		CIcon.AnchorPoint = Vector2.new(0.5, 0.5)
 		CIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		CIcon.Size = UDim2.new(0, 26, 0, 26)
+		CIcon.Size = UDim2.new(0, 28, 0, 28)
 		CIcon.Image = Astral.Icons.big_arrow_down or Astral.Icons.down_arrow
 		CIcon.ImageColor3 = Color3.fromRGB(235, 235, 240)
 		CIcon.ScaleType = Enum.ScaleType.Fit
@@ -2045,7 +2045,7 @@ function Astral:MakeWindow(config)
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 1
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(0, 0, 0, 36)
+		TabButton.Size = UDim2.new(0, 0, 0, 40)
 		TabButton.AutomaticSize = Enum.AutomaticSize.X
 		TabButton.AutoButtonColor = false
 		TabButton.Text = ""
