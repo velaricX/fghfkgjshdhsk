@@ -271,290 +271,58 @@ end
 -- ============================================================================
 -- Notification system -- copied from the main Lumu UI
 -- (bottom-right stack, icon box, title + message, progress bar, action buttons)
-local function createNotifier(screenGui)
-	local viewportX = 1280
+-- ============================================================================
+-- Shared notification UI (LumuHubNotify) -- loaded once, used by every file.
+-- No duplicate notification code lives in here.
+-- ============================================================================
+local function loadSharedNotify()
+	local shared = nil
 	pcall(function()
-		local cam = workspace.CurrentCamera
-		if cam then viewportX = cam.ViewportSize.X end
+		if getgenv then
+			local g = getgenv()
+			if type(g) == "table" and type(g.LumuNotify) == "table" and type(g.LumuNotify.Send) == "function" then
+				shared = g.LumuNotify
+			end
+		end
 	end)
-	local notifW = math.min(300, math.floor(viewportX * 0.3))
-	if notifW < 150 then notifW = 150 end
-
-	local Container = Instance.new("Frame")
-	Container.Name = "NotificationContainer"
-	Container.Size = UDim2.new(0, notifW + 20, 0, 0)
-	Container.Position = UDim2.new(1, -12, 1, -12)
-	Container.AnchorPoint = Vector2.new(1, 1)
-	Container.BackgroundTransparency = 1
-	Container.AutomaticSize = Enum.AutomaticSize.Y
-	Container.ZIndex = 200
-	Container.Parent = screenGui
-
-	local NotifLayout = Instance.new("UIListLayout")
-	NotifLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-	NotifLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-	NotifLayout.Padding = UDim.new(0, 8)
-	NotifLayout.Parent = Container
-
-	local TYPE_COLORS = {
-		good = Color3.fromRGB(46, 204, 113),
-		warning = Color3.fromRGB(241, 196, 15),
-		bad = Color3.fromRGB(231, 76, 60),
-		info = ACCENT,
-	}
-	local TYPE_ICONS = { good = "Checkmark", warning = "Warning", bad = "Close", info = "Warning" }
-	local TYPE_FALLBACK = { good = Draw.check, warning = Draw.bang, bad = Draw.cross, info = Draw.bang }
-
-	return function(a, b, c, d, e)
-		local cfg
-		if type(a) == "table" then
-			cfg = a
-		else
-			cfg = { Type = a, Title = b, Message = c, Duration = d, Actions = e }
-		end
-
-		local kind = tostring(cfg.Type or "info"):lower()
-		local tColor = TYPE_COLORS[kind] or TYPE_COLORS.info
-		local actions = cfg.Actions
-		local hasActions = type(actions) == "table" and #actions > 0
-		local notifH = hasActions and 100 or 76
-		local duration = tonumber(cfg.Duration) or 5
-		if duration <= 0 then duration = 1 end
-
-		local function mix(base, color, amount)
-			return Color3.fromRGB(
-				math.floor(base.R * 255 * (1 - amount) + color.R * 255 * amount),
-				math.floor(base.G * 255 * (1 - amount) + color.G * 255 * amount),
-				math.floor(base.B * 255 * (1 - amount) + color.B * 255 * amount)
-			)
-		end
-
-		local Frame = Instance.new("Frame")
-		Frame.Size = UDim2.new(0, notifW, 0, notifH)
-		Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tColor, 0.22)
-		Frame.BorderSizePixel = 0
-		Frame.ZIndex = 200
-		Frame.ClipsDescendants = true
-		Frame.Parent = Container
-
-		local Corner = Instance.new("UICorner")
-		Corner.CornerRadius = UDim.new(0, 10)
-		Corner.Parent = Frame
-
-		local Stroke = Instance.new("UIStroke")
-		Stroke.Thickness = 1.4
-		Stroke.Color = tColor
-		Stroke.Transparency = 0.35
-		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		Stroke.Parent = Frame
-
-		local AccentBar = Instance.new("Frame")
-		AccentBar.Name = "AccentBar"
-		AccentBar.BackgroundColor3 = tColor
-		AccentBar.BorderSizePixel = 0
-		AccentBar.Position = UDim2.new(0, 0, 0, 12)
-		AccentBar.Size = UDim2.new(0, 3, 1, -24)
-		AccentBar.ZIndex = 202
-		AccentBar.Parent = Frame
-		round(AccentBar, 1)
-
-		-- icon box (matches the UI IconContainer style)
-		local IconFrame = Instance.new("Frame")
-		IconFrame.Size = UDim2.fromOffset(38, 38)
-		IconFrame.Position = UDim2.new(0, 22, 0, hasActions and 12 or 19)
-		IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tColor, 0.28)
-		IconFrame.BorderSizePixel = 0
-		IconFrame.ZIndex = 200
-		IconFrame.Parent = Frame
-
-		local IconCorner = Instance.new("UICorner")
-		IconCorner.CornerRadius = UDim.new(0, 8)
-		IconCorner.Parent = IconFrame
-
-		local IconStroke = Instance.new("UIStroke")
-		IconStroke.Thickness = 1.2
-		IconStroke.Color = tColor
-		IconStroke.Transparency = 0.4
-		IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		IconStroke.Parent = IconFrame
-
-		local IconHolder = Instance.new("Frame")
-		IconHolder.Name = "Icon"
-		IconHolder.BackgroundTransparency = 1
-		IconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
-		IconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		IconHolder.Size = UDim2.fromOffset(20, 20)
-		IconHolder.ZIndex = 201
-		IconHolder.Parent = IconFrame
-		renderIcon(IconHolder, parseIcon(TYPE_ICONS[kind]) or cfg.Icon, TYPE_FALLBACK[kind] or Draw.bang, tColor, "fit")
-
-		-- text
-		local TextFrame = Instance.new("Frame")
-		TextFrame.Size = UDim2.new(1, -108, 0, hasActions and 40 or 44)
-		TextFrame.Position = UDim2.new(0, 70, 0, hasActions and 10 or 12)
-		TextFrame.BackgroundTransparency = 1
-		TextFrame.ZIndex = 200
-		TextFrame.Parent = Frame
-
-		local TitleLabel = Instance.new("TextLabel")
-		TitleLabel.Size = UDim2.new(1, -6, 0, 18)
-		TitleLabel.BackgroundTransparency = 1
-		TitleLabel.Font = Enum.Font.GothamBold
-		TitleLabel.Text = tostring(cfg.Title or "")
-		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TitleLabel.TextSize = 12
-		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-		TitleLabel.ZIndex = 200
-		TitleLabel.Parent = TextFrame
-
-		local DescLabel = Instance.new("TextLabel")
-		DescLabel.Size = UDim2.new(1, -6, 0, hasActions and 20 or 24)
-		DescLabel.Position = UDim2.new(0, 0, 0, 19)
-		DescLabel.BackgroundTransparency = 1
-		DescLabel.Font = Enum.Font.Gotham
-		DescLabel.Text = tostring(cfg.Message or "")
-		DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-		DescLabel.TextSize = 11
-		DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-		DescLabel.TextYAlignment = Enum.TextYAlignment.Top
-		DescLabel.TextWrapped = true
-		DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
-		DescLabel.ZIndex = 200
-		DescLabel.Parent = TextFrame
-
-		-- bottom progress bar
-		local ProgressTrack = Instance.new("Frame")
-		ProgressTrack.Name = "ProgressTrack"
-		ProgressTrack.Size = UDim2.new(1, -32, 0, 2)
-		ProgressTrack.Position = UDim2.new(0, 16, 1, -6)
-		ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
-		ProgressTrack.BorderSizePixel = 0
-		ProgressTrack.ZIndex = 201
-		ProgressTrack.Parent = Frame
-		round(ProgressTrack, 1)
-
-		local ProgressFill = Instance.new("Frame")
-		ProgressFill.Name = "ProgressFill"
-		ProgressFill.Size = UDim2.new(1, 0, 1, 0)
-		ProgressFill.BackgroundColor3 = Color3.fromRGB(120, 120, 125)
-		ProgressFill.BorderSizePixel = 0
-		ProgressFill.ZIndex = 202
-		ProgressFill.Parent = ProgressTrack
-		round(ProgressFill, 1)
-
-		local dismiss
-
-		if hasActions then
-			local btnRow = Instance.new("Frame")
-			btnRow.Size = UDim2.new(1, -86, 0, 26)
-			btnRow.Position = UDim2.new(0, 70, 0, 58)
-			btnRow.BackgroundTransparency = 1
-			btnRow.ZIndex = 200
-			btnRow.Parent = Frame
-
-			local BtnLayout = Instance.new("UIListLayout")
-			BtnLayout.FillDirection = Enum.FillDirection.Horizontal
-			BtnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-			BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			BtnLayout.Padding = UDim.new(0, 8)
-			BtnLayout.Parent = btnRow
-
-			for i, action in ipairs(actions) do
-				local aType = tostring(action.Type or kind):lower()
-				local aColor = TYPE_COLORS[aType] or tColor
-				local isPrimary = (i == 1)
-
-				local Btn = Instance.new("TextButton")
-				Btn.Size = UDim2.new(0, 72, 0, 26)
-				Btn.BackgroundColor3 = isPrimary and aColor or Color3.fromRGB(36, 36, 40)
-				Btn.BorderSizePixel = 0
-				Btn.Font = Enum.Font.GothamBold
-				Btn.Text = tostring(action.Text or "")
-				Btn.TextColor3 = isPrimary and Color3.fromRGB(15, 15, 15) or Color3.fromRGB(255, 255, 255)
-				Btn.TextSize = 11
-				Btn.AutoButtonColor = false
-				Btn.ZIndex = 200
-				Btn.Parent = btnRow
-				round(Btn, 0.23)
-
-				if not isPrimary then
-					local BtnStroke = Instance.new("UIStroke")
-					BtnStroke.Thickness = 1
-					BtnStroke.Color = Color3.fromRGB(50, 50, 55)
-					BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-					BtnStroke.Parent = Btn
-				end
-
-				local BtnScale = Instance.new("UIScale")
-				BtnScale.Scale = 1
-				BtnScale.Parent = Btn
-
-				Btn.MouseEnter:Connect(function()
-					TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Scale = 1.04 }):Play()
-				end)
-				Btn.MouseLeave:Connect(function()
-					TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Scale = 1 }):Play()
-				end)
-				Btn.MouseButton1Down:Connect(function()
-					TweenService:Create(BtnScale, TweenInfo.new(0.08), { Scale = 0.96 }):Play()
-				end)
-				Btn.MouseButton1Up:Connect(function()
-					TweenService:Create(BtnScale, TweenInfo.new(0.12), { Scale = 1.04 }):Play()
-				end)
-				Btn.MouseButton1Click:Connect(function()
-					if type(action) == "table" and type(action.Callback) == "function" then
-						task.spawn(action.Callback)
-					end
-					dismiss()
-				end)
-			end
-		end
-
-		-- hover highlight like UI cards
-		Frame.MouseEnter:Connect(function()
-			TweenService:Create(Stroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(70, 70, 75) }):Play()
-		end)
-		Frame.MouseLeave:Connect(function()
-			TweenService:Create(Stroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(45, 45, 50) }):Play()
-		end)
-
-		-- slide in from the right
-		Frame.Position = UDim2.new(0, notifW + 24, 0, 0)
-		Frame.BackgroundTransparency = 1
-		TweenService:Create(Frame, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Position = UDim2.new(0, 0, 0, 0),
-			BackgroundTransparency = 0,
-		}):Play()
-
-		local closed = false
-		dismiss = function()
-			if closed then return end
-			closed = true
-			TweenService:Create(Frame, TweenInfo.new(0.24, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-				Position = UDim2.new(0, notifW + 24, 0, 0),
-				BackgroundTransparency = 1,
-			}):Play()
-			task.delay(0.28, function()
-				pcall(function() Frame:Destroy() end)
-			end)
-		end
-
-		TweenService:Create(ProgressFill, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-			Size = UDim2.new(0, 0, 1, 0),
-		}):Play()
-
-		task.spawn(function()
-			local elapsed = 0
-			while elapsed < duration do
-				if closed or not Frame.Parent then return end
-				task.wait(0.1)
-				elapsed = elapsed + 0.1
-			end
-			dismiss()
-		end)
+	if shared then return shared end
+	-- not loaded yet: fetch it so this file stays standalone
+	local ok, mod = pcall(function()
+		return loadstring(game:HttpGet("https://raw.githubusercontent.com/velaricX/fghfkgjshdhsk/main/LumuHubNotify.lua"))()
+	end)
+	if ok and type(mod) == "table" and type(mod.Send) == "function" then
+		return mod
 	end
+	return nil
+end
+
+-- Brand icon with a watchdog: if Roblox fails to load the image,
+-- automatically swap to the drawn mark instead of leaving a blank box.
+-- mode "fill" = square app icons (Discord, YouTube)
+-- mode "fit"  = tall/wide glyphs (LumuHub logo)
+local function renderBrandIcon(holder, sprite, fallbackFn, color, mode)
+	local asset = parseIcon(sprite)
+	if not asset then
+		renderIcon(holder, nil, fallbackFn, color, "fit")
+		return
+	end
+	holder:ClearAllChildren()
+	local img = Instance.new("ImageLabel")
+	img.Name = "Sprite"
+	img.BackgroundTransparency = 1
+	img.Size = UDim2.fromScale(1, 1)
+	img.ScaleType = (mode == "fill") and Enum.ScaleType.Stretch or Enum.ScaleType.Fit
+	img.ZIndex = (holder.ZIndex or 1) + 2
+	applyIcon(img, asset)
+	img.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	img.Parent = holder
+
+	task.delay(4, function()
+		if img.Parent and not img.IsLoaded then
+			img:Destroy()
+			renderIcon(holder, nil, fallbackFn, color, "fit")
+		end
+	end)
 end
 
 -- ============================================================================
@@ -780,26 +548,13 @@ function KeySystem:Create(config)
 	if type(checkFn) ~= "function" and verifyUrl then checkFn = verifyOnServer end
 
 	local screenGui = newScreenGui("LumuKeySystem")
-	local internalNotify = createNotifier(screenGui)
 
-	-- reuse a shared LumuNotify stack if one is already running
-	local sharedNotify = nil
-	pcall(function()
-		if getgenv then
-			local g = getgenv()
-			if type(g) == "table" and type(g.LumuNotify) == "table" and type(g.LumuNotify.Send) == "function" then
-				sharedNotify = g.LumuNotify
-			end
-		end
-	end)
+	-- the new shared notification UI (auto-loaded, no duplicate code in here)
+	local sharedNotify = loadSharedNotify()
 
 	local notify = function(kind, titleText, message, duration, actions)
-		local cfg = { Type = kind, Title = titleText, Message = message, Duration = duration or 5, Actions = actions }
-		if sharedNotify then
-			sharedNotify:Send(cfg)
-		else
-			internalNotify(cfg)
-		end
+		if not sharedNotify then return end
+		sharedNotify:Send({ Type = kind, Title = titleText, Message = message, Duration = duration or 5, Actions = actions })
 	end
 
 	-- ---------- window (fixed, not draggable) ----------
@@ -1229,16 +984,15 @@ function KeySystem:Create(config)
 		stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		stroke.Parent = btn
 
-		local asset = parseIcon(sprite)
 		local iconHolder = Instance.new("Frame")
 		iconHolder.Name = "Inner"
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		iconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		iconHolder.Size = asset and UDim2.new(1, -8, 1, -8) or UDim2.new(0, 34, 0, 34)
+		iconHolder.Size = UDim2.new(1, -8, 1, -8)
 		iconHolder.ZIndex = 103
 		iconHolder.Parent = btn
-		renderIcon(iconHolder, sprite, fallbackFn, brandColor, "fit")
+		renderBrandIcon(iconHolder, sprite, fallbackFn, brandColor, "fill")
 
 		local caption = Instance.new("TextLabel")
 		caption.Name = "Caption"
