@@ -350,14 +350,6 @@ local function createMainNotify(screenGui, getAccent)
 		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		Stroke.Parent = Frame
 
-		local AccentBar = Instance.new("Frame")
-		AccentBar.BackgroundColor3 = tc
-		AccentBar.BorderSizePixel = 0
-		AccentBar.Position = UDim2.new(0, 0, 0, 12)
-		AccentBar.Size = UDim2.new(0, 3, 1, -24)
-		AccentBar.ZIndex = 202
-		AccentBar.Parent = Frame
-		round(AccentBar, 1)
 
 		-- icon box
 		local IconFrame = Instance.new("Frame")
@@ -383,7 +375,7 @@ local function createMainNotify(screenGui, getAccent)
 		IconHolder.BackgroundTransparency = 1
 		IconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		IconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		IconHolder.Size = UDim2.fromOffset(20, 20)
+		IconHolder.Size = UDim2.fromOffset(26, 26)
 		IconHolder.ZIndex = 201
 		IconHolder.Parent = IconFrame
 		local customIcon = config.Icon and parseIcon(config.Icon) or nil
@@ -432,8 +424,8 @@ local function createMainNotify(screenGui, getAccent)
 		-- bottom progress bar
 		local ProgressTrack = Instance.new("Frame")
 		ProgressTrack.Name = "ProgressTrack"
-		ProgressTrack.Size = UDim2.new(1, -32, 0, 2)
-		ProgressTrack.Position = UDim2.new(0, 16, 1, -6)
+		ProgressTrack.Size = UDim2.new(1, -32, 0, 4)
+		ProgressTrack.Position = UDim2.new(0, 16, 1, -8)
 		ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 		ProgressTrack.BorderSizePixel = 0
 		ProgressTrack.ZIndex = 201

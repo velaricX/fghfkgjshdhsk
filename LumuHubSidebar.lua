@@ -2422,18 +2422,18 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
-			SwitchTrack.Position = UDim2.new(1, -70, 0.5, -14)
-			SwitchTrack.Size = UDim2.new(0, 54, 0, 28)
+			SwitchTrack.Position = UDim2.new(1, -72, 0.5, -15)
+			SwitchTrack.Size = UDim2.new(0, 60, 0, 30)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(0, 14)
+			TrackCorner.CornerRadius = UDim.new(1, 0)
 			TrackCorner.Parent = SwitchTrack
 			local SwitchThumb = Instance.new("Frame")
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SwitchThumb.BorderSizePixel = 0
-			SwitchThumb.Position = default and UDim2.new(1, -25, 0.5, -11) or UDim2.new(0, 3, 0.5, -11)
-			SwitchThumb.Size = UDim2.new(0, 22, 0, 22)
+			SwitchThumb.Position = default and UDim2.new(1, -27, 0.5, -12) or UDim2.new(0, 3, 0.5, -12)
+			SwitchThumb.Size = UDim2.new(0, 24, 0, 24)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
 			ThumbCorner.CornerRadius = UDim.new(1, 0)
@@ -2442,7 +2442,7 @@ function Astral:MakeWindow(config)
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
 				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
-				local targetThumbPos = enabled and UDim2.new(1, -25, 0.5, -11) or UDim2.new(0, 3, 0.5, -11)
+				local targetThumbPos = enabled and UDim2.new(1, -27, 0.5, -12) or UDim2.new(0, 3, 0.5, -12)
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
 				task.spawn(callback, enabled)
@@ -2586,13 +2586,13 @@ function Astral:MakeWindow(config)
 			Checkbox.Name = "Checkbox"
 			Checkbox.BackgroundColor3 = default and AccentColor or Color3.fromRGB(22, 22, 26) -- Fills with accent Color
 			Checkbox.BorderSizePixel = 0
-			Checkbox.Position = UDim2.new(1, -50, 0.5, -18) -- FIXED: Centered perfectly in 60px height
-			Checkbox.Size = UDim2.new(0, 36, 0, 36) -- FIXED: Sized perfectly for 60px height
+			Checkbox.Position = UDim2.new(1, -50, 0.5, -20) -- FIXED: Centered perfectly in 60px height
+			Checkbox.Size = UDim2.new(0, 40, 0, 40) -- FIXED: Sized perfectly for 60px height
 			Checkbox.ZIndex = 11
 			Checkbox.Parent = TickFrame
 
 			local CheckboxCorner = Instance.new("UICorner")
-			CheckboxCorner.CornerRadius = UDim.new(0, 10) -- Squircle look matching image
+			CheckboxCorner.CornerRadius = UDim.new(0, 14) -- Squircle look matching image
 			CheckboxCorner.Parent = Checkbox
 
 			local CheckboxStroke = Instance.new("UIStroke")
@@ -2608,7 +2608,7 @@ function Astral:MakeWindow(config)
 			Checkmark.BackgroundTransparency = 1
 			Checkmark.AnchorPoint = Vector2.new(0.5, 0.5)
 			Checkmark.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Checkmark.Size = UDim2.new(0, 24, 0, 24) -- FIXED: Sized perfectly inside checkbox
+			Checkmark.Size = UDim2.new(0, 28, 0, 28) -- FIXED: Sized perfectly inside checkbox
 			Checkmark.Image = Astral.Icons.Checkmark -- Uses requested ID 12690727184
 			Checkmark.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			Checkmark.ImageTransparency = default and 0 or 1
@@ -5388,7 +5388,7 @@ function Astral:MakeWindow(config)
 
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(0, notifW, 0, notifH)
-			Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tc, 0.22)
+			Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tc, 0.30)
 			Frame.BorderSizePixel = 0
 			Frame.ZIndex = 200
 			Frame.ClipsDescendants = true
@@ -5405,23 +5405,11 @@ function Astral:MakeWindow(config)
 			Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Stroke.Parent = Frame
 
-			local AccentBar = Instance.new("Frame")
-			AccentBar.Name = "AccentBar"
-			AccentBar.BackgroundColor3 = tc
-			AccentBar.BorderSizePixel = 0
-			AccentBar.Position = UDim2.new(0, 0, 0, 12)
-			AccentBar.Size = UDim2.new(0, 3, 1, -24)
-			AccentBar.ZIndex = 202
-			AccentBar.Parent = Frame
-
-			local AccentBarCorner = Instance.new("UICorner")
-			AccentBarCorner.CornerRadius = UDim.new(1, 0)
-			AccentBarCorner.Parent = AccentBar
 
 			-- Icon (matches UI IconContainer style)
 			local IconFrame = Instance.new("Frame")
-			IconFrame.Size = UDim2.fromOffset(38, 38)
-			IconFrame.Position = UDim2.new(0, 22, 0, hasActions and 12 or 19)
+			IconFrame.Size = UDim2.fromOffset(44, 44)
+			IconFrame.Position = UDim2.new(0, 20, 0, hasActions and 12 or 16)
 			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
 			IconFrame.ZIndex = 200
@@ -5439,7 +5427,7 @@ function Astral:MakeWindow(config)
 			IconStroke.Parent = IconFrame
 
 			local Icon = Instance.new("ImageLabel")
-			Icon.Size = UDim2.fromOffset(20, 20)
+			Icon.Size = UDim2.fromOffset(26, 26)
 			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
 			Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Icon.BackgroundTransparency = 1
@@ -5483,11 +5471,26 @@ function Astral:MakeWindow(config)
 			DescLabel.ZIndex = 200
 			DescLabel.Parent = TextFrame
 
+			-- countdown seconds (top-right)
+			local CountLabel = Instance.new("TextLabel")
+			CountLabel.Name = "Countdown"
+			CountLabel.BackgroundTransparency = 1
+			CountLabel.AnchorPoint = Vector2.new(1, 0)
+			CountLabel.Position = UDim2.new(1, -14, 0, 12)
+			CountLabel.Size = UDim2.new(0, 44, 0, 16)
+			CountLabel.Font = Enum.Font.GothamBold
+			CountLabel.Text = tostring(math.ceil(duration)) .. "s"
+			CountLabel.TextSize = 11
+			CountLabel.TextColor3 = tc
+			CountLabel.TextXAlignment = Enum.TextXAlignment.Right
+			CountLabel.ZIndex = 202
+			CountLabel.Parent = Frame
+
 			-- Bottom progress bar (neutral, matches UI - no type colors)
 			local ProgressTrack = Instance.new("Frame")
 			ProgressTrack.Name = "ProgressTrack"
-			ProgressTrack.Size = UDim2.new(1, -32, 0, 2)
-			ProgressTrack.Position = UDim2.new(0, 16, 1, -6)
+			ProgressTrack.Size = UDim2.new(1, -32, 0, 4)
+			ProgressTrack.Position = UDim2.new(0, 16, 1, -8)
 			ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			ProgressTrack.BorderSizePixel = 0
 			ProgressTrack.ZIndex = 201
@@ -5629,6 +5632,7 @@ function Astral:MakeWindow(config)
 				local remain = math.clamp(1 - (elapsed / duration), 0, 1)
 				pcall(function()
 					ProgressFill.Size = UDim2.new(remain, 0, 1, 0)
+					CountLabel.Text = tostring(math.max(0, math.ceil(duration - elapsed))) .. "s"
 				end)
 				if elapsed >= duration then
 					dismiss()

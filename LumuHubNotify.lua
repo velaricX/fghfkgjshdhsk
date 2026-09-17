@@ -241,7 +241,7 @@ function Notify:Send(config)
 	holder.BackgroundTransparency = 1
 	holder.AnchorPoint = Vector2.new(0, 0.5)
 	holder.Position = UDim2.new(0, 16, 0, height / 2 - (hasActions and 14 or 0))
-	holder.Size = UDim2.new(0, 22, 0, 22)
+	holder.Size = UDim2.new(0, 28, 0, 28)
 	holder.ZIndex = 902
 	holder.Parent = card
 
@@ -302,7 +302,7 @@ function Notify:Send(config)
 	local track = newBox(card, Color3.fromRGB(38, 38, 44))
 	track.AnchorPoint = Vector2.new(0.5, 1)
 	track.Position = UDim2.new(0.5, 0, 1, -1)
-	track.Size = UDim2.new(1, -16, 0, 3)
+	track.Size = UDim2.new(1, -16, 0, 5)
 	round(track, 1)
 
 	local fill = newBox(track, color)
