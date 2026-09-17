@@ -941,14 +941,14 @@ function KeySystem:Create(config)
 	socialLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	socialLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 	socialLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	socialLayout.Padding = UDim.new(0, 46)
+	socialLayout.Padding = UDim.new(0, 40)
 	socialLayout.Parent = SocialRow
 
 	local function makeSocial(name, labelText, url, brandColor, sprite, fallbackFn, order)
 		local column = Instance.new("Frame")
 		column.Name = name .. "Column"
 		column.BackgroundTransparency = 1
-		column.Size = UDim2.new(0, 88, 0, 0)
+		column.Size = UDim2.new(0, 96, 0, 0)
 		column.AutomaticSize = Enum.AutomaticSize.Y
 		column.LayoutOrder = order
 		column.ZIndex = 102
@@ -965,7 +965,7 @@ function KeySystem:Create(config)
 		btn.Name = name .. "Button"
 		btn.BackgroundColor3 = CARD
 		btn.BorderSizePixel = 0
-		btn.Size = UDim2.new(0, 66, 0, 66)
+		btn.Size = UDim2.new(0, 74, 0, 74)
 		btn.Text = ""
 		btn.AutoButtonColor = false
 		btn.ClipsDescendants = true
@@ -989,7 +989,7 @@ function KeySystem:Create(config)
 		iconHolder.BackgroundTransparency = 1
 		iconHolder.AnchorPoint = Vector2.new(0.5, 0.5)
 		iconHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-		iconHolder.Size = UDim2.new(1, -8, 1, -8)
+		iconHolder.Size = UDim2.new(1, -4, 1, -4)
 		iconHolder.ZIndex = 103
 		iconHolder.Parent = btn
 		renderBrandIcon(iconHolder, sprite, fallbackFn, brandColor, "fill")
