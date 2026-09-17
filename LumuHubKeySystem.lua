@@ -333,7 +333,7 @@ local function createMainNotify(screenGui, getAccent)
 
 		local Frame = Instance.new("Frame")
 		Frame.Size = UDim2.new(0, notifW, 0, notifH)
-		Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tc, 0.22)
+		Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		Frame.BorderSizePixel = 0
 		Frame.ZIndex = 200
 		Frame.ClipsDescendants = true

@@ -359,37 +359,37 @@ end
 -- Index: 1 = Light, 2 = Midnight (0 = Dark = the source keys themselves).
 -- ============================================================================
 local THEME_SWAP = {
-	["12,12,14"] = { "230,230,238", "5,7,15" },
-	["26,26,30"] = { "255,255,255", "12,16,29" },
-	["18,18,22"] = { "244,244,250", "9,12,23" },
-	["16,16,18"] = { "238,238,246", "8,11,21" },
-	["20,20,24"] = { "236,236,244", "11,15,27" },
-	["22,22,26"] = { "240,240,248", "13,18,32" },
-	["30,30,36"] = { "226,226,236", "19,25,43" },
-	["28,28,34"] = { "226,226,236", "19,25,43" },
-	["36,36,40"] = { "218,218,228", "25,33,55" },
-	["32,32,36"] = { "233,233,242", "17,23,39" },
-	["35,35,40"] = { "208,208,218", "29,39,63" },
-	["45,45,50"] = { "203,203,213", "31,43,69" },
-	["50,50,55"] = { "192,192,204", "39,53,83" },
-	["38,38,44"] = { "210,210,220", "28,38,60" },
-	["52,52,60"] = { "198,198,210", "36,48,76" },
-	["54,54,62"] = { "198,198,210", "36,48,76" },
-	["70,70,75"] = { "170,170,185", "55,70,105" },
-	["255,255,255"] = { "18,18,26", "231,237,255" },
-	["160,160,165"] = { "92,92,106", "146,158,188" },
-	["150,150,158"] = { "92,92,106", "146,158,188" },
-	["162,162,172"] = { "92,92,106", "146,158,188" },
-	["165,165,176"] = { "92,92,106", "146,158,188" },
-	["175,175,182"] = { "92,92,106", "146,158,188" },
-	["170,170,178"] = { "105,105,120", "158,170,200" },
-	["180,180,185"] = { "118,118,134", "148,160,190" },
-	["120,120,125"] = { "138,138,152", "118,130,163" },
-	["110,110,118"] = { "138,138,152", "118,130,163" },
-	["100,100,105"] = { "138,138,152", "118,130,163" },
-	["15,15,15"] = { "235,235,242", "8,11,20" },
+	["12,12,14"] = { "5,7,15", "14,8,22" },
+	["26,26,30"] = { "12,16,29", "22,14,34" },
+	["18,18,22"] = { "9,12,23", "17,11,27" },
+	["16,16,18"] = { "8,11,21", "18,11,28" },
+	["20,20,24"] = { "11,15,27", "20,13,32" },
+	["22,22,26"] = { "13,18,32", "23,15,37" },
+	["30,30,36"] = { "19,25,43", "32,20,50" },
+	["28,28,34"] = { "19,25,43", "32,20,50" },
+	["36,36,40"] = { "25,33,55", "40,26,62" },
+	["32,32,36"] = { "17,23,39", "30,19,46" },
+	["35,35,40"] = { "29,39,63", "48,32,74" },
+	["45,45,50"] = { "31,43,69", "52,36,80" },
+	["50,50,55"] = { "39,53,83", "64,44,98" },
+	["38,38,44"] = { "28,38,60", "46,32,72" },
+	["52,52,60"] = { "36,48,76", "58,40,90" },
+	["54,54,62"] = { "36,48,76", "58,40,90" },
+	["70,70,75"] = { "55,70,105", "85,60,130" },
+	["255,255,255"] = { "231,237,255", "245,235,255" },
+	["160,160,165"] = { "146,158,188", "180,170,205" },
+	["150,150,158"] = { "146,158,188", "180,170,205" },
+	["162,162,172"] = { "146,158,188", "180,170,205" },
+	["165,165,176"] = { "146,158,188", "180,170,205" },
+	["175,175,182"] = { "146,158,188", "180,170,205" },
+	["170,170,178"] = { "158,170,200", "190,180,215" },
+	["180,180,185"] = { "148,160,190", "185,175,210" },
+	["120,120,125"] = { "118,130,163", "150,140,175" },
+	["110,110,118"] = { "118,130,163", "150,140,175" },
+	["100,100,105"] = { "118,130,163", "150,140,175" },
+	["15,15,15"] = { "8,11,20", "16,10,26" },
 }
-local THEME_INDEX = { Dark = 0, Light = 1, Midnight = 2 }
+local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2 }
 local CurrentThemeName = "Dark"
 
 local function parseThemeRGB(s)
@@ -455,25 +455,25 @@ end
 -- Live hover helpers: evaluated when a hover FIRES, so they always match
 -- the current theme. Use these instead of hardcoded dark literals.
 local function themeCardBG(t)
-	if t == "Light" then return Color3.fromRGB(255, 255, 255) end
+	if t == "Purple" then return Color3.fromRGB(22, 14, 34) end
 	if t == "Midnight" then return Color3.fromRGB(12, 16, 29) end
 	return Color3.fromRGB(26, 26, 30)
 end
 
 local function themeHoverBG(t)
-	if t == "Light" then return Color3.fromRGB(218, 218, 228) end
+	if t == "Purple" then return Color3.fromRGB(40, 26, 62) end
 	if t == "Midnight" then return Color3.fromRGB(25, 33, 55) end
 	return Color3.fromRGB(36, 36, 40)
 end
 
 local function themeStroke(t)
-	if t == "Light" then return Color3.fromRGB(192, 192, 204) end
+	if t == "Purple" then return Color3.fromRGB(64, 44, 98) end
 	if t == "Midnight" then return Color3.fromRGB(39, 53, 83) end
 	return Color3.fromRGB(50, 50, 55)
 end
 
 local function themeStrokeHover(t)
-	if t == "Light" then return Color3.fromRGB(170, 170, 185) end
+	if t == "Purple" then return Color3.fromRGB(85, 60, 130) end
 	if t == "Midnight" then return Color3.fromRGB(55, 70, 105) end
 	return Color3.fromRGB(70, 70, 75)
 end
@@ -5572,7 +5572,7 @@ function Astral:MakeWindow(config)
 
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(0, notifW, 0, notifH)
-			Frame.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), tc, 0.30)
+			Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 			Frame.BorderSizePixel = 0
 			Frame.ZIndex = 200
 			Frame.ClipsDescendants = true
@@ -5687,7 +5687,7 @@ function Astral:MakeWindow(config)
 			local ProgressFill = Instance.new("Frame")
 			ProgressFill.Name = "ProgressFill"
 			ProgressFill.Size = UDim2.new(1, 0, 1, 0)
-			ProgressFill.BackgroundColor3 = Color3.fromRGB(120, 120, 125)
+			ProgressFill.BackgroundColor3 = tc
 			ProgressFill.BorderSizePixel = 0
 			ProgressFill.ZIndex = 202
 			ProgressFill.Parent = ProgressTrack

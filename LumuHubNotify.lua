@@ -216,7 +216,7 @@ function Notify:Send(config)
 
 	local card = Instance.new("Frame")
 	card.Name = "Toast"
-	card.BackgroundColor3 = mix(Color3.fromRGB(24, 24, 28), color, 0.22)
+	card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 	card.BorderSizePixel = 0
 	card.Size = UDim2.new(0, Notify.Width, 0, height)
 	card.ZIndex = 901
