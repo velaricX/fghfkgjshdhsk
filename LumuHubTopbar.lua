@@ -2675,18 +2675,18 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
-			SwitchTrack.Position = UDim2.new(1, -72, 0.5, -15)
-			SwitchTrack.Size = UDim2.new(0, 60, 0, 30)
+			SwitchTrack.Position = UDim2.new(1, -80, 0.5, -17)
+			SwitchTrack.Size = UDim2.new(0, 68, 0, 34)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(1, 0)
+			TrackCorner.CornerRadius = UDim.new(0, 8)
 			TrackCorner.Parent = SwitchTrack
 			local SwitchThumb = Instance.new("Frame")
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SwitchThumb.BorderSizePixel = 0
-			SwitchThumb.Position = default and UDim2.new(1, -27, 0.5, -12) or UDim2.new(0, 3, 0.5, -12)
-			SwitchThumb.Size = UDim2.new(0, 24, 0, 24)
+			SwitchThumb.Position = default and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
+			SwitchThumb.Size = UDim2.new(0, 28, 0, 28)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
 			ThumbCorner.CornerRadius = UDim.new(1, 0)
@@ -2695,7 +2695,7 @@ function Astral:MakeWindow(config)
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
 				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
-				local targetThumbPos = enabled and UDim2.new(1, -27, 0.5, -12) or UDim2.new(0, 3, 0.5, -12)
+				local targetThumbPos = enabled and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
 				task.spawn(callback, enabled)
@@ -2839,13 +2839,13 @@ function Astral:MakeWindow(config)
 			Checkbox.Name = "Checkbox"
 			Checkbox.BackgroundColor3 = default and AccentColor or Color3.fromRGB(22, 22, 26) -- Fills with accent Color
 			Checkbox.BorderSizePixel = 0
-			Checkbox.Position = UDim2.new(1, -50, 0.5, -20) -- FIXED: Centered perfectly in 60px height
-			Checkbox.Size = UDim2.new(0, 40, 0, 40) -- FIXED: Sized perfectly for 60px height
+			Checkbox.Position = UDim2.new(1, -52, 0.5, -22) -- FIXED: Centered perfectly in 60px height
+			Checkbox.Size = UDim2.new(0, 44, 0, 44) -- FIXED: Sized perfectly for 60px height
 			Checkbox.ZIndex = 11
 			Checkbox.Parent = TickFrame
 
 			local CheckboxCorner = Instance.new("UICorner")
-			CheckboxCorner.CornerRadius = UDim.new(0, 14) -- Squircle look matching image
+			CheckboxCorner.CornerRadius = UDim.new(0, 8) -- Squircle look matching image
 			CheckboxCorner.Parent = Checkbox
 
 			local CheckboxStroke = Instance.new("UIStroke")
@@ -2861,7 +2861,7 @@ function Astral:MakeWindow(config)
 			Checkmark.BackgroundTransparency = 1
 			Checkmark.AnchorPoint = Vector2.new(0.5, 0.5)
 			Checkmark.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Checkmark.Size = UDim2.new(0, 28, 0, 28) -- FIXED: Sized perfectly inside checkbox
+			Checkmark.Size = UDim2.new(0, 30, 0, 30) -- FIXED: Sized perfectly inside checkbox
 			Checkmark.Image = Astral.Icons.Checkmark -- Uses requested ID 12690727184
 			Checkmark.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			Checkmark.ImageTransparency = default and 0 or 1
@@ -3413,14 +3413,14 @@ function Astral:MakeWindow(config)
 			CountBadge.BackgroundColor3 = AccentColor
 			CountBadge.BorderSizePixel = 0
 			CountBadge.AnchorPoint = Vector2.new(1, 0.5)
-			CountBadge.Position = UDim2.new(1, -34, 0.5, 0)
-			CountBadge.Size = UDim2.new(0, 20, 0, 20)
+			CountBadge.Position = UDim2.new(1, -36, 0.5, 0)
+			CountBadge.Size = UDim2.new(0, 22, 0, 22)
 			CountBadge.Visible = false
 			CountBadge.ZIndex = 12
 			CountBadge.Parent = ValueBox
 
 			local BadgeCorner = Instance.new("UICorner")
-			BadgeCorner.CornerRadius = UDim.new(1, 0)
+			BadgeCorner.CornerRadius = UDim.new(0, 7)
 			BadgeCorner.Parent = CountBadge
 
 			local BadgeLabel = Instance.new("TextLabel")
@@ -3429,7 +3429,7 @@ function Astral:MakeWindow(config)
 			BadgeLabel.Font = Enum.Font.GothamBold
 			BadgeLabel.Text = ""
 			BadgeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			BadgeLabel.TextSize = 11
+			BadgeLabel.TextSize = 12
 			BadgeLabel.TextXAlignment = Enum.TextXAlignment.Center
 			BadgeLabel.ZIndex = 13
 			BadgeLabel.Parent = CountBadge
@@ -3818,7 +3818,7 @@ function Astral:MakeWindow(config)
 			local icon = parseIcon(labelConfig.Icon)
 			local callback = labelConfig.Callback or function() end
 			local titleSize = tonumber(labelConfig.TextSize) or 14
-			local descSize = tonumber(labelConfig.DescSize) or 13
+			local descSize = tonumber(labelConfig.DescSize) or 15
 
 			local hasDesc = description and description ~= ""
 			local calculatedHeight = 64
@@ -3880,7 +3880,7 @@ function Astral:MakeWindow(config)
 			StatusBadge.BorderSizePixel = 0
 			StatusBadge.AnchorPoint = Vector2.new(1, 0.5)
 			StatusBadge.Position = UDim2.new(1, -12, 0.5, 0)
-			StatusBadge.Size = UDim2.new(0, 0, 0, 26)
+			StatusBadge.Size = UDim2.new(0, 0, 0, 30)
 			StatusBadge.AutomaticSize = Enum.AutomaticSize.X
 			StatusBadge.Visible = false
 			StatusBadge.Parent = LabelFrame
@@ -3910,7 +3910,7 @@ function Astral:MakeWindow(config)
 			local StatusIcon = Instance.new("ImageLabel")
 			StatusIcon.Name = "StatusIcon"
 			StatusIcon.BackgroundTransparency = 1
-			StatusIcon.Size = UDim2.new(0, 15, 0, 15)
+			StatusIcon.Size = UDim2.new(0, 18, 0, 18)
 			StatusIcon.LayoutOrder = 1
 			StatusIcon.ScaleType = Enum.ScaleType.Fit
 			StatusIcon.ImageColor3 = Color3.fromRGB(46, 204, 113)
@@ -3925,7 +3925,7 @@ function Astral:MakeWindow(config)
 			StatusText.Font = Enum.Font.GothamBold
 			StatusText.Text = ""
 			StatusText.TextColor3 = Color3.fromRGB(46, 204, 113)
-			regText(StatusText, 11)
+			regText(StatusText, 13)
 			StatusText.TextXAlignment = Enum.TextXAlignment.Left
 			StatusText.Parent = StatusBadge
 
