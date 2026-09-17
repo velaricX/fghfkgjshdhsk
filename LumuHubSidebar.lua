@@ -2422,8 +2422,8 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
-			SwitchTrack.Position = UDim2.new(1, -80, 0.5, -17)
-			SwitchTrack.Size = UDim2.new(0, 68, 0, 34)
+			SwitchTrack.Position = UDim2.new(1, -88, 0.5, -19)
+			SwitchTrack.Size = UDim2.new(0, 76, 0, 38)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(0, 8)
@@ -2432,17 +2432,17 @@ function Astral:MakeWindow(config)
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SwitchThumb.BorderSizePixel = 0
-			SwitchThumb.Position = default and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
-			SwitchThumb.Size = UDim2.new(0, 28, 0, 28)
+			SwitchThumb.Position = default and UDim2.new(1, -35, 0.5, -16) or UDim2.new(0, 3, 0.5, -16)
+			SwitchThumb.Size = UDim2.new(0, 32, 0, 32)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(0, 8)
+			ThumbCorner.CornerRadius = UDim.new(0, 6)
 			ThumbCorner.Parent = SwitchThumb
 			local enabled = default
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
 				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
-				local targetThumbPos = enabled and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
+				local targetThumbPos = enabled and UDim2.new(1, -35, 0.5, -16) or UDim2.new(0, 3, 0.5, -16)
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
 				task.spawn(callback, enabled)
