@@ -351,6 +351,105 @@ local function getRelativePosition(guiObject, input)
 	return math.clamp(relX, 0, 1), math.clamp(relY, 0, 1)
 end
 
+-- ============================================================================
+-- THEMES: Dark (default build) / Light / Midnight.
+-- Window:SetTheme(name) recolors every surface + text by value.
+-- Anything currently bound to the accent color is left untouched.
+-- Index: 1 = Light, 2 = Midnight (0 = Dark = the source keys themselves).
+-- ============================================================================
+local THEME_SWAP = {
+	["12,12,14"] = { "230,230,238", "5,7,15" },
+	["26,26,30"] = { "255,255,255", "12,16,29" },
+	["18,18,22"] = { "244,244,250", "9,12,23" },
+	["16,16,18"] = { "238,238,246", "8,11,21" },
+	["20,20,24"] = { "236,236,244", "11,15,27" },
+	["22,22,26"] = { "240,240,248", "13,18,32" },
+	["30,30,36"] = { "226,226,236", "19,25,43" },
+	["28,28,34"] = { "226,226,236", "19,25,43" },
+	["36,36,40"] = { "218,218,228", "25,33,55" },
+	["32,32,36"] = { "233,233,242", "17,23,39" },
+	["35,35,40"] = { "208,208,218", "29,39,63" },
+	["45,45,50"] = { "203,203,213", "31,43,69" },
+	["50,50,55"] = { "192,192,204", "39,53,83" },
+	["38,38,44"] = { "210,210,220", "28,38,60" },
+	["52,52,60"] = { "198,198,210", "36,48,76" },
+	["54,54,62"] = { "198,198,210", "36,48,76" },
+	["70,70,75"] = { "170,170,185", "55,70,105" },
+	["255,255,255"] = { "18,18,26", "231,237,255" },
+	["160,160,165"] = { "92,92,106", "146,158,188" },
+	["150,150,158"] = { "92,92,106", "146,158,188" },
+	["162,162,172"] = { "92,92,106", "146,158,188" },
+	["165,165,176"] = { "92,92,106", "146,158,188" },
+	["175,175,182"] = { "92,92,106", "146,158,188" },
+	["170,170,178"] = { "105,105,120", "158,170,200" },
+	["180,180,185"] = { "118,118,134", "148,160,190" },
+	["120,120,125"] = { "138,138,152", "118,130,163" },
+	["110,110,118"] = { "138,138,152", "118,130,163" },
+	["100,100,105"] = { "138,138,152", "118,130,163" },
+	["15,15,15"] = { "235,235,242", "8,11,20" },
+}
+local THEME_INDEX = { Dark = 0, Light = 1, Midnight = 2 }
+
+local function parseThemeRGB(s)
+	local r, g, b = string.match(s, "^(%d+),(%d+),(%d+)$")
+	return Color3.fromRGB(tonumber(r) or 0, tonumber(g) or 0, tonumber(b) or 0)
+end
+
+local function themeKeyOf(c)
+	return math.floor(c.R * 255 + 0.5) .. "," .. math.floor(c.G * 255 + 0.5) .. "," .. math.floor(c.B * 255 + 0.5)
+end
+
+-- File-scope theme applier (kept out of MakeWindow to respect the 200-local limit).
+-- Returns the new theme name on success, nil on failure.
+local function applyThemeToGui(screenGui, accentColor, fromName, toName)
+	local target = THEME_INDEX[toName]
+	if target == nil then return nil end
+	local current = THEME_INDEX[fromName] or 0
+	if target == current then return toName end
+
+	local function valFor(srcKey, idx)
+		if idx == 0 then return parseThemeRGB(srcKey) end
+		local pair = THEME_SWAP[srcKey]
+		if not pair then return nil end
+		return parseThemeRGB(pair[idx])
+	end
+
+	local remap = {}
+	for srcKey in pairs(THEME_SWAP) do
+		local oldC = valFor(srcKey, current)
+		local newC = valFor(srcKey, target)
+		if oldC and newC then remap[themeKeyOf(oldC)] = newC end
+	end
+
+	local accentKey = themeKeyOf(accentColor)
+
+	local function swapProp(obj, prop, allowWhite)
+		local ok, val = pcall(function() return obj[prop] end)
+		if not ok or typeof(val) ~= "Color3" then return end
+		local key = themeKeyOf(val)
+		if key == accentKey then return end
+		if not allowWhite and key == "255,255,255" then return end
+		local to = remap[key]
+		if to then pcall(function() obj[prop] = to end) end
+	end
+
+	for _, d in ipairs(screenGui:GetDescendants()) do
+		if d:IsA("GuiObject") then
+			swapProp(d, "BackgroundColor3", false)
+			if d:IsA("TextLabel") or d:IsA("TextButton") or d:IsA("TextBox") then
+				swapProp(d, "TextColor3", true)
+				swapProp(d, "PlaceholderColor3", true)
+			elseif d:IsA("ImageLabel") or d:IsA("ImageButton") then
+				swapProp(d, "ImageColor3", false)
+			end
+		elseif d:IsA("UIStroke") then
+			swapProp(d, "Color", true)
+		end
+	end
+
+	return toName
+end
+
 function Astral:MakeWindow(config)
 	config = config or {}
 	-- Accent engine FIRST: panels and elements below hook into it during build
@@ -360,6 +459,7 @@ function Astral:MakeWindow(config)
 		table.insert(accentAppliers, fn)
 		pcall(fn, AccentColor)
 	end
+
 	local titleText = config.Title or "Astral"
 	local subTitleText = config.SubTitle or "Hub"
 	local badgeText = config.badge or "PREMIUM"
@@ -2422,8 +2522,8 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
-			SwitchTrack.Position = UDim2.new(1, -88, 0.5, -19)
-			SwitchTrack.Size = UDim2.new(0, 76, 0, 38)
+			SwitchTrack.Position = UDim2.new(1, -80, 0.5, -16)
+			SwitchTrack.Size = UDim2.new(0, 68, 0, 32)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(0, 8)
@@ -2432,8 +2532,8 @@ function Astral:MakeWindow(config)
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SwitchThumb.BorderSizePixel = 0
-			SwitchThumb.Position = default and UDim2.new(1, -35, 0.5, -16) or UDim2.new(0, 3, 0.5, -16)
-			SwitchThumb.Size = UDim2.new(0, 32, 0, 32)
+			SwitchThumb.Position = default and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
+			SwitchThumb.Size = UDim2.new(0, 28, 0, 28)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
 			ThumbCorner.CornerRadius = UDim.new(0, 6)
@@ -2442,7 +2542,7 @@ function Astral:MakeWindow(config)
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
 				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
-				local targetThumbPos = enabled and UDim2.new(1, -35, 0.5, -16) or UDim2.new(0, 3, 0.5, -16)
+				local targetThumbPos = enabled and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
 				task.spawn(callback, enabled)
@@ -4938,6 +5038,11 @@ function Astral:MakeWindow(config)
 			end
 		end
 
+		-- if a non-dark theme is active, theme the new tab too (idempotent)
+		if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
 		return TabObject
 	end
 
@@ -5347,6 +5452,19 @@ function Astral:MakeWindow(config)
 				currentTab.Gradient.Color = ColorSequence.new(color, color * 0.5)
 			end)
 		end
+	end
+
+	function Window:SetTheme(name)
+		local result = applyThemeToGui(ScreenGui, AccentColor, Window.ThemeName or "Dark", name)
+		if result then
+			Window.ThemeName = result
+			return true
+		end
+		return false
+	end
+
+	function Window:GetTheme()
+		return Window.ThemeName or "Dark"
 	end
 	
 		-- ==========================================
@@ -5987,25 +6105,41 @@ function Astral:MakeWindow(config)
 			end
 			row.token = (row.token or 0) + 1
 			applyRow(row, opts)
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:Set(name, value)
 			if type(value) == "table" then return GameStatus:SetRow(name, value) end
-			return GameStatus:SetRow(name, { Value = value })
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus:SetRow(name, { Value = value })
 		end
 		GameStatus.SetValue = GameStatus.Set
 
 		function GameStatus:SetColor(name, color)
 			local r = rows[tostring(name)]
 			if r then applyRow(r, { Color = color }) end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:SetIcon(name, iconInput)
 			local r = rows[tostring(name)]
 			if r then applyRow(r, { Icon = iconInput }) end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:Get(name)
@@ -6017,13 +6151,21 @@ function Astral:MakeWindow(config)
 			name = tostring(name)
 			local r = rows[name]
 			if r then pcall(function() r.Frame:Destroy() end); rows[name] = nil end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:Clear()
 			for _, r in pairs(rows) do pcall(function() r.Frame:Destroy() end) end
 			rows = {}
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:SetRows(list)
@@ -6038,7 +6180,11 @@ function Astral:MakeWindow(config)
 					end
 				end
 			end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		-- Live row timer: GameStatus:Countdown("Next Boss", 300) / (..., "up")
@@ -6066,27 +6212,43 @@ function Astral:MakeWindow(config)
 				end
 				if row.token == myToken and mode ~= "up" and onDone then task.spawn(onDone) end
 			end)
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:StopCountdown(name)
 			local r = rows[tostring(name)]
 			if r then r.token = (r.token or 0) + 1 end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 
 		function GameStatus:SetTitle(t) TitleLabel.Text = tostring(t); return GameStatus end
 		function GameStatus:SetTitleIcon(iconInput)
 			local asset = parseIcon(iconInput)
 			if asset then Astral.ApplyIcon(HeaderIcon, asset) end
-			return GameStatus
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus
 		end
 		function GameStatus:SetPosition(pos) Panel.Position = pos; return GameStatus end
 		function GameStatus:Show() enabled = true; Panel.Visible = true; return GameStatus end
 		function GameStatus:Hide() enabled = false; Panel.Visible = false; return GameStatus end
 		function GameStatus:SetEnabled(v)
 			if v then return GameStatus:Show() end
-			return GameStatus:Hide()
+			if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
+		return GameStatus:Hide()
 		end
 		function GameStatus:Toggle() return GameStatus:SetEnabled(not enabled) end
 		function GameStatus:IsEnabled() return enabled end
@@ -6094,10 +6256,21 @@ function Astral:MakeWindow(config)
 
 		if config.Rows then GameStatus:SetRows(config.Rows) end
 
+		if Window.ThemeName and Window.ThemeName ~= "Dark" then
+			applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+		end
+
 		return GameStatus
 	end
 
 
+
+	-- starting theme (Dark is the default build)
+	Window.ThemeName = "Dark"
+	if config.Theme and type(config.Theme) == "string" then
+		local initial = applyThemeToGui(ScreenGui, AccentColor, "Dark", config.Theme)
+		if initial then Window.ThemeName = initial end
+	end
 
 	return Window
 end
