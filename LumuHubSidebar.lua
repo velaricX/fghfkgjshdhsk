@@ -1619,6 +1619,7 @@ function Astral:MakeWindow(config)
 	local activeSelectorOptions = {}
 	local activeSelectorSearch = false
 	local searchConn = nil
+	local activeSelectorRefresh = nil
 
 	local function openSelector(title, options, current, searchEnabled, callback, buttonTextLabel, isMulti)
 		if pickerOpen then closeColorPicker() end
@@ -1659,7 +1660,7 @@ function Astral:MakeWindow(config)
 
 			for _, option in ipairs(options) do
 				local optionStr = tostring(option)
-				if filter and filter ~= "" and not string.find(string.lower(optionStr), string.lower(filter)) then
+				if filter and filter ~= "" and not string.find(string.lower(optionStr), string.lower(filter), 1, true) then
 					continue
 				end
 
@@ -1789,6 +1790,9 @@ function Astral:MakeWindow(config)
 			OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, OptionsList.AbsoluteContentSize.Y + 10)
 		end
 
+		activeSelectorRefresh = function()
+			populate(SearchInput.Text)
+		end
 		populate("")
 
 		if searchConn then searchConn:Disconnect() end
@@ -2987,8 +2991,14 @@ function Astral:MakeWindow(config)
 			PreviewStroke.Thickness = 1.2
 			PreviewStroke.Parent = ColorPreview
 
+			local myColor = default
+
 			PickerFrame.MouseButton1Click:Connect(function()
-				openColorPicker(ColorPreview.BackgroundColor3, callback, ColorPreview)
+				openColorPicker(myColor, function(c)
+					myColor = c
+					ColorPreview.BackgroundColor3 = c
+					task.spawn(callback, c)
+				end, ColorPreview)
 			end)
 
 			PickerFrame.MouseEnter:Connect(function()
@@ -3013,13 +3023,16 @@ function Astral:MakeWindow(config)
 
 			local ColorpickerController = {}
 			function ColorpickerController:Set(color)
+				local isColor = (typeof(color) == "Color3") or (type(color) == "table" and color.R ~= nil and color.G ~= nil and color.B ~= nil)
+				if not isColor then return end
+				myColor = color
 				ColorPreview.BackgroundColor3 = color
 				task.spawn(callback, color)
 			end
-			function ColorpickerController:Get() return selectedColor end
+			function ColorpickerController:Get() return myColor end
 			if pickerConfig.Flag and pickerConfig.Flag ~= "" then
 				table.insert(configFlags, {Flag = pickerConfig.Flag, Kind = "color",
-					Get = function() return selectedColor end,
+					Get = function() return myColor end,
 					Set = function(v) ColorpickerController:Set(v) end})
 			end
 
@@ -3439,8 +3452,18 @@ function Astral:MakeWindow(config)
 				if type(newOptions) == "table" then
 					for _, v in ipairs(newOptions) do table.insert(options, v) end
 				end
+				for s in pairs(selectedOptions) do
+					local stillThere = false
+					for _, opt in ipairs(options) do
+						if tostring(opt) == s then stillThere = true break end
+					end
+					if not stillThere then selectedOptions[s] = nil end
+				end
 				if newDefault ~= nil then applyDefault(newDefault) end
 				updateValueLabel()
+				if selectorOpen and activeSelectorRefresh then
+					pcall(activeSelectorRefresh)
+				end
 			end
 			function SelectorController:Get()
 				if multi then
