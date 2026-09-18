@@ -25,7 +25,7 @@ local TEXT_DIM = Color3.fromRGB(160, 160, 168)
 
 local GOOD = Color3.fromRGB(46, 204, 113)
 local BAD = Color3.fromRGB(231, 76, 60)
-local WARN = Color3.fromRGB(245, 158, 11)
+local WARN = Color3.fromRGB(255, 196, 40)
 local INFO = ACCENT
 
 local PALETTE = { good = GOOD, bad = BAD, warning = WARN, info = INFO, success = GOOD, error = BAD }
@@ -163,9 +163,18 @@ function Notify:SetPosition(where)
 	Layout.HorizontalAlignment = p.Align
 	Layout.VerticalAlignment = (p.Dir == 1) and Enum.VerticalAlignment.Bottom or Enum.VerticalAlignment.Top
 	Notify.Side = p.Dir
+	-- off-screen resting spot for the slide animation
+	if p.Align == Enum.HorizontalAlignment.Right then
+		Notify.OffPos = UDim2.new(1, 60, 0, 0)
+	elseif p.Align == Enum.HorizontalAlignment.Left then
+		Notify.OffPos = UDim2.new(-1, -60, 0, 0)
+	else
+		Notify.OffPos = UDim2.new(0, 0, 0, -80)
+	end
 	return Notify
 end
 Notify.Side = -1
+Notify.OffPos = UDim2.new(1, 60, 0, 0)
 
 function Notify:SetAccent(color)
 	if typeof(color) == "Color3" then
@@ -347,8 +356,8 @@ function Notify:Send(config)
 	end
 
 	-- animate in
-	local side = Notify.Side or -1
-	card.Position = UDim2.new(side, 44 * -side, 0, 0)
+	local offPos = Notify.OffPos or UDim2.new(1, 60, 0, 0)
+	card.Position = offPos
 	card.BackgroundTransparency = 1
 	stroke.Transparency = 1
 	TweenService:Create(card, TweenInfo.new(0.24, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
@@ -364,7 +373,7 @@ function Notify:Send(config)
 		if closed then return end
 		closed = true
 		TweenService:Create(card, TweenInfo.new(0.2), {
-			Position = UDim2.new(side, 44 * -side, 0, 0),
+			Position = offPos,
 			BackgroundTransparency = 1,
 		}):Play()
 		TweenService:Create(stroke, TweenInfo.new(0.2), { Transparency = 1 }):Play()

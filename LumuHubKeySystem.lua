@@ -38,7 +38,7 @@ local TEXT_DIM = Color3.fromRGB(160, 160, 168)
 
 local GOOD = Color3.fromRGB(46, 204, 113)
 local BAD = Color3.fromRGB(231, 76, 60)
-local WARN = Color3.fromRGB(245, 158, 11)
+local WARN = Color3.fromRGB(255, 196, 40)
 
 local DISCORD_COLOR = Color3.fromRGB(88, 101, 242)
 local YOUTUBE_COLOR = Color3.fromRGB(255, 0, 0)
@@ -307,7 +307,7 @@ local function createMainNotify(screenGui, getAccent)
 
 	local TYPE_COLORS = {
 		good = Color3.fromRGB(46, 204, 113),
-		warning = Color3.fromRGB(245, 158, 11),
+		warning = Color3.fromRGB(255, 196, 40),
 		bad = Color3.fromRGB(231, 76, 60),
 		info = nil,
 	}
@@ -518,7 +518,7 @@ local function createMainNotify(screenGui, getAccent)
 		end)
 
 		-- slide in from the right with a pop
-		Frame.Position = UDim2.new(0, notifW + 24, 0, 0)
+		Frame.Position = UDim2.new(1, 60, 0, 0)
 		Frame.BackgroundTransparency = 1
 		local NotifScale = Instance.new("UIScale")
 		NotifScale.Scale = 0.96
@@ -536,7 +536,7 @@ local function createMainNotify(screenGui, getAccent)
 			if closed then return end
 			closed = true
 			TweenService:Create(Frame, TweenInfo.new(0.24, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-				Position = UDim2.new(0, notifW + 24, 0, 0),
+				Position = UDim2.new(1, 60, 0, 0),
 				BackgroundTransparency = 1,
 			}):Play()
 			task.delay(0.28, function()

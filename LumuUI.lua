@@ -678,17 +678,7 @@ function Astral:MakeWindow(config)
 	TopBar.Size = UDim2.new(1, 0, 0, 50)
 	TopBar.Parent = MainFrame
 
-	-- Accent underline below the header (premium touch, follows the theme accent)
-	local HeaderLine = Instance.new("Frame")
-	HeaderLine.Name = "HeaderLine"
-	HeaderLine.BackgroundColor3 = AccentColor
-	HeaderLine.BackgroundTransparency = 0.55
-	HeaderLine.BorderSizePixel = 0
-	HeaderLine.Position = UDim2.new(0, 0, 0, 50)
-	HeaderLine.Size = UDim2.new(1, 0, 0, 2)
-	HeaderLine.ZIndex = 5
-	HeaderLine.Parent = MainFrame
-	onAccentChange(function(c) HeaderLine.BackgroundColor3 = c end)
+
 
 	-- Horizontal Layout for TopBar Elements
 	local HeaderLayoutContainer = Instance.new("Frame")
@@ -1788,6 +1778,10 @@ function Astral:MakeWindow(config)
 				end)
 			end
 			OptionsScroll.CanvasSize = UDim2.new(0, 0, 0, OptionsList.AbsoluteContentSize.Y + 10)
+			-- keep option rows themed if a non-dark theme is active
+			if CurrentThemeName and CurrentThemeName ~= "Dark" then
+				applyThemeToGui(ScreenGui, AccentColor, "Dark", CurrentThemeName)
+			end
 		end
 
 		activeSelectorRefresh = function()
@@ -2291,8 +2285,8 @@ function Astral:MakeWindow(config)
 			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced})
 			table.insert(tabData.Elements, elements[#elements])
 			-- if a non-dark theme is active, theme this new element too (idempotent)
-			if Window.ThemeName and Window.ThemeName ~= "Dark" then
-				applyThemeToGui(ScreenGui, AccentColor, "Dark", Window.ThemeName)
+			if CurrentThemeName and CurrentThemeName ~= "Dark" then
+				applyThemeToGui(ScreenGui, AccentColor, "Dark", CurrentThemeName)
 			end
 			updateCanvas()
 		end
@@ -3938,7 +3932,7 @@ function Astral:MakeWindow(config)
 			local STATUS_DEFS = {
 				good    = { Icon = "Checkmark", Color = Color3.fromRGB(46, 204, 113),  Text = "SPAWNED" },
 				bad     = { Icon = "Close",     Color = Color3.fromRGB(231, 76, 60),   Text = "NOT SPAWNED" },
-				waiting = { Icon = "timer",     Color = Color3.fromRGB(245, 158, 11),  Text = "WAITING" },
+				waiting = { Icon = "timer",     Color = Color3.fromRGB(255, 196, 40),  Text = "WAITING" },
 			}
 			local function tint(c, f)
 				return Color3.fromRGB(math.floor(c.R * 255 * f), math.floor(c.G * 255 * f), math.floor(c.B * 255 * f))
@@ -4840,7 +4834,7 @@ function Astral:MakeWindow(config)
 					purple = Color3.fromRGB(138, 90, 255),
 					pink = Color3.fromRGB(255, 90, 180),
 					orange = Color3.fromRGB(243, 156, 18),
-					gold = Color3.fromRGB(245, 158, 11),
+					gold = Color3.fromRGB(255, 196, 40),
 					white = Color3.fromRGB(240, 240, 245),
 					dark = Color3.fromRGB(40, 40, 46),
 				}
@@ -5633,7 +5627,7 @@ function Astral:MakeWindow(config)
 		-- ==========================================
 		local notifTypeColors = {
 			good = {bg = Color3.fromRGB(46, 204, 113)},
-			warning = {bg = Color3.fromRGB(245, 158, 11)},
+			warning = {bg = Color3.fromRGB(255, 196, 40)},
 			bad = {bg = Color3.fromRGB(231, 76, 60)}
 		}
 		local notifTypeIcons = {
@@ -5871,7 +5865,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			-- Slide in from right side
-			Frame.Position = UDim2.new(0, notifW + 24, 0, 0)
+			Frame.Position = UDim2.new(1, 60, 0, 0)
 			Frame.BackgroundTransparency = 1
 			local NotifScale = Instance.new("UIScale")
 			NotifScale.Scale = 0.96
@@ -5894,7 +5888,7 @@ function Astral:MakeWindow(config)
 				running = false
 				if conn then conn:Disconnect() end
 				TweenService:Create(Frame, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-					Position = UDim2.new(0, notifW + 24, 0, 0),
+					Position = UDim2.new(1, 60, 0, 0),
 					BackgroundTransparency = 1
 				}):Play()
 				TweenService:Create(NotifScale, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
@@ -5961,7 +5955,7 @@ function Astral:MakeWindow(config)
 			purple = Color3.fromRGB(138, 90, 255),
 			pink = Color3.fromRGB(255, 90, 180),
 			orange = Color3.fromRGB(243, 156, 18),
-			gold = Color3.fromRGB(245, 158, 11),
+			gold = Color3.fromRGB(255, 196, 40),
 			white = Color3.fromRGB(240, 240, 245),
 			gray = Color3.fromRGB(160, 160, 168),
 		}
