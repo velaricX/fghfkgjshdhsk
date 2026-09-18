@@ -623,7 +623,7 @@ function Astral:MakeWindow(config)
 	BackgroundImage.BackgroundTransparency = 1
 	BackgroundImage.Image = config.BackgroundImage or "rbxassetid://91526381633533"
 	BackgroundImage.ScaleType = Enum.ScaleType.Crop
-	BackgroundImage.ImageColor3 = Color3.fromRGB(15, 15, 15)
+	BackgroundImage.ImageColor3 = Color3.fromRGB(58, 58, 64)
 	BackgroundImage.ZIndex = 0
 	BackgroundImage.Parent = MainFrame
 	pcall(function()
@@ -667,7 +667,7 @@ function Astral:MakeWindow(config)
 	BgDim.Size = UDim2.fromScale(1, 1)
 	BgDim.Position = UDim2.fromScale(0, 0)
 	BgDim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	BgDim.BackgroundTransparency = 0.5
+	BgDim.BackgroundTransparency = tonumber(config.BackgroundDim) or 0.35
 	BgDim.BorderSizePixel = 0
 	BgDim.ZIndex = 1
 	BgDim.Parent = MainFrame
@@ -5512,9 +5512,15 @@ function Astral:MakeWindow(config)
 			BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255)
 		end
 	end
+	function Window:SetBackgroundDim(transparency)
+		local t = tonumber(transparency)
+		if not t then return end
+		BgDim.BackgroundTransparency = math.clamp(t, 0, 1)
+	end
+
 	function Window:ResetBackground()
 		BackgroundImage.Image = "rbxassetid://91526381633533"
-		BackgroundImage.ImageColor3 = Color3.fromRGB(15,15,15)
+		BackgroundImage.ImageColor3 = Color3.fromRGB(58,58,64)
 	end
 	-- Manual window size override (preview PC vs mobile sizes live)
 	function Window:SetWindowSize(w, h)
