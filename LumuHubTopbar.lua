@@ -599,6 +599,8 @@ function Astral.SetSavedDesign(design)
 	return writeDesignPref(design)
 end
 
+Astral._DesignCache = {}
+
 function Astral:MakeWindow(config)
 	config = config or {}
 	-- Accent engine FIRST: panels and elements below hook into it during build
@@ -6668,12 +6670,15 @@ function Astral:MakeWindow(config)
 	-- design identity + LIVE switcher (no rejoin needed; choice is persisted)
 	Window.DesignName = "TopBar"
 	Window._Config = config
+	-- register this lib in the design cache so SwitchDesign can swap instantly
+	Astral._DesignCache["TopBar"] = Astral
 
 	function Window:GetDesign()
 		return Window.DesignName
 	end
 
-	-- Switch design right now: wipes this UI, loads the other design and rebuilds.
+	-- Switch design right now: wipes this UI, rebuilds in the other design instantly.
+	-- Priority: LumuHubReload hook (rebuilds your full app) > cached lib > HTTP fallback.
 	function Window:SwitchDesign(design)
 		if design ~= "Sidebar" and design ~= "TopBar" then return false end
 		writeDesignPref(design)
@@ -6682,35 +6687,31 @@ function Astral:MakeWindow(config)
 			local ok = pcall(getgenv().LumuHubReload, design)
 			if ok then return true end
 		end
-		-- 2) hosted loader (rebuilds the demo UI in the chosen design)
-		local ok2 = pcall(function()
-			loadstring(game:HttpGet(LUMU_RAW .. "LumuLoader.lua"))()
-		end)
-		if ok2 then return true end
-		-- 3) last resort: rebuild just this window's chrome in the other design
-		return (pcall(function()
+		-- 2) cached lib (instant, no network — loader must cache both libs at startup)
+		local cached = Astral._DesignCache and Astral._DesignCache[design]
+		if cached then
+			local ok = pcall(function()
+				if cached.RegisterIcons and Astral.Icons then pcall(cached.RegisterIcons, cached, Astral.Icons) end
+				local cfg = Window._Config or { Title = "Lumu" }
+				pcall(function() ScreenGui:Destroy() end)
+				cached:CreateWindow(cfg)
+			end)
+			if ok then return true end
+		end
+		-- 3) last resort: HTTP fallback (slow)
+		local ok3 = pcall(function()
 			local lib = loadstring(game:HttpGet(DESIGN_URLS[design]))()
 			if lib and lib.RegisterIcons and Astral.Icons then pcall(lib.RegisterIcons, lib, Astral.Icons) end
 			local cfg = Window._Config or { Title = "Lumu" }
 			pcall(function() ScreenGui:Destroy() end)
 			lib:CreateWindow(cfg)
-		end))
+		end)
+		return ok3
 	end
 
 	-- SetDesign is an alias of SwitchDesign (persist + switch live)
 	function Window:SetDesign(design)
 		return Window:SwitchDesign(design)
-	end
-
-	-- re-run this script after a teleport / server hop (needs an executor queue_on_teleport)
-	function Window:SetAutoReexecute(scriptText)
-		if type(scriptText) ~= "string" or scriptText == "" then return false end
-		Window._ReexecScript = scriptText
-		if type(queue_on_teleport) == "function" then
-			local ok = pcall(queue_on_teleport, scriptText)
-			return ok
-		end
-		return false
 	end
 
 	-- header button: switch to the other design
