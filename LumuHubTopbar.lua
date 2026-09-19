@@ -502,6 +502,96 @@ local function themeHoverBG(t) return themeColorFor("36,36,40", t) end
 local function themeStroke(t) return themeColorFor("50,50,55", t) end
 local function themeStrokeHover(t) return themeColorFor("70,70,75", t) end
 
+local function getGuiParent()
+	-- executors: hidden UI container (CoreGui area); otherwise PlayerGui
+	local ok, h = pcall(function() return gethui and gethui() end)
+	if ok and h then return h end
+	return PlayerGui
+end
+
+local function makeGuiName(base)
+	local suffix = ""
+	pcall(function() suffix = "_" .. tostring(math.random(100000000, 999999999)) end)
+	return base .. suffix
+end
+
+local UIPOS_FILE = "lumu_ui_pos.json"
+
+local function saveUIPosFile(name, data)
+	if not writefile then return false end
+	local ok, json = pcall(function() return game:GetService("HttpService"):JSONEncode(data) end)
+	if not ok then return false end
+	local okW = pcall(writefile, name or UIPOS_FILE, json)
+	return okW
+end
+
+local function loadUIPosFile(name)
+	if not (readfile and isfile) then return nil end
+	local fname = name or UIPOS_FILE
+	local okE = false
+	pcall(function() okE = isfile(fname) end)
+	if not okE then return nil end
+	local okR, raw = pcall(readfile, fname)
+	if not okR or not raw or raw == "" then return nil end
+	local okJ, data = pcall(function() return game:GetService("HttpService"):JSONDecode(raw) end)
+	if not okJ or type(data) ~= "table" then return nil end
+	return data
+end
+
+local function udimToTable(u)
+	if typeof(u) ~= "UDim2" and (not u or not u.X) then return nil end
+	return { sX = u.X.Scale, oX = u.X.Offset, sY = u.Y.Scale, oY = u.Y.Offset }
+end
+
+local function tableToUdim(t)
+	if type(t) ~= "table" then return nil end
+	return UDim2.new(tonumber(t.sX) or 0, tonumber(t.oX) or 0, tonumber(t.sY) or 0, tonumber(t.oY) or 0)
+end
+
+local function clampPanelOnScreen(pos, w, hEst)
+	local cam = workspace.CurrentCamera
+	if not cam then return pos end
+	local vp = cam.ViewportSize
+	if not vp or vp.X < 10 then return pos end
+	local x = pos.X.Offset
+	local y = pos.Y.Offset
+	x = math.clamp(x, 8, math.max(8, vp.X - (w or 280) - 8))
+	y = math.clamp(y, 8, math.max(8, vp.Y - (hEst or 220) - 8))
+	return UDim2.new(pos.X.Scale, x, pos.Y.Scale, y)
+end
+local DESIGN_FILE = "lumu_design.json"
+
+local function readDesignPref()
+	if not (readfile and isfile) then return nil end
+	local okE = false
+	pcall(function() okE = isfile(DESIGN_FILE) end)
+	if not okE then return nil end
+	local okR, raw = pcall(readfile, DESIGN_FILE)
+	if not okR or not raw or raw == "" then return nil end
+	local okJ, data = pcall(function() return game:GetService("HttpService"):JSONDecode(raw) end)
+	if okJ and type(data) == "table" and type(data.design) == "string" then return data.design end
+	local txt = tostring(raw):gsub("%s", "")
+	if txt == "Sidebar" or txt == "TopBar" then return txt end
+	return nil
+end
+
+local function writeDesignPref(design)
+	if not writefile then return false end
+	local ok = pcall(function()
+		writefile(DESIGN_FILE, game:GetService("HttpService"):JSONEncode({ design = design }))
+	end)
+	return ok
+end
+
+function Astral.GetSavedDesign()
+	return readDesignPref()
+end
+
+function Astral.SetSavedDesign(design)
+	if design ~= "Sidebar" and design ~= "TopBar" then return false end
+	return writeDesignPref(design)
+end
+
 function Astral:MakeWindow(config)
 	config = config or {}
 	-- Accent engine FIRST: panels and elements below hook into it during build
@@ -533,11 +623,11 @@ function Astral:MakeWindow(config)
 
 	-- Create ScreenGui
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "ZenUI_ScreenGui"
+	ScreenGui.Name = makeGuiName("LumuHubMain")
 	ScreenGui.ResetOnSpawn = false
 	ScreenGui.IgnoreGuiInset = true
 	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.Parent = PlayerGui
+	ScreenGui.Parent = getGuiParent()
 
 
 	-- Notification Container (Bottom-Right of Screen, copied from main UI)
@@ -562,6 +652,9 @@ function Astral:MakeWindow(config)
 
 	-- Main Frame (Responsive Sizing for Mobile & PC)
 	local MainFrame = Instance.new("Frame")
+	local statusPanels = {}
+	local defaultMainPos = UDim2.new(0.5, 15, 0.5, -4)
+	local defaultLogoPos = nil
 	MainFrame.Name = "MainFrame"
 	MainFrame.Active = true
 	MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -603,11 +696,11 @@ function Astral:MakeWindow(config)
 		local h = math.min(refH, vps.Y - 16)
 		if w < 200 or h < 140 then return end
 		MainFrame.Size = UDim2.new(0, w, 0, h)
-		MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+		MainFrame.Position = UDim2.new(0.5, 15, 0.5, -4)
 		applyTextSize()
 	end
 	MainFrame.Size = UDim2.new(0, refW, 0, refH)
-	MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	MainFrame.Position = UDim2.new(0.5, 15, 0.5, -4)
 	MainFrame.Parent = ScreenGui
 	task.spawn(function()
 		local cam = workspace.CurrentCamera
@@ -621,7 +714,7 @@ function Astral:MakeWindow(config)
 	BackgroundImage.Size = UDim2.fromScale(1, 1)
 	BackgroundImage.Position = UDim2.fromScale(0, 0)
 	BackgroundImage.BackgroundTransparency = 1
-	BackgroundImage.Image = config.BackgroundImage or "rbxassetid://91526381633533"
+	BackgroundImage.Image = config.BackgroundImage or ""
 	BackgroundImage.ScaleType = Enum.ScaleType.Crop
 	BackgroundImage.ImageColor3 = Color3.fromRGB(58, 58, 64)
 	BackgroundImage.ZIndex = 0
@@ -5399,10 +5492,11 @@ function Astral:MakeWindow(config)
 	
 	-- Apply Responsive Position for Logo Button
 	if IsMobile then
-		LogoButton.Position = UDim2.new(0.05, -33, 0.32, -77)
+		LogoButton.Position = UDim2.new(0.05, -2, 0.32, -90)
 	else
-		LogoButton.Position = UDim2.new(0.05, 39, 0.32, -125)
+		LogoButton.Position = UDim2.new(0.05, -2, 0.32, -90)
 	end
+	defaultLogoPos = LogoButton.Position
 	
 	LogoButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Dark black base matching image reference
 	LogoButton.BorderSizePixel = 0
@@ -5503,7 +5597,7 @@ function Astral:MakeWindow(config)
 	end
 
 	function Window:ResetBackground()
-		BackgroundImage.Image = "rbxassetid://91526381633533"
+		BackgroundImage.Image = ""
 		BackgroundImage.ImageColor3 = Color3.fromRGB(58,58,64)
 	end
 	-- Manual window size override (preview PC vs mobile sizes live)
@@ -5604,6 +5698,67 @@ function Astral:MakeWindow(config)
 				end
 			end
 		end
+		return true
+	end
+
+	-- UI positions: save / load / reset (main window, logo button, status panels)
+	function Window:SaveUIPositions(name)
+		local data = {}
+		pcall(function() data.main = udimToTable(MainFrame.Position) end)
+		pcall(function() data.logo = udimToTable(LogoButton.Position) end)
+		data.status = {}
+		pcall(function()
+			for _, p in ipairs(statusPanels) do
+				if p.Panel and p.Panel.Parent then
+					table.insert(data.status, udimToTable(p.Panel.Position))
+				end
+			end
+		end)
+		return saveUIPosFile(name, data)
+	end
+
+	function Window:LoadUIPositions(name)
+		local data = loadUIPosFile(name)
+		if not data then return false end
+		pcall(function()
+			local pos = tableToUdim(data.main)
+			if pos then MainFrame.Position = clampPanelOnScreen(pos, 880, 600) end
+		end)
+		pcall(function()
+			local pos = tableToUdim(data.logo)
+			if pos then LogoButton.Position = pos end
+		end)
+		pcall(function()
+			if type(data.status) == "table" then
+				for i, p in ipairs(statusPanels) do
+					local pos = tableToUdim(data.status[i])
+					if pos and p.Panel then
+						p.Panel.Position = clampPanelOnScreen(pos, 276, 220)
+					end
+				end
+			end
+		end)
+		return true
+	end
+
+	function Window:ResetUIPositions(name)
+		pcall(function()
+			local fname = name or UIPOS_FILE
+			if delfile and isfile and isfile(fname) then
+				pcall(delfile, fname)
+			elseif writefile then
+				pcall(writefile, fname, "")
+			end
+		end)
+		pcall(function() MainFrame.Position = defaultMainPos end)
+		pcall(function() LogoButton.Position = defaultLogoPos end)
+		pcall(function()
+			for _, p in ipairs(statusPanels) do
+				if p.Panel and p.DefaultPos then
+					p.Panel.Position = p.DefaultPos
+				end
+			end
+		end)
 		return true
 	end
 	function Window:SetAccent(color)
@@ -6061,12 +6216,18 @@ function Astral:MakeWindow(config)
 		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 		Panel.BorderSizePixel = 0
 		Panel.Size = UDim2.new(0, panelW, 0, 46)
-		Panel.Position = config.Position or UDim2.new(0, 20, 0, 130)
+		Panel.Position = config.Position or UDim2.new(0, 1254, 0, 64)
 		Panel.AutomaticSize = Enum.AutomaticSize.Y
 		Panel.ZIndex = 500
 		Panel.Active = true
 		Panel.Visible = enabled
 		Panel.Parent = ScreenGui
+		-- clamp on-screen at spawn (fixes off-screen summon on join)
+		do
+			local defaultPos = Panel.Position
+			Panel.Position = clampPanelOnScreen(defaultPos, panelW, 220)
+			table.insert(statusPanels, { Panel = Panel, DefaultPos = Panel.Position })
+		end
 
 		local PanelCorner = Instance.new("UICorner")
 		PanelCorner.CornerRadius = UDim.new(0, 12)
@@ -6327,7 +6488,8 @@ function Astral:MakeWindow(config)
 			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 				local dx = input.Position.X - dragStart.X
 				local dy = input.Position.Y - dragStart.Y
-				Panel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + dx, startPos.Y.Scale, startPos.Y.Offset + dy)
+				local nextPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + dx, startPos.Y.Scale, startPos.Y.Offset + dy)
+				Panel.Position = clampPanelOnScreen(nextPos, panelW, 220)
 			end
 		end)
 
@@ -6484,6 +6646,75 @@ function Astral:MakeWindow(config)
 	if config.Theme and type(config.Theme) == "string" then
 		local initial = applyThemeToGui(ScreenGui, AccentColor, "Dark", config.Theme)
 		if initial then Window.ThemeName = initial; CurrentThemeName = initial end
+	end
+
+	-- restore saved UI positions (main, logo, status panels)
+	pcall(function() Window:LoadUIPositions() end)
+
+	-- auto-load saved element states so a server hop resumes itself
+	if config.AutoLoad or config.AutoLoadConfig then
+		local cfgName = config.ConfigName
+		task.delay(1, function()
+			pcall(Window.LoadConfig, Window, cfgName)
+		end)
+	end
+
+	-- design identity + live switcher (persisted so next execute loads the chosen design)
+	Window.DesignName = "TopBar"
+
+	function Window:GetDesign()
+		return Window.DesignName
+	end
+
+	function Window:SetDesign(design)
+		if design ~= "Sidebar" and design ~= "TopBar" then return false end
+		writeDesignPref(design)
+		if Window.Notify then
+			pcall(function()
+				Window:Notify({ Title = "Design Saved", Message = design .. " UI loads next execute.", Duration = 4 })
+			end)
+		end
+		pcall(function()
+			if type(getgenv().LumuHubReload) == "function" then
+				task.defer(getgenv().LumuHubReload, design)
+			end
+		end)
+		return true
+	end
+
+	-- re-run this script after a teleport / server hop (needs an executor queue_on_teleport)
+	function Window:SetAutoReexecute(scriptText)
+		if type(scriptText) ~= "string" or scriptText == "" then return false end
+		Window._ReexecScript = scriptText
+		if type(queue_on_teleport) == "function" then
+			local ok = pcall(queue_on_teleport, scriptText)
+			return ok
+		end
+		return false
+	end
+
+	-- header button: switch to the other design
+	do
+		local other = (Window.DesignName == "Sidebar") and "TopBar" or "Sidebar"
+		local SwitchBtn = Instance.new("TextButton")
+		SwitchBtn.Name = "DesignSwitch"
+		SwitchBtn.Size = UDim2.new(0, 0, 0, 22)
+		SwitchBtn.AutomaticSize = Enum.AutomaticSize.X
+		SwitchBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 38)
+		SwitchBtn.BorderSizePixel = 0
+		SwitchBtn.Text = "  Load " .. other .. " UI  "
+		SwitchBtn.Font = Enum.Font.GothamMedium
+		SwitchBtn.TextSize = 11
+		SwitchBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
+		SwitchBtn.AutoButtonColor = false
+		SwitchBtn.LayoutOrder = 9
+		SwitchBtn.Parent = HeaderLayoutContainer
+		local sc = Instance.new("UICorner")
+		sc.CornerRadius = UDim.new(0, 6)
+		sc.Parent = SwitchBtn
+		SwitchBtn.MouseEnter:Connect(function() SwitchBtn.BackgroundColor3 = Color3.fromRGB(46, 46, 56) end)
+		SwitchBtn.MouseLeave:Connect(function() SwitchBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 38) end)
+		SwitchBtn.MouseButton1Click:Connect(function() Window:SetDesign(other) end)
 	end
 
 	return Window

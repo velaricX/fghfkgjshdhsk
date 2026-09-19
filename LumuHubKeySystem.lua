@@ -258,11 +258,18 @@ end
 
 local function newScreenGui(name)
 	local gui = Instance.new("ScreenGui")
-	gui.Name = name
+	local suffix = ""
+	pcall(function() suffix = "_" .. tostring(math.random(100000000, 999999999)) end)
+	gui.Name = name .. suffix
 	gui.ResetOnSpawn = false
 	gui.IgnoreGuiInset = true
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	gui.Parent = PlayerGui
+	local ok, h = pcall(function() return gethui and gethui() end)
+	if ok and h then
+		gui.Parent = h
+	else
+		gui.Parent = PlayerGui
+	end
 	return gui
 end
 
@@ -599,7 +606,7 @@ function KeySystem:CreateLoading(config)
 	local title = config.Title or "LumuHub"
 	local subtitle = config.Subtitle or "Loading"
 
-	local gui = newScreenGui("LumuLoading")
+	local gui = newScreenGui("LumuHubLoading")
 
 	local Backdrop = Instance.new("Frame")
 	Backdrop.Name = "Backdrop"
@@ -811,7 +818,7 @@ function KeySystem:Create(config)
 	local checkFn = config.CheckKey
 	if type(checkFn) ~= "function" and verifyUrl then checkFn = verifyOnServer end
 
-	local screenGui = newScreenGui("LumuKeySystem")
+	local screenGui = newScreenGui("LumuHubKey")
 
 	-- notification system copied from the main UI (same stack, same cards)
 	local mainNotify = createMainNotify(screenGui, function() return accent end)

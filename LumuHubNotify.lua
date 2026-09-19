@@ -119,12 +119,23 @@ local MARKS = { good = drawCheck, bad = drawCross, warning = drawBang, info = dr
 -- gui
 -- ---------------------------------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LumuNotify"
+do
+	local suffix = ""
+	pcall(function() suffix = "_" .. tostring(math.random(100000000, 999999999)) end)
+	ScreenGui.Name = "LumuHubNotify" .. suffix
+end
 ScreenGui.ResetOnSpawn = false
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.DisplayOrder = 999
-ScreenGui.Parent = PlayerGui
+do
+	local ok, h = pcall(function() return gethui and gethui() end)
+	if ok and h then
+		ScreenGui.Parent = h
+	else
+		ScreenGui.Parent = PlayerGui
+	end
+end
 
 local Stack = Instance.new("Frame")
 Stack.Name = "Stack"
