@@ -404,7 +404,10 @@ local CustomThemeValues = nil -- darkKey -> "r,g,b" string, built by SetCustomTh
 local CurrentThemeName = "Dark"
 
 local function parseThemeRGB(s)
-	local r, g, b = string.match(s, "^(%d+),(%d+),(%d+)$")
+	-- accepts both "r,g,b" strings and raw Color3 values (CustomThemeValues stores Color3)
+	if typeof(s) == "Color3" then return s end
+	local str = tostring(s or "")
+	local r, g, b = string.match(str, "^(%d+),(%d+),(%d+)$")
 	return Color3.fromRGB(tonumber(r) or 0, tonumber(g) or 0, tonumber(b) or 0)
 end
 
@@ -546,8 +549,12 @@ local function clampPanelOnScreen(pos, w, hEst)
 	y = math.clamp(y, 8, math.max(8, vp.Y - (hEst or 220) - 8))
 	return UDim2.new(pos.X.Scale, x, pos.Y.Scale, y)
 end
+local LUMU_RAW = "https://raw.githubusercontent.com/velaricX/fghfkgjshdhsk/main/"
+local DESIGN_URLS = {
+	TopBar = LUMU_RAW .. "LumuHubTopbar.lua",
+	Sidebar = LUMU_RAW .. "LumuHubSidebar.lua",
+}
 local DESIGN_FILE = "lumu_design.json"
-
 local function readDesignPref()
 	if not (readfile and isfile) then return nil end
 	local okE = false
@@ -706,12 +713,7 @@ function Astral:MakeWindow(config)
 	BackgroundImage.ImageColor3 = Color3.fromRGB(58, 58, 64)
 	BackgroundImage.ZIndex = 0
 	BackgroundImage.Parent = MainFrame
-	pcall(function()
-		if getcustomasset and isfile and isfile("astral_bg.jpg") then
-			local a = getcustomasset("astral_bg.jpg")
-			if a and a ~= "" then BackgroundImage.Image = a; BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255) end
-		end
-	end)
+	-- no default background: nothing is applied unless you call Window:SetBackground(...) yourself
 	local function GetIconOnWeb(url)
 		if not url or url == "" then return url end
 		local ext = url:match("%.(%w+)$") or "png"
@@ -5585,6 +5587,10 @@ function Astral:MakeWindow(config)
 			BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255)
 		end
 	end
+	-- alias kept for old scripts: downloads the URL then applies it
+	function Window:LoadBackgroundFromUrl(url)
+		return Window:SetBackground(url)
+	end
 	function Window:SetBackgroundDim(transparency)
 		local t = tonumber(transparency)
 		if not t then return end
@@ -6652,27 +6658,41 @@ function Astral:MakeWindow(config)
 		end)
 	end
 
-	-- design identity + live switcher (persisted so next execute loads the chosen design)
+	-- design identity + LIVE switcher (no rejoin needed; choice is persisted)
 	Window.DesignName = "Sidebar"
+	Window._Config = config
 
 	function Window:GetDesign()
 		return Window.DesignName
 	end
 
-	function Window:SetDesign(design)
+	-- Switch design right now: wipes this UI, loads the other design and rebuilds.
+	function Window:SwitchDesign(design)
 		if design ~= "Sidebar" and design ~= "TopBar" then return false end
 		writeDesignPref(design)
-		if Window.Notify then
-			pcall(function()
-				Window:Notify({ Title = "Design Saved", Message = design .. " UI loads next execute.", Duration = 4 })
-			end)
+		-- 1) app-provided reload hook (rebuilds the whole script, keeps your tabs)
+		if type(getgenv().LumuHubReload) == "function" then
+			local ok = pcall(getgenv().LumuHubReload, design)
+			if ok then return true end
 		end
-		pcall(function()
-			if type(getgenv().LumuHubReload) == "function" then
-				task.defer(getgenv().LumuHubReload, design)
-			end
+		-- 2) hosted loader (rebuilds the demo UI in the chosen design)
+		local ok2 = pcall(function()
+			loadstring(game:HttpGet(LUMU_RAW .. "LumuLoader.lua"))()
 		end)
-		return true
+		if ok2 then return true end
+		-- 3) last resort: rebuild just this window's chrome in the other design
+		return (pcall(function()
+			local lib = loadstring(game:HttpGet(DESIGN_URLS[design]))()
+			if lib and lib.RegisterIcons and Astral.Icons then pcall(lib.RegisterIcons, lib, Astral.Icons) end
+			local cfg = Window._Config or { Title = "Lumu" }
+			pcall(function() ScreenGui:Destroy() end)
+			lib:CreateWindow(cfg)
+		end))
+	end
+
+	-- SetDesign is an alias of SwitchDesign (persist + switch live)
+	function Window:SetDesign(design)
+		return Window:SwitchDesign(design)
 	end
 
 	-- re-run this script after a teleport / server hop (needs an executor queue_on_teleport)
