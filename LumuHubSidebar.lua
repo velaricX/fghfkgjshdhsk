@@ -529,8 +529,8 @@ function Astral:MakeWindow(config)
 
 	-- Notification Container (Bottom-Right of Screen, copied from main UI)
 	local notifW = config.NotifySize or (IsMobile
-		and math.min(180, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.3))
-		or math.min(300, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.3)))
+		and math.min(160, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28))
+		or math.min(258, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28)))
 
 	local NotificationContainer = Instance.new("Frame")
 	NotificationContainer.Name = "NotificationContainer"
@@ -5610,11 +5610,15 @@ function Astral:MakeWindow(config)
 		-- recolor tab strokes + logo ring (not registered, direct refs)
 		for _, td in ipairs(tabs) do pcall(function() if td.Stroke then td.Stroke.Color = color end end) end
 		pcall(function() end) -- ring stays neutral
-		-- refresh active tab gradient with the new accent
-		if currentTab then
-			pcall(function()
-				currentTab.Gradient.Color = ColorSequence.new(color, color * 0.5)
-			end)
+		-- re-apply the ACTIVE tab pill with the new accent (solid pill style)
+		for _, td in ipairs(tabs) do
+			if td == currentTab then
+				pcall(function() td.Button.BackgroundColor3 = color; td.Button.BackgroundTransparency = 0 end)
+				pcall(function() td.Stroke.Color = color; td.Stroke.Transparency = 0 end)
+				if td.Gradient then td.Gradient.Enabled = false end
+			else
+				pcall(function() td.Stroke.Color = Color3.fromRGB(42, 42, 46) end)
+			end
 		end
 	end
 
@@ -5708,7 +5712,7 @@ function Astral:MakeWindow(config)
 			local hasActions = #actions > 0
 			local tColor = notifTypeColors[nType] or notifTypeColors.good
 			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
-			local notifH = hasActions and 100 or 76
+			local notifH = hasActions and 88 or 62
 
 			-- type colour drives the whole card so good/warning/bad read instantly
 			local tc = tColor.bg
@@ -5742,8 +5746,8 @@ function Astral:MakeWindow(config)
 
 			-- Icon (matches UI IconContainer style)
 			local IconFrame = Instance.new("Frame")
-			IconFrame.Size = UDim2.fromOffset(44, 44)
-			IconFrame.Position = UDim2.new(0, 20, 0, hasActions and 12 or 16)
+			IconFrame.Size = UDim2.fromOffset(34, 34)
+			IconFrame.Position = UDim2.new(0, 14, 0, hasActions and 12 or 14)
 			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
 			IconFrame.ZIndex = 200
@@ -5761,7 +5765,7 @@ function Astral:MakeWindow(config)
 			IconStroke.Parent = IconFrame
 
 			local Icon = Instance.new("ImageLabel")
-			Icon.Size = UDim2.fromOffset(26, 26)
+			Icon.Size = UDim2.fromOffset(22, 22)
 			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
 			Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Icon.BackgroundTransparency = 1
@@ -5772,8 +5776,8 @@ function Astral:MakeWindow(config)
 
 			-- Text
 			local TextFrame = Instance.new("Frame")
-			TextFrame.Size = UDim2.new(1, -108, 0, hasActions and 40 or 44)
-			TextFrame.Position = UDim2.new(0, 70, 0, hasActions and 10 or 12)
+			TextFrame.Size = UDim2.new(1, -86, 0, hasActions and 38 or 36)
+			TextFrame.Position = UDim2.new(0, 56, 0, hasActions and 10 or 12)
 			TextFrame.BackgroundTransparency = 1
 			TextFrame.ZIndex = 200
 			TextFrame.Parent = Frame
@@ -5806,25 +5810,44 @@ function Astral:MakeWindow(config)
 			DescLabel.Parent = TextFrame
 
 			-- countdown seconds (top-right)
+			local CountPill = Instance.new("Frame")
+			CountPill.Name = "CountdownPill"
+			CountPill.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.30)
+			CountPill.BorderSizePixel = 0
+			CountPill.AnchorPoint = Vector2.new(1, 0)
+			CountPill.Position = UDim2.new(1, -12, 0, 11)
+			CountPill.Size = UDim2.new(0, 34, 0, 18)
+			CountPill.ZIndex = 202
+			CountPill.Parent = Frame
+
+			local CountPillCorner = Instance.new("UICorner")
+			CountPillCorner.CornerRadius = UDim.new(0, 6)
+			CountPillCorner.Parent = CountPill
+
+			local CountPillStroke = Instance.new("UIStroke")
+			CountPillStroke.Color = tc
+			CountPillStroke.Transparency = 0.5
+			CountPillStroke.Thickness = 1
+			CountPillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			CountPillStroke.Parent = CountPill
+
 			local CountLabel = Instance.new("TextLabel")
 			CountLabel.Name = "Countdown"
 			CountLabel.BackgroundTransparency = 1
-			CountLabel.AnchorPoint = Vector2.new(1, 0)
-			CountLabel.Position = UDim2.new(1, -14, 0, 12)
-			CountLabel.Size = UDim2.new(0, 44, 0, 16)
+			CountLabel.Size = UDim2.new(1, 0, 1, 0)
 			CountLabel.Font = Enum.Font.GothamBold
 			CountLabel.Text = tostring(math.ceil(duration)) .. "s"
 			CountLabel.TextSize = 11
 			CountLabel.TextColor3 = tc
-			CountLabel.TextXAlignment = Enum.TextXAlignment.Right
-			CountLabel.ZIndex = 202
-			CountLabel.Parent = Frame
+			CountLabel.TextXAlignment = Enum.TextXAlignment.Center
+			CountLabel.ZIndex = 203
+			CountLabel.Parent = CountPill
 
 			-- Bottom progress bar (neutral, matches UI - no type colors)
 			local ProgressTrack = Instance.new("Frame")
 			ProgressTrack.Name = "ProgressTrack"
-			ProgressTrack.Size = UDim2.new(1, -32, 0, 4)
-			ProgressTrack.Position = UDim2.new(0, 16, 1, -8)
+			ProgressTrack.Size = UDim2.new(1, -24, 0, 3)
+			ProgressTrack.Position = UDim2.new(0, 12, 1, -6)
 			ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			ProgressTrack.BorderSizePixel = 0
 			ProgressTrack.ZIndex = 201
