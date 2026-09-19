@@ -780,15 +780,7 @@ function Astral:MakeWindow(config)
 	DecoArrows.LayoutOrder = 3
 	DecoArrows.Parent = HeaderLayoutContainer
 
-	-- Horizontal Separator Line
-	local HorizontalSeparator = Instance.new("Frame")
-	HorizontalSeparator.Name = "HorizontalSeparator"
-	HorizontalSeparator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
-	HorizontalSeparator.BorderSizePixel = 0
-	HorizontalSeparator.Position = UDim2.new(0, 0, 0, 50)
-	HorizontalSeparator.Size = UDim2.new(1, 0, 0, 1)
-	HorizontalSeparator.ZIndex = 3
-	HorizontalSeparator.Parent = MainFrame
+	-- (no separator line above the tab bar - clean look)
 
 	-- =====================================================================
 	-- TOP BAR NAVIGATION (topbar design: horizontal tabs, no sidebar)
@@ -818,11 +810,7 @@ function Astral:MakeWindow(config)
 	TabBarCorner.CornerRadius = UDim.new(0, 8)
 	TabBarCorner.Parent = TabBarSection
 
-	local TabBarStroke = Instance.new("UIStroke")
-	TabBarStroke.Color = Color3.fromRGB(45, 45, 50)
-	TabBarStroke.Thickness = 1
-	TabBarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	TabBarStroke.Parent = TabBarSection
+	-- (no border stroke on the tab bar box - clean look)
 
 	-- Separate box for the collapse toggle, to the right with a gap
 	local CollapseBox = Instance.new("Frame")
@@ -840,11 +828,7 @@ function Astral:MakeWindow(config)
 	CollapseBoxCorner.CornerRadius = UDim.new(0, 8)
 	CollapseBoxCorner.Parent = CollapseBox
 
-	local CollapseBoxStroke = Instance.new("UIStroke")
-	CollapseBoxStroke.Color = Color3.fromRGB(62, 62, 70)
-	CollapseBoxStroke.Thickness = 1
-	CollapseBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	CollapseBoxStroke.Parent = CollapseBox
+	-- (no border stroke on the collapse box - clean look)
 
 	-- Horizontal tab strip (fills the tabs box)
 	local ArrowW = 26
@@ -1016,15 +1000,7 @@ function Astral:MakeWindow(config)
 		end)
 	end
 
-	-- Divider under the tab strip
-	local Separator = Instance.new("Frame")
-	Separator.Name = "Separator"
-	Separator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
-	Separator.BorderSizePixel = 0
-	Separator.Position = UDim2.new(0, 0, 0, TabBarTop + TabBarHeight + 2)
-	Separator.Size = UDim2.new(1, 0, 0, 1)
-	Separator.ZIndex = 3
-	Separator.Parent = MainFrame
+	-- (no divider line under the tab strip - clean look)
 
 	-- Content fills the window below the tab strip
 	local ContentContainer = Instance.new("Frame")
