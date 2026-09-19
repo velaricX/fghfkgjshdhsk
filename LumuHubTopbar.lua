@@ -996,6 +996,7 @@ function Astral:MakeWindow(config)
 		CIcon.Parent = TabsCollapse
 
 		TabsCollapse.MouseEnter:Connect(function()
+			if pickerOpen or selectorOpen then return end
 			TweenService:Create(TabsCollapse, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(CurrentThemeName)}):Play()
 			TweenService:Create(CIcon, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 		end)
@@ -1982,6 +1983,7 @@ function Astral:MakeWindow(config)
 				end)
 
 				OptionBtn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
 					if not isSelected then
 						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(CurrentThemeName)}):Play()
 					end
@@ -2709,6 +2711,7 @@ function Astral:MakeWindow(config)
 				end
 			end)
 			ButtonFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
@@ -2861,6 +2864,7 @@ function Astral:MakeWindow(config)
 			end
 			ToggleFrame.MouseButton1Click:Connect(function() toggle() end)
 			ToggleFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -3070,6 +3074,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			TickFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(TickFrame, TweenInfo.new(0.15), {
 					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
@@ -3247,6 +3252,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			PickerFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(PickerFrame, TweenInfo.new(0.15), {
 					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
@@ -3671,6 +3677,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			ValueBox.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -3924,6 +3931,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			TextboxFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 130, 135)}):Play()
@@ -4168,6 +4176,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover white effect like toggle (good UI)
 			LabelFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local s = IconContainer and IconContainer:FindFirstChild("UIStroke"); if s then TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0}):Play() end end)
@@ -4461,6 +4470,7 @@ function Astral:MakeWindow(config)
 
 			-- hover white effect like toggle (good UI)
 			ParaFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0}):Play() end end end)
@@ -4751,6 +4761,7 @@ function Astral:MakeWindow(config)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
 			ActionButton.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ActionButton, TweenInfo.new(0.12), {BackgroundColor3 = hoverColor}):Play()
 			end)
 			ActionButton.MouseLeave:Connect(function()
@@ -4765,13 +4776,12 @@ function Astral:MakeWindow(config)
 
 				pcall(function() if setclipboard then setclipboard(inviteLink) end end)
 
-				pcall(function()
-					game:GetService("StarterGui"):SetCore("SendNotification", {
-						Title = data.ServerName or "Discord Server",
-						Text = "Invite copied to clipboard!",
-						Duration = 5
-					})
-				end)
+				Window:Notify({
+					Type = "good",
+					Title = "Invite copied",
+					Message = "discord.gg/" .. tostring(inviteCode) .. " is on your clipboard.",
+					Duration = 6,
+				})
 
 				pcall(function()
 					if httpRequest then
@@ -4799,6 +4809,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			MainFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 0.95}):Play()
 			end)
 			MainFrame.MouseLeave:Connect(function()
@@ -5005,6 +5016,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover effects (identical to toggle/button rows)
 			KeybindFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -5015,6 +5027,7 @@ function Astral:MakeWindow(config)
 
 			-- Key box hover: accent outline so it reads as clickable
 			KeybindButton.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				if listening then return end
 				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
@@ -5313,6 +5326,7 @@ function Astral:MakeWindow(config)
 					end
 				end)
 				Btn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
 					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = (bColor or AccentColor):Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
@@ -5912,6 +5926,7 @@ function Astral:MakeWindow(config)
 					BtnScale.Parent = Btn
 
 					Btn.MouseEnter:Connect(function()
+						if pickerOpen or selectorOpen then return end
 						TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 1.04}):Play()
 					end)
 					Btn.MouseLeave:Connect(function()
@@ -5934,6 +5949,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover highlight like UI cards
 			Frame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			Frame.MouseLeave:Connect(function()
@@ -6252,6 +6268,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Parent = Row
 
 			Row.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(RowHover, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
 			end)
 			Row.MouseLeave:Connect(function()

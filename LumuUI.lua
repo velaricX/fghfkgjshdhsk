@@ -1101,11 +1101,30 @@ function Astral:MakeWindow(config)
 	-- RGB Inputs
 	local RGBContainer = Instance.new("Frame")
 	RGBContainer.Name = "RGBContainer"
-	RGBContainer.BackgroundTransparency = 1
-	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight)
-	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding)
+	RGBContainer.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	RGBContainer.BackgroundTransparency = 0
+	RGBContainer.BorderSizePixel = 0
+	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight + 10)
+	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5)
 	RGBContainer.ZIndex = 202
 	RGBContainer.Parent = ColorPickerPanel
+
+	local RGBCorner = Instance.new("UICorner")
+	RGBCorner.CornerRadius = UDim.new(0, 8)
+	RGBCorner.Parent = RGBContainer
+
+	local RGBStroke = Instance.new("UIStroke")
+	RGBStroke.Color = Color3.fromRGB(52, 52, 60)
+	RGBStroke.Thickness = 1
+	RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	RGBStroke.Parent = RGBContainer
+
+	local RGBPad = Instance.new("UIPadding")
+	RGBPad.PaddingLeft = UDim.new(0, 6)
+	RGBPad.PaddingRight = UDim.new(0, 6)
+	RGBPad.PaddingTop = UDim.new(0, 5)
+	RGBPad.PaddingBottom = UDim.new(0, 5)
+	RGBPad.Parent = RGBContainer
 
 	-- RGB Inputs: one real horizontal layout (no manual math, no dup padding)
 	local RGBLayout = Instance.new("UIListLayout")
@@ -1163,11 +1182,30 @@ function Astral:MakeWindow(config)
 	-- Hex row: caption + input aligned on one clean line
 	local HexRow = Instance.new("Frame")
 	HexRow.Name = "HexRow"
-	HexRow.BackgroundTransparency = 1
-	HexRow.Size = UDim2.new(1, -24, 0, inputHeight)
-	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding + inputHeight + padding)
+	HexRow.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	HexRow.BackgroundTransparency = 0
+	HexRow.BorderSizePixel = 0
+	HexRow.Size = UDim2.new(1, -24, 0, inputHeight + 10)
+	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5 + inputHeight + 10 + 6)
 	HexRow.ZIndex = 202
 	HexRow.Parent = ColorPickerPanel
+
+	local HexCardCorner = Instance.new("UICorner")
+	HexCardCorner.CornerRadius = UDim.new(0, 8)
+	HexCardCorner.Parent = HexRow
+
+	local HexCardStroke = Instance.new("UIStroke")
+	HexCardStroke.Color = Color3.fromRGB(52, 52, 60)
+	HexCardStroke.Thickness = 1
+	HexCardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	HexCardStroke.Parent = HexRow
+
+	local HexCardPad = Instance.new("UIPadding")
+	HexCardPad.PaddingLeft = UDim.new(0, 6)
+	HexCardPad.PaddingRight = UDim.new(0, 6)
+	HexCardPad.PaddingTop = UDim.new(0, 5)
+	HexCardPad.PaddingBottom = UDim.new(0, 5)
+	HexCardPad.Parent = HexRow
 
 	local HexRowLayout = Instance.new("UIListLayout")
 	HexRowLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -1767,6 +1805,7 @@ function Astral:MakeWindow(config)
 				end)
 
 				OptionBtn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
 					if not isSelected then
 						TweenService:Create(OptionBtn, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(CurrentThemeName)}):Play()
 					end
@@ -1849,15 +1888,11 @@ function Astral:MakeWindow(config)
 			local isActive = (tab == targetTab)
 			
 			if isActive then
-				tab.Gradient.Enabled = true
-				tab.Gradient.Color = ColorSequence.new(AccentColor, Color3.new(AccentColor.R * 0.5, AccentColor.G * 0.5, AccentColor.B * 0.5))
-				tab.Gradient.Transparency = NumberSequence.new({
-					NumberSequenceKeypoint.new(0, 0),
-					NumberSequenceKeypoint.new(0.7, 0.1),
-					NumberSequenceKeypoint.new(1, 0.8)
-				})
+				-- match the topbar: solid accent pill, no gradient
+				tab.Gradient.Enabled = false
 				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+					BackgroundColor3 = AccentColor,
+					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Color = AccentColor,
@@ -1866,11 +1901,18 @@ function Astral:MakeWindow(config)
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					TextColor3 = Color3.fromRGB(255, 255, 255)
 				}):Play()
+				if tab.IconLabel then
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				end
+				if tab.FallbackLabel then
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				end
 			else
 				tab.Gradient.Enabled = false
-				
+
 				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+					BackgroundColor3 = Color3.fromRGB(26, 26, 30),
+					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Color = Color3.fromRGB(42, 42, 46),
@@ -1879,6 +1921,12 @@ function Astral:MakeWindow(config)
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					TextColor3 = Color3.fromRGB(180, 180, 185)
 				}):Play()
+				if tab.IconLabel then
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+				end
+				if tab.FallbackLabel then
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+				end
 			end
 		end
 
@@ -2010,7 +2058,7 @@ function Astral:MakeWindow(config)
 			IconLabel.BackgroundTransparency = 1
 			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
 			IconLabel.Position = UDim2.new(0, 10, 0.5, 0)
-			IconLabel.Size = UDim2.new(0, 28, 0, 28) -- Made sidebar icons bigger
+			IconLabel.Size = UDim2.new(0, 32, 0, 32) -- bigger sidebar tab icon
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2456,6 +2504,7 @@ function Astral:MakeWindow(config)
 				end
 			end)
 			ButtonFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
@@ -2609,6 +2658,7 @@ function Astral:MakeWindow(config)
 			end
 			ToggleFrame.MouseButton1Click:Connect(function() toggle() end)
 			ToggleFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ToggleFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ToggleStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -2819,6 +2869,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			TickFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(TickFrame, TweenInfo.new(0.15), {
 					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
@@ -2996,6 +3047,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			PickerFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(PickerFrame, TweenInfo.new(0.15), {
 					BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")
 				}):Play()
@@ -3420,6 +3472,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			ValueBox.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(SelectorFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(SelectorStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -3671,6 +3724,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			TextboxFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 130, 135)}):Play()
@@ -3915,6 +3969,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover white effect like toggle (good UI)
 			LabelFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(LabelFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(LabelStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local s = IconContainer and IconContainer:FindFirstChild("UIStroke"); if s then TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0}):Play() end end)
@@ -4208,6 +4263,7 @@ function Astral:MakeWindow(config)
 
 			-- hover white effect like toggle (good UI)
 			ParaFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0}):Play() end end end)
@@ -4498,6 +4554,7 @@ function Astral:MakeWindow(config)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
 			ActionButton.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ActionButton, TweenInfo.new(0.12), {BackgroundColor3 = hoverColor}):Play()
 			end)
 			ActionButton.MouseLeave:Connect(function()
@@ -4512,13 +4569,12 @@ function Astral:MakeWindow(config)
 
 				pcall(function() if setclipboard then setclipboard(inviteLink) end end)
 
-				pcall(function()
-					game:GetService("StarterGui"):SetCore("SendNotification", {
-						Title = data.ServerName or "Discord Server",
-						Text = "Invite copied to clipboard!",
-						Duration = 5
-					})
-				end)
+				Window:Notify({
+					Type = "good",
+					Title = "Invite copied",
+					Message = "discord.gg/" .. tostring(inviteCode) .. " is on your clipboard.",
+					Duration = 6,
+				})
 
 				pcall(function()
 					if httpRequest then
@@ -4546,6 +4602,7 @@ function Astral:MakeWindow(config)
 			end)
 
 			MainFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 0.95}):Play()
 			end)
 			MainFrame.MouseLeave:Connect(function()
@@ -4754,6 +4811,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover effects (identical to toggle/button rows)
 			KeybindFrame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(KeybindFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(KeybindStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
@@ -4764,6 +4822,7 @@ function Astral:MakeWindow(config)
 
 			-- Key box hover: accent outline so it reads as clickable
 			KeybindButton.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				if listening then return end
 				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
@@ -5062,6 +5121,7 @@ function Astral:MakeWindow(config)
 					end
 				end)
 				Btn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
 					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = (bColor or AccentColor):Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
@@ -5301,6 +5361,7 @@ function Astral:MakeWindow(config)
 	end)
 
 	MinimizeButton.MouseEnter:Connect(function()
+		if pickerOpen or selectorOpen then return end
 		TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
 			BackgroundColor3 = Color3.fromRGB(32, 32, 34)
 		}):Play()
@@ -5836,6 +5897,7 @@ function Astral:MakeWindow(config)
 					BtnScale.Parent = Btn
 
 					Btn.MouseEnter:Connect(function()
+						if pickerOpen or selectorOpen then return end
 						TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 1.04}):Play()
 					end)
 					Btn.MouseLeave:Connect(function()
@@ -5858,6 +5920,7 @@ function Astral:MakeWindow(config)
 
 			-- Hover highlight like UI cards
 			Frame.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			Frame.MouseLeave:Connect(function()
@@ -6176,6 +6239,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Parent = Row
 
 			Row.MouseEnter:Connect(function()
+				if pickerOpen or selectorOpen then return end
 				TweenService:Create(RowHover, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
 			end)
 			Row.MouseLeave:Connect(function()
