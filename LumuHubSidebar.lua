@@ -6708,29 +6708,6 @@ function Astral:MakeWindow(config)
 		return Window:SwitchDesign(design)
 	end
 
-	-- header button: switch to the other design
-	do
-		local other = (Window.DesignName == "Sidebar") and "TopBar" or "Sidebar"
-		local SwitchBtn = Instance.new("TextButton")
-		SwitchBtn.Name = "DesignSwitch"
-		SwitchBtn.Size = UDim2.new(0, 0, 0, 22)
-		SwitchBtn.AutomaticSize = Enum.AutomaticSize.X
-		SwitchBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 38)
-		SwitchBtn.BorderSizePixel = 0
-		SwitchBtn.Text = "  Load " .. other .. " UI  "
-		SwitchBtn.Font = Enum.Font.GothamMedium
-		SwitchBtn.TextSize = 11
-		SwitchBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
-		SwitchBtn.AutoButtonColor = false
-		SwitchBtn.LayoutOrder = 9
-		SwitchBtn.Parent = HeaderLayoutContainer
-		local sc = Instance.new("UICorner")
-		sc.CornerRadius = UDim.new(0, 6)
-		sc.Parent = SwitchBtn
-		SwitchBtn.MouseEnter:Connect(function() SwitchBtn.BackgroundColor3 = Color3.fromRGB(46, 46, 56) end)
-		SwitchBtn.MouseLeave:Connect(function() SwitchBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 38) end)
-		SwitchBtn.MouseButton1Click:Connect(function() Window:SetDesign(other) end)
-	end
 
 	return Window
 end
