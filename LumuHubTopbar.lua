@@ -641,7 +641,7 @@ function Astral:MakeWindow(config)
 
 	-- Notification Container (Bottom-Right of Screen, copied from main UI)
 	local notifW = config.NotifySize or (IsMobile
-		and math.min(160, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28))
+		and math.min(130, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28))
 		or math.min(258, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28)))
 
 	local NotificationContainer = Instance.new("Frame")
@@ -674,7 +674,7 @@ function Astral:MakeWindow(config)
 	-- Fixed sizes: big on PC (880x600), 550x400 on mobile. Never scaled down,
 	-- only clamped to the viewport so nothing clips. Text stays full-size = readable.
 	local refW, refH = 880, 600
-	if IsMobile then refW, refH = 550, 400 end
+	if IsMobile then refW, refH = 460, 350 end
 	if IsEmulator then refW, refH = 500, 370 end -- emulator/cloud phone: bit smaller than mobile
 	if config.Size then
 		refW, refH = config.Size.X.Offset, config.Size.Y.Offset
@@ -5487,7 +5487,7 @@ function Astral:MakeWindow(config)
 
 	-- LOGO TOGGLE BUTTON (Completely Independent ScreenGui Element)
 	-- Smaller footprint (was oversized), slightly bigger on mobile for touch
-	local logoSize = IsMobile and 64 or 72
+	local logoSize = IsMobile and 54 or 72
 	-- Default logo, change per window with Logo = "rbxassetid://..." in CreateWindow config
 	local logoAsset = config.Logo or "rbxassetid://134909842242325"
 	local LogoButton = Instance.new("TextButton")
@@ -5880,7 +5880,7 @@ function Astral:MakeWindow(config)
 			local hasActions = #actions > 0
 			local tColor = notifTypeColors[nType] or notifTypeColors.good
 			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
-			local notifH = hasActions and 88 or 62
+			local notifH = (IsMobile and (hasActions and 70 or 48) or (hasActions and 88 or 62))
 
 			-- type colour drives the whole card so good/warning/bad read instantly
 			local tc = tColor.bg
@@ -5914,7 +5914,7 @@ function Astral:MakeWindow(config)
 
 			-- Icon (matches UI IconContainer style)
 			local IconFrame = Instance.new("Frame")
-			IconFrame.Size = UDim2.fromOffset(34, 34)
+			IconFrame.Size = UDim2.fromOffset(IsMobile and 26 or 34, IsMobile and 26 or 34)
 			IconFrame.Position = UDim2.new(0, 14, 0, hasActions and 12 or 14)
 			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
@@ -5922,7 +5922,7 @@ function Astral:MakeWindow(config)
 			IconFrame.Parent = Frame
 
 			local IconCorner = Instance.new("UICorner")
-			IconCorner.CornerRadius = UDim.new(0, 8)
+			IconCorner.CornerRadius = UDim.new(0, IsMobile and 6 or 8)
 			IconCorner.Parent = IconFrame
 
 			local IconStroke = Instance.new("UIStroke")
@@ -5933,7 +5933,7 @@ function Astral:MakeWindow(config)
 			IconStroke.Parent = IconFrame
 
 			local Icon = Instance.new("ImageLabel")
-			Icon.Size = UDim2.fromOffset(22, 22)
+			Icon.Size = UDim2.fromOffset(IsMobile and 17 or 22, IsMobile and 17 or 22)
 			Icon.AnchorPoint = Vector2.new(0.5, 0.5)
 			Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Icon.BackgroundTransparency = 1
@@ -5984,7 +5984,7 @@ function Astral:MakeWindow(config)
 			CountPill.BorderSizePixel = 0
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 11)
-			CountPill.Size = UDim2.new(0, 34, 0, 18)
+			CountPill.Size = UDim2.new(0, IsMobile and 28 or 34, 0, IsMobile and 15 or 18)
 			CountPill.ZIndex = 202
 			CountPill.Parent = Frame
 
@@ -6005,7 +6005,7 @@ function Astral:MakeWindow(config)
 			CountLabel.Size = UDim2.new(1, 0, 1, 0)
 			CountLabel.Font = Enum.Font.GothamBold
 			CountLabel.Text = tostring(math.ceil(duration)) .. "s"
-			CountLabel.TextSize = 11
+			CountLabel.TextSize = IsMobile and 10 or 11
 			CountLabel.TextColor3 = tc
 			CountLabel.TextXAlignment = Enum.TextXAlignment.Center
 			CountLabel.ZIndex = 203
@@ -6193,8 +6193,8 @@ function Astral:MakeWindow(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
-		local panelW = tonumber(config.Width) or 276
-		local rowH = tonumber(config.RowHeight) or 30
+		local panelW = tonumber(config.Width) or (IsMobile and 210 or 276)
+		local rowH = tonumber(config.RowHeight) or (IsMobile and 24 or 30)
 		local showBeta = config.Beta
 		if showBeta == nil then showBeta = true end
 		local enabled = config.Enabled
@@ -6238,7 +6238,7 @@ function Astral:MakeWindow(config)
 		end
 
 		local PanelCorner = Instance.new("UICorner")
-		PanelCorner.CornerRadius = UDim.new(0, 12)
+		PanelCorner.CornerRadius = UDim.new(0, IsMobile and 8 or 12)
 		PanelCorner.Parent = Panel
 
 		local PanelStroke = Instance.new("UIStroke")
@@ -6264,7 +6264,7 @@ function Astral:MakeWindow(config)
 		Header.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
 		Header.BackgroundTransparency = 0.35
 		Header.BorderSizePixel = 0
-		Header.Size = UDim2.new(1, 0, 0, 44)
+		Header.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 44)
 		Header.LayoutOrder = 1
 		Header.ZIndex = 501
 		Header.Active = true
@@ -6275,7 +6275,7 @@ function Astral:MakeWindow(config)
 		HeaderIcon.BackgroundTransparency = 1
 		HeaderIcon.AnchorPoint = Vector2.new(0, 0.5)
 		HeaderIcon.Position = UDim2.new(0, 12, 0.5, 0)
-		HeaderIcon.Size = UDim2.new(0, 19, 0, 19)
+		HeaderIcon.Size = UDim2.new(0, IsMobile and 15 or 19, 0, IsMobile and 15 or 19)
 		HeaderIcon.ZIndex = 502
 		HeaderIcon.ScaleType = Enum.ScaleType.Fit
 		HeaderIcon.ImageColor3 = AccentColor
@@ -6291,7 +6291,7 @@ function Astral:MakeWindow(config)
 		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 39 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
 		TitleLabel.Text = title
-		TitleLabel.TextSize = 15
+		TitleLabel.TextSize = IsMobile and 13 or 15
 		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6398,7 +6398,7 @@ function Astral:MakeWindow(config)
 			IconLabel.BackgroundTransparency = 1
 			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
 			IconLabel.Position = UDim2.new(0, 2, 0.5, 0)
-			IconLabel.Size = UDim2.new(0, 17, 0, 17)
+			IconLabel.Size = UDim2.new(0, IsMobile and 14 or 17, 0, IsMobile and 14 or 17)
 			IconLabel.Visible = false
 			IconLabel.ScaleType = Enum.ScaleType.Fit
 			IconLabel.ImageColor3 = colorOverride or Color3.fromRGB(205, 205, 214)
@@ -6413,7 +6413,7 @@ function Astral:MakeWindow(config)
 			NameLabel.Size = UDim2.new(0.58, 0, 1, 0)
 			NameLabel.Font = Enum.Font.Gotham
 			NameLabel.Text = tostring(name)
-			NameLabel.TextSize = 14
+			NameLabel.TextSize = IsMobile and 12 or 14
 			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6428,7 +6428,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Size = UDim2.new(0.42, 0, 1, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.Text = tostring(value or "--")
-			ValueLabel.TextSize = 14
+			ValueLabel.TextSize = IsMobile and 12 or 14
 			ValueLabel.TextColor3 = colorOverride or AccentColor
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
