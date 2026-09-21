@@ -670,8 +670,8 @@ function Astral:MakeWindow(config)
 	-- Fixed sizes: big on PC (880x600), 550x400 on mobile. Never scaled down,
 	-- only clamped to the viewport so nothing clips. Text stays full-size = readable.
 	local refW, refH = 880, 600
-	if IsMobile then refW, refH = 400, 320 end
-	if IsEmulator then refW, refH = 380, 300 end -- emulator/cloud phone: bit smaller than mobile
+	if IsMobile then refW, refH = 480, 360 end
+	if IsEmulator then refW, refH = 440, 340 end -- emulator/cloud phone: bit smaller than mobile
 	if config.Size then
 		refW, refH = config.Size.X.Offset, config.Size.Y.Offset
 	end
@@ -885,8 +885,8 @@ function Astral:MakeWindow(config)
 	HorizontalSeparator.Parent = MainFrame
 
 	-- Sidebar Width Configuration
-	local SidebarWidth = 165
-	local CollapsedSidebarWidth = 50
+	local SidebarWidth = IsMobile and 120 or 165
+	local CollapsedSidebarWidth = IsMobile and 40 or 50
 
 	-- Sidebar Frame
 	local Sidebar = Instance.new("Frame")
@@ -1973,7 +1973,7 @@ function Astral:MakeWindow(config)
 	local configFlags = {}
 	local categoryHeaders = {}
 	local currentTab = nil
-	local isCollapsed = false
+	local isCollapsed = IsMobile
 	local layoutOrderCounter = 0
 
 	local function switchTab(targetTab)

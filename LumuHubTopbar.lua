@@ -683,8 +683,8 @@ function Astral:MakeWindow(config)
 	-- Fixed sizes: big on PC (880x600), 550x400 on mobile. Never scaled down,
 	-- only clamped to the viewport so nothing clips. Text stays full-size = readable.
 	local refW, refH = 880, 600
-	if IsMobile then refW, refH = 400, 320 end
-	if IsEmulator then refW, refH = 380, 300 end -- emulator/cloud phone: bit smaller than mobile
+	if IsMobile then refW, refH = 480, 360 end
+	if IsEmulator then refW, refH = 440, 340 end -- emulator/cloud phone: bit smaller than mobile
 	if config.Size then
 		refW, refH = config.Size.X.Offset, config.Size.Y.Offset
 	end
