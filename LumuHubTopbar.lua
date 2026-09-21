@@ -39,6 +39,15 @@ pcall(function()
 	end
 end)
 
+-- Mobile text scaler: call mTS(label, normalSize) to auto-shrink on mobile
+local function mTS(label, normalSize)
+	if IsMobile then
+		label.TextSize = math.max(8, normalSize - 2)
+	else
+		label.TextSize = normalSize
+	end
+end
+
 -- Define the Astral Library
 local Astral = {}
 Astral.Registry = {} -- Global registry to track all toggle/tick controllers for easy resetting
@@ -674,8 +683,8 @@ function Astral:MakeWindow(config)
 	-- Fixed sizes: big on PC (880x600), 550x400 on mobile. Never scaled down,
 	-- only clamped to the viewport so nothing clips. Text stays full-size = readable.
 	local refW, refH = 880, 600
-	if IsMobile then refW, refH = 460, 350 end
-	if IsEmulator then refW, refH = 500, 370 end -- emulator/cloud phone: bit smaller than mobile
+	if IsMobile then refW, refH = 400, 320 end
+	if IsEmulator then refW, refH = 380, 300 end -- emulator/cloud phone: bit smaller than mobile
 	if config.Size then
 		refW, refH = config.Size.X.Offset, config.Size.Y.Offset
 	end
@@ -1794,7 +1803,7 @@ function Astral:MakeWindow(config)
 	SelectorPanelTitle.Font = Enum.Font.GothamBold
 	SelectorPanelTitle.Text = "Select Option"
 	SelectorPanelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-	SelectorPanelTitle.TextSize = 14
+	mTS(SelectorPanelTitle, 14)
 	SelectorPanelTitle.ZIndex = 202
 	SelectorPanelTitle.Parent = SelectorPanel
 
@@ -1834,7 +1843,7 @@ function Astral:MakeWindow(config)
 	SearchInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 	SearchInput.Text = ""
 	SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-	SearchInput.TextSize = 12
+	mTS(SearchInput, 12)
 	SearchInput.TextXAlignment = Enum.TextXAlignment.Left
 	SearchInput.ZIndex = 203
 	SearchInput.Parent = SearchContainer
@@ -2016,7 +2025,7 @@ function Astral:MakeWindow(config)
 				OptionLabel.Font = Enum.Font.GothamBold
 				OptionLabel.Text = optionStr
 				OptionLabel.TextColor3 = isSelected and AccentColor or Color3.fromRGB(232, 232, 237)
-				OptionLabel.TextSize = 12
+				mTS(OptionLabel, 12)
 				OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
 				OptionLabel.TextTruncate = Enum.TextTruncate.AtEnd
 				OptionLabel.LayoutOrder = 2
@@ -2354,7 +2363,7 @@ function Astral:MakeWindow(config)
 		ButtonText.Font = Enum.Font.GothamBold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
-		ButtonText.TextSize = 14
+		mTS(ButtonText, 14)
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
 		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
 		ButtonText.LayoutOrder = 2
@@ -3649,7 +3658,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Position = UDim2.new(0, 10, 0, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			ValueLabel.TextSize = 11
+			mTS(ValueLabel, 11)
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Left
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			ValueLabel.Parent = ValueBox
@@ -3676,7 +3685,7 @@ function Astral:MakeWindow(config)
 			BadgeLabel.Font = Enum.Font.GothamBold
 			BadgeLabel.Text = ""
 			BadgeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			BadgeLabel.TextSize = 12
+			mTS(BadgeLabel, 12)
 			BadgeLabel.TextXAlignment = Enum.TextXAlignment.Center
 			BadgeLabel.ZIndex = 13
 			BadgeLabel.Parent = CountBadge
@@ -3743,11 +3752,24 @@ function Astral:MakeWindow(config)
 			end
 
 			ValueBox.MouseButton1Click:Connect(openPanel)
-			SelectorFrame.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					openPanel()
-				end
-			end)
+			-- Mobile: only open on tap, not on scroll/drag
+			do
+				local touchStartPos = nil
+				SelectorFrame.InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						touchStartPos = input.Position
+					end
+				end)
+				SelectorFrame.InputEnded:Connect(function(input)
+					if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and touchStartPos then
+						local delta = (input.Position - touchStartPos).Magnitude
+						if delta < 10 then
+							openPanel()
+						end
+						touchStartPos = nil
+					end
+				end)
+			end
 
 			ValueBox.MouseEnter:Connect(function()
 				if pickerOpen or selectorOpen then return end
@@ -3966,7 +3988,7 @@ function Astral:MakeWindow(config)
 			InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 			InputBox.Text = default
 			InputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-			InputBox.TextSize = 12
+			mTS(InputBox, 12)
 			InputBox.TextXAlignment = Enum.TextXAlignment.Left
 			InputBox.TextTruncate = Enum.TextTruncate.AtEnd
 			InputBox.ClearTextOnFocus = clearOnFocus
@@ -4674,7 +4696,7 @@ function Astral:MakeWindow(config)
 			ServerName.AutomaticSize = Enum.AutomaticSize.X
 			ServerName.Text = data.ServerName or "Astral Hub"
 			ServerName.Font = Enum.Font.GothamBold
-			ServerName.TextSize = 16
+			mTS(ServerName, 16)
 			ServerName.TextColor3 = Color3.fromHex("#ffffff")
 			ServerName.TextXAlignment = Enum.TextXAlignment.Left
 			ServerName.BackgroundTransparency = 1
@@ -4719,7 +4741,7 @@ function Astral:MakeWindow(config)
 			OnlineLabel.AutomaticSize = Enum.AutomaticSize.X
 			OnlineLabel.Text = tostring(data.OnlineCount or 46) .. " Online"
 			OnlineLabel.Font = Enum.Font.GothamMedium
-			OnlineLabel.TextSize = 12
+			mTS(OnlineLabel, 12)
 			OnlineLabel.TextColor3 = Color3.fromHex("#949ba4")
 			OnlineLabel.BackgroundTransparency = 1
 			OnlineLabel.LayoutOrder = 2
@@ -4748,7 +4770,7 @@ function Astral:MakeWindow(config)
 			MemberLabel.AutomaticSize = Enum.AutomaticSize.X
 			MemberLabel.Text = tostring(data.MemberCount or 593) .. " Members"
 			MemberLabel.Font = Enum.Font.GothamMedium
-			MemberLabel.TextSize = 12
+			mTS(MemberLabel, 12)
 			MemberLabel.TextColor3 = Color3.fromHex("#949ba4")
 			MemberLabel.BackgroundTransparency = 1
 			MemberLabel.LayoutOrder = 5
@@ -4759,7 +4781,7 @@ function Astral:MakeWindow(config)
 			EstLabel.Size = UDim2.new(1, 0, 0, 14)
 			EstLabel.Text = data.EstablishedDate or "Est. Jun 2025"
 			EstLabel.Font = Enum.Font.GothamMedium
-			EstLabel.TextSize = 12
+			mTS(EstLabel, 12)
 			EstLabel.TextColor3 = Color3.fromHex("#949ba4")
 			EstLabel.TextXAlignment = Enum.TextXAlignment.Left
 			EstLabel.BackgroundTransparency = 1
@@ -4806,7 +4828,7 @@ function Astral:MakeWindow(config)
 			GameLabel.Position = UDim2.new(0, 28, 0, 0)
 			GameLabel.Text = data.GameLabel or "ROBLOX"
 			GameLabel.Font = Enum.Font.GothamBold
-			GameLabel.TextSize = 12
+			mTS(GameLabel, 12)
 			GameLabel.TextColor3 = Color3.fromHex("#ffffff")
 			GameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			GameLabel.BackgroundTransparency = 1
@@ -4820,7 +4842,7 @@ function Astral:MakeWindow(config)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join Server"
 			ActionButton.Font = Enum.Font.GothamBold
-			ActionButton.TextSize = 13
+			mTS(ActionButton, 13)
 			ActionButton.TextColor3 = Color3.fromHex("#ffffff")
 			ActionButton.AutoButtonColor = false
 			ActionButton.Parent = MainFrame
@@ -4992,7 +5014,7 @@ function Astral:MakeWindow(config)
 			KeybindButton.Font = Enum.Font.GothamBold
 			KeybindButton.Text = default.Name
 			KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-			KeybindButton.TextSize = 13
+			mTS(KeybindButton, 13)
 			KeybindButton.AutoButtonColor = false
 			KeybindButton.Parent = KeybindFrame
 
@@ -5880,7 +5902,7 @@ function Astral:MakeWindow(config)
 			local hasActions = #actions > 0
 			local tColor = notifTypeColors[nType] or notifTypeColors.good
 			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
-			local notifH = (IsMobile and (hasActions and 70 or 48) or (hasActions and 88 or 62))
+			local notifH = (IsMobile and (hasActions and 82 or 52) or (hasActions and 88 or 62))
 
 			-- type colour drives the whole card so good/warning/bad read instantly
 			local tc = tColor.bg
@@ -5944,8 +5966,8 @@ function Astral:MakeWindow(config)
 
 			-- Text
 			local TextFrame = Instance.new("Frame")
-			TextFrame.Size = UDim2.new(1, -86, 0, hasActions and 38 or 36)
-			TextFrame.Position = UDim2.new(0, 56, 0, hasActions and 10 or 12)
+			TextFrame.Size = UDim2.new(1, -70, 0, hasActions and 34 or 32)
+			TextFrame.Position = UDim2.new(0, 48, 0, hasActions and 8 or 10)
 			TextFrame.BackgroundTransparency = 1
 			TextFrame.ZIndex = 200
 			TextFrame.Parent = Frame
@@ -6042,8 +6064,8 @@ function Astral:MakeWindow(config)
 			local btnRow
 			if hasActions then
 				btnRow = Instance.new("Frame")
-				btnRow.Size = UDim2.new(1, -86, 0, 26)
-				btnRow.Position = UDim2.new(0, 70, 0, 58)
+				btnRow.Size = UDim2.new(1, -70, 0, IsMobile and 22 or 26)
+				btnRow.Position = UDim2.new(0, 56, 0, IsMobile and 50 or 58)
 				btnRow.BackgroundTransparency = 1
 				btnRow.ZIndex = 200
 				btnRow.Parent = Frame
@@ -6060,13 +6082,13 @@ function Astral:MakeWindow(config)
 					local aColor = (notifTypeColors[aType] or tColor).bg
 					local isPrimary = (i == 1)
 					local Btn = Instance.new("TextButton")
-					Btn.Size = UDim2.new(0, 72, 0, 26)
+					Btn.Size = UDim2.new(0, IsMobile and 56 or 72, 0, IsMobile and 22 or 26)
 					Btn.BackgroundColor3 = isPrimary and aColor or Color3.fromRGB(36, 36, 40)
 					Btn.BorderSizePixel = 0
 					Btn.Font = Enum.Font.GothamBold
 					Btn.Text = action.Text or ""
 					Btn.TextColor3 = isPrimary and Color3.fromRGB(15, 15, 15) or Color3.fromRGB(255, 255, 255)
-					Btn.TextSize = 11
+					Btn.TextSize = IsMobile and 10 or 11
 					Btn.AutoButtonColor = false
 					Btn.ZIndex = 200
 					Btn.Parent = btnRow
