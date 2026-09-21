@@ -2455,7 +2455,7 @@ function Astral:MakeWindow(config)
 			local callback = buttonConfig.Callback or function() end
 			local icon = parseIcon(buttonConfig.Icon)
 			local hasDesc = description and description ~= ""
-			local calculatedHeight = 64
+			local calculatedHeight = IsMobile and 50 or 64
 
 			local ButtonFrame = Instance.new("TextButton")
 			ButtonFrame.Name = title .. "_Button"
@@ -2647,7 +2647,7 @@ function Astral:MakeWindow(config)
 			local callback = toggleConfig.Callback or function() end
 			local icon = parseIcon(toggleConfig.Icon)
 			local hasDesc = description and description ~= ""
-			local calculatedHeight = 64
+			local calculatedHeight = IsMobile and 50 or 64
 			local TargetColumn = GetTargetColumn()
 			local ToggleFrame = Instance.new("TextButton")
 			ToggleFrame.Name = title .. "_Toggle"
@@ -3203,7 +3203,7 @@ function Astral:MakeWindow(config)
 			local default = sliderConfig.Default or min
 			local callback = sliderConfig.Callback or function() end
 			local icon = parseIcon(sliderConfig.Icon)
-			local calculatedHeight = 64
+			local calculatedHeight = IsMobile and 50 or 64
 			local SliderFrame = Instance.new("Frame")
 			SliderFrame.Name = title .. "_Slider"
 			SliderFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
@@ -3923,7 +3923,7 @@ function Astral:MakeWindow(config)
 			local descSize = tonumber(labelConfig.DescSize) or 15
 
 			local hasDesc = description and description ~= ""
-			local calculatedHeight = 64
+			local calculatedHeight = IsMobile and 50 or 64
 
 			local LabelFrame = Instance.new("Frame")
 			LabelFrame.Name = title .. "_Label"
@@ -4743,7 +4743,7 @@ function Astral:MakeWindow(config)
 			local callback = keybindConfig.Callback or function() end
 			local icon = parseIcon(keybindConfig.Icon)
 
-			local calculatedHeight = 64
+			local calculatedHeight = IsMobile and 50 or 64
 
 			local KeybindFrame = Instance.new("Frame")
 			KeybindFrame.Name = title .. "_Keybind"
@@ -5030,6 +5030,7 @@ function Astral:MakeWindow(config)
 			local cardIcon = parseIcon(cfg.Icon)
 			local items = cfg.Buttons or {}
 			local columns = math.max(1, math.floor(cfg.Columns or 2))
+			if IsMobile and columns > 2 then columns = 2 end
 			local hasDesc = description and description ~= ""
 			local cardButtonColor = parseButtonColor(cfg.ButtonColor)
 
@@ -5039,10 +5040,10 @@ function Astral:MakeWindow(config)
 				if it and it.Title and it.Title ~= "" then iconOnlyMode = false break end
 			end
 
-			local pad = 10
-			local gap = 10
-			local btnH = iconOnlyMode and 64 or 34
-			local headerH = hasDesc and 36 or 22
+			local pad = IsMobile and 6 or 10
+			local gap = IsMobile and 6 or 10
+			local btnH = iconOnlyMode and (IsMobile and 48 or 64) or (IsMobile and 28 or 34)
+			local headerH = hasDesc and (IsMobile and 30 or 36) or (IsMobile and 18 or 22)
 			local rows = math.max(1, math.ceil(#items / columns))
 			local gridH = rows * btnH + (rows - 1) * gap
 			local calculatedHeight = pad + headerH + 10 + gridH + pad
@@ -5217,13 +5218,13 @@ function Astral:MakeWindow(config)
 					local BLabel = Instance.new("TextLabel")
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
-					BLabel.Size = UDim2.new(0, 0, 1, 0)
-					BLabel.AutomaticSize = Enum.AutomaticSize.X
+					BLabel.Size = UDim2.new(1, 0, 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					BLabel.Text = bTitle
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-					BLabel.TextSize = 12
+					BLabel.TextSize = IsMobile and 10 or 12
 					BLabel.TextXAlignment = Enum.TextXAlignment.Center
+					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
 					BLabel.LayoutOrder = 2
 					BLabel.Parent = Content
 				end
