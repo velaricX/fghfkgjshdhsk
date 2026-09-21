@@ -650,7 +650,7 @@ function Astral:MakeWindow(config)
 
 	-- Notification Container (Bottom-Right of Screen, copied from main UI)
 	local notifW = config.NotifySize or (IsMobile
-		and math.min(130, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28))
+		and math.min(170, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.42))
 		or math.min(258, math.floor((workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X or 760) * 0.28)))
 
 	local NotificationContainer = Instance.new("Frame")
@@ -825,7 +825,7 @@ function Astral:MakeWindow(config)
 	TitleLabel.RichText = true
 	TitleLabel.Text = titleText .. ' <font color="#1E6EE6">' .. subTitleText .. '</font>'
 	TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TitleLabel.TextSize = 18
+	TitleLabel.TextSize = IsMobile and 14 or 18
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
 	TitleLabel.TextWrapped = false
@@ -884,6 +884,7 @@ function Astral:MakeWindow(config)
 	DecoArrows.TextYAlignment = Enum.TextYAlignment.Center
 	DecoArrows.TextWrapped = false
 	DecoArrows.LayoutOrder = 3
+	if IsMobile then DecoArrows.Visible = false end
 	DecoArrows.Parent = HeaderLayoutContainer
 
 	-- (no separator line above the tab bar - clean look)
@@ -5902,7 +5903,7 @@ function Astral:MakeWindow(config)
 			local hasActions = #actions > 0
 			local tColor = notifTypeColors[nType] or notifTypeColors.good
 			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
-			local notifH = (IsMobile and (hasActions and 82 or 52) or (hasActions and 88 or 62))
+			local notifH = (IsMobile and (hasActions and 90 or 56) or (hasActions and 88 or 62))
 
 			-- type colour drives the whole card so good/warning/bad read instantly
 			local tc = tColor.bg
@@ -5937,7 +5938,7 @@ function Astral:MakeWindow(config)
 			-- Icon (matches UI IconContainer style)
 			local IconFrame = Instance.new("Frame")
 			IconFrame.Size = UDim2.fromOffset(IsMobile and 26 or 34, IsMobile and 26 or 34)
-			IconFrame.Position = UDim2.new(0, 14, 0, hasActions and 12 or 14)
+			IconFrame.Position = UDim2.new(0, 10, 0, hasActions and 10 or 12)
 			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
 			IconFrame.ZIndex = 200
@@ -5966,8 +5967,8 @@ function Astral:MakeWindow(config)
 
 			-- Text
 			local TextFrame = Instance.new("Frame")
-			TextFrame.Size = UDim2.new(1, -70, 0, hasActions and 34 or 32)
-			TextFrame.Position = UDim2.new(0, 48, 0, hasActions and 8 or 10)
+			TextFrame.Size = UDim2.new(1, -60, 0, hasActions and 38 or 34)
+			TextFrame.Position = UDim2.new(0, 42, 0, hasActions and 6 or 8)
 			TextFrame.BackgroundTransparency = 1
 			TextFrame.ZIndex = 200
 			TextFrame.Parent = Frame
@@ -5978,7 +5979,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			regText(TitleLabel, 12)
+			regText(TitleLabel, IsMobile and 10 or 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TitleLabel.ZIndex = 200
@@ -5991,7 +5992,7 @@ function Astral:MakeWindow(config)
 			DescLabel.Font = Enum.Font.Gotham
 			DescLabel.Text = message
 			DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
-			regText(DescLabel, 11)
+			regText(DescLabel, IsMobile and 9 or 11)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
@@ -6006,7 +6007,7 @@ function Astral:MakeWindow(config)
 			CountPill.BorderSizePixel = 0
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 11)
-			CountPill.Size = UDim2.new(0, IsMobile and 28 or 34, 0, IsMobile and 15 or 18)
+			CountPill.Size = UDim2.new(0, IsMobile and 24 or 34, 0, IsMobile and 14 or 18)
 			CountPill.ZIndex = 202
 			CountPill.Parent = Frame
 
@@ -6064,8 +6065,8 @@ function Astral:MakeWindow(config)
 			local btnRow
 			if hasActions then
 				btnRow = Instance.new("Frame")
-				btnRow.Size = UDim2.new(1, -70, 0, IsMobile and 22 or 26)
-				btnRow.Position = UDim2.new(0, 56, 0, IsMobile and 50 or 58)
+				btnRow.Size = UDim2.new(1, -56, 0, IsMobile and 24 or 26)
+				btnRow.Position = UDim2.new(0, 42, 0, IsMobile and 56 or 58)
 				btnRow.BackgroundTransparency = 1
 				btnRow.ZIndex = 200
 				btnRow.Parent = Frame
@@ -6082,7 +6083,7 @@ function Astral:MakeWindow(config)
 					local aColor = (notifTypeColors[aType] or tColor).bg
 					local isPrimary = (i == 1)
 					local Btn = Instance.new("TextButton")
-					Btn.Size = UDim2.new(0, IsMobile and 56 or 72, 0, IsMobile and 22 or 26)
+					Btn.Size = UDim2.new(0, IsMobile and 44 or 72, 0, IsMobile and 22 or 26)
 					Btn.BackgroundColor3 = isPrimary and aColor or Color3.fromRGB(36, 36, 40)
 					Btn.BorderSizePixel = 0
 					Btn.Font = Enum.Font.GothamBold
@@ -6215,7 +6216,7 @@ function Astral:MakeWindow(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
-		local panelW = tonumber(config.Width) or (IsMobile and 210 or 276)
+		local panelW = tonumber(config.Width) or (IsMobile and 170 or 276)
 		local rowH = tonumber(config.RowHeight) or (IsMobile and 24 or 30)
 		local showBeta = config.Beta
 		if showBeta == nil then showBeta = true end
