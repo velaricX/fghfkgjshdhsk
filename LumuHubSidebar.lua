@@ -5035,7 +5035,7 @@ function Astral:MakeWindow(config)
 			local cardIcon = parseIcon(cfg.Icon)
 			local items = cfg.Buttons or {}
 			local columns = math.max(1, math.floor(cfg.Columns or 2))
-			if IsMobile and columns > 2 then columns = 2 end
+			if IsMobile then columns = 1 end
 			local hasDesc = description and description ~= ""
 			local cardButtonColor = parseButtonColor(cfg.ButtonColor)
 
@@ -5201,7 +5201,7 @@ function Astral:MakeWindow(config)
 
 				local ContentLayout = Instance.new("UIListLayout")
 				ContentLayout.FillDirection = Enum.FillDirection.Horizontal
-				ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+				ContentLayout.HorizontalAlignment = iconOnlyMode and Enum.HorizontalAlignment.Center or Enum.HorizontalAlignment.Left
 				ContentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 				ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
 				ContentLayout.Padding = UDim.new(0, 6)
@@ -5220,7 +5220,7 @@ function Astral:MakeWindow(config)
 					BIcon.Parent = Content
 				end
 
-				if bTitle and bTitle ~= "" then
+				if not iconOnlyMode and bTitle and bTitle ~= "" then
 					local BLabel = Instance.new("TextLabel")
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
@@ -5336,8 +5336,8 @@ function Astral:MakeWindow(config)
 	MinimizeButton.Name = "MinimizeButton"
 	MinimizeButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 	MinimizeButton.BorderSizePixel = 0
-	MinimizeButton.Position = UDim2.new(0, 6, 1, -42)
-	MinimizeButton.Size = UDim2.new(1, -12, 0, 36)
+	MinimizeButton.Position = IsMobile and UDim2.new(0.5, -18, 1, -42) or UDim2.new(0, 6, 1, -42)
+	MinimizeButton.Size = IsMobile and UDim2.new(0, 36, 0, 36) or UDim2.new(1, -12, 0, 36)
 	MinimizeButton.AutoButtonColor = false
 	MinimizeButton.Text = ""
 	MinimizeButton.ZIndex = 10
@@ -5357,9 +5357,10 @@ function Astral:MakeWindow(config)
 	local MinimizeIcon = Instance.new("ImageLabel")
 	MinimizeIcon.Name = "MinimizeIcon"
 	MinimizeIcon.BackgroundTransparency = 1
-	MinimizeIcon.AnchorPoint = Vector2.new(0, 0.5)
-	MinimizeIcon.Position = UDim2.new(0, 8, 0.5, 0)
-	MinimizeIcon.Size = UDim2.new(0, 24, 0, 24) -- Made minimize icon bigger
+	MinimizeIcon.AnchorPoint = IsMobile and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
+	MinimizeIcon.Position = IsMobile and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
+	MinimizeIcon.Size = IsMobile and UDim2.new(0, 28, 0, 28) or UDim2.new(0, 24, 0, 24)
+	MinimizeIcon.Rotation = IsMobile and 180 or 0
 	MinimizeIcon.Image = "rbxassetid://96304569438872"
 	MinimizeIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
 	MinimizeIcon.ScaleType = Enum.ScaleType.Fit
@@ -5377,6 +5378,7 @@ function Astral:MakeWindow(config)
 	mTS(MinimizeText, 11)
 	MinimizeText.TextXAlignment = Enum.TextXAlignment.Left
 	MinimizeText.TextYAlignment = Enum.TextYAlignment.Center
+	MinimizeText.TextTransparency = IsMobile and 1 or 0
 	MinimizeText.ZIndex = 11
 	MinimizeText.Parent = MinimizeButton
 
@@ -5480,6 +5482,31 @@ function Astral:MakeWindow(config)
 						Size = UDim2.new(0, 28, 0, 28) -- Expanded fallback size
 					}):Play()
 				end
+			end
+		end
+	end
+
+	-- Apply collapsed state immediately if mobile (no animation)
+	if isCollapsed then
+		Sidebar.Size = UDim2.new(0, CollapsedSidebarWidth, 1, -51)
+		Separator.Position = UDim2.new(0, CollapsedSidebarWidth, 0, 51)
+		ContentContainer.Position = UDim2.new(0, CollapsedSidebarWidth + 1, 0, 51)
+		ContentContainer.Size = UDim2.new(1, -CollapsedSidebarWidth - 9, 1, -59)
+		for _, header in ipairs(categoryHeaders) do header.Visible = false end
+		for _, tab in ipairs(tabs) do
+			tab.Button.Size = UDim2.new(0, 36, 0, 36)
+			tab.ButtonText.TextTransparency = 1
+			if tab.Corner then tab.Corner.CornerRadius = UDim.new(0, 8) end
+			if tab.IconLabel then
+				tab.IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+				tab.IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+				tab.IconLabel.Size = UDim2.new(0, 32, 0, 32)
+			elseif tab.FallbackLabel then
+				tab.FallbackLabel.Visible = true
+				tab.FallbackLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+				tab.FallbackLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+				tab.FallbackLabel.TextTransparency = 0
+				tab.FallbackLabel.Size = UDim2.new(0, 32, 0, 32)
 			end
 		end
 	end
@@ -5932,8 +5959,8 @@ function Astral:MakeWindow(config)
 
 			local Stroke = Instance.new("UIStroke")
 			Stroke.Thickness = 1.4
-			Stroke.Color = tc
-			Stroke.Transparency = 0.35
+			Stroke.Color = Color3.fromRGB(50, 50, 55)
+			Stroke.Transparency = 0.5
 			Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Stroke.Parent = Frame
 
@@ -6006,7 +6033,7 @@ function Astral:MakeWindow(config)
 			-- countdown seconds (top-right)
 			local CountPill = Instance.new("Frame")
 			CountPill.Name = "CountdownPill"
-			CountPill.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.30)
+			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			CountPill.BorderSizePixel = 0
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 11)
@@ -6019,7 +6046,7 @@ function Astral:MakeWindow(config)
 			CountPillCorner.Parent = CountPill
 
 			local CountPillStroke = Instance.new("UIStroke")
-			CountPillStroke.Color = tc
+			CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			CountPillStroke.Transparency = 0.5
 			CountPillStroke.Thickness = 1
 			CountPillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -6032,7 +6059,7 @@ function Astral:MakeWindow(config)
 			CountLabel.Font = Enum.Font.GothamBold
 			CountLabel.Text = tostring(math.ceil(duration)) .. "s"
 			CountLabel.TextSize = IsMobile and 10 or 11
-			CountLabel.TextColor3 = tc
+			CountLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
 			CountLabel.TextXAlignment = Enum.TextXAlignment.Center
 			CountLabel.ZIndex = 203
 			CountLabel.Parent = CountPill
@@ -6054,7 +6081,7 @@ function Astral:MakeWindow(config)
 			local ProgressFill = Instance.new("Frame")
 			ProgressFill.Name = "ProgressFill"
 			ProgressFill.Size = UDim2.new(1, 0, 1, 0)
-			ProgressFill.BackgroundColor3 = tc
+			ProgressFill.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
 			ProgressFill.BorderSizePixel = 0
 			ProgressFill.ZIndex = 202
 			ProgressFill.Parent = ProgressTrack
@@ -6359,6 +6386,50 @@ function Astral:MakeWindow(config)
 				BetaStroke.Color = c
 			end)
 		end
+
+		-- Collapse/Expand arrow button
+		local gsCollapsed = false
+		local ArrowBtn = Instance.new("TextButton")
+		ArrowBtn.Name = "CollapseBtn"
+		ArrowBtn.BackgroundTransparency = 1
+		ArrowBtn.Size = UDim2.new(0, IsMobile and 24 or 28, 0, IsMobile and 24 or 28)
+		ArrowBtn.AnchorPoint = Vector2.new(1, 0.5)
+		ArrowBtn.Position = showBeta and UDim2.new(1, -64, 0.5, 0) or UDim2.new(1, -10, 0.5, 0)
+		ArrowBtn.Text = ""
+		ArrowBtn.ZIndex = 503
+		ArrowBtn.Parent = Header
+
+		local ArrowIcon = Instance.new("ImageLabel")
+		ArrowIcon.BackgroundTransparency = 1
+		ArrowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		ArrowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		ArrowIcon.Size = UDim2.new(0, 12, 0, 12)
+		ArrowIcon.Rotation = 0
+		ArrowIcon.ScaleType = Enum.ScaleType.Fit
+		ArrowIcon.ZIndex = 504
+		ArrowIcon.Parent = ArrowBtn
+		Astral.ApplyIcon(ArrowIcon, "chevrondown")
+
+		ArrowBtn.MouseButton1Click:Connect(function()
+			gsCollapsed = not gsCollapsed
+			TweenService:Create(ArrowIcon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+				Rotation = gsCollapsed and -90 or 0
+			}):Play()
+			TweenService:Create(RowsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+				Size = gsCollapsed and UDim2.new(1, 0, 0, 0) or UDim2.new(1, 0, 0, 0),
+				Visible = not gsCollapsed
+			}):Play()
+			-- Resize panel
+			local targetH = gsCollapsed and (IsMobile and 36 or 44) or nil
+			if targetH then
+				TweenService:Create(Panel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+					Size = UDim2.new(0, panelW, 0, targetH)
+				}):Play()
+			else
+				Panel.Size = UDim2.new(0, panelW, 0, 46)
+				Panel.AutomaticSize = Enum.AutomaticSize.Y
+			end
+		end)
 
 		local Sep = Instance.new("Frame")
 		Sep.Name = "Separator"
