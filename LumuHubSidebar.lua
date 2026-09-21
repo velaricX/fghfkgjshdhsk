@@ -2485,8 +2485,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 10, 0.5, -21)
-				IconContainer.Size = UDim2.new(0, 42, 0, 42)
+				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
+				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
 				IconContainer.Parent = ButtonFrame
 				local IconCorner = Instance.new("UICorner")
 				IconCorner.CornerRadius = UDim.new(0, 6)
@@ -2502,7 +2502,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 26, 0, 26)
+				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2669,8 +2669,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 10, 0.5, -21)
-				IconContainer.Size = UDim2.new(0, 42, 0, 42)
+				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
+				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
 				IconContainer.Parent = ToggleFrame
 				local IconCorner = Instance.new("UICorner")
 				IconCorner.CornerRadius = UDim.new(0, 6)
@@ -2686,7 +2686,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 26, 0, 26)
+				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2830,8 +2830,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 8, 0.5, -22) -- FIXED: Centered perfectly in 60px height
-				IconContainer.Size = UDim2.new(0, 44, 0, 44) -- FIXED: Sized perfectly for 60px height
+				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
+				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
 				IconContainer.Parent = TickFrame
 
 				local IconCorner = Instance.new("UICorner")
@@ -3058,8 +3058,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 8, 0.5, -22) -- FIXED: Centered perfectly in 60px height
-				IconContainer.Size = UDim2.new(0, 44, 0, 44) -- FIXED: Sized perfectly for 60px height
+				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
+				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
 				IconContainer.Parent = PickerFrame
 
 				local IconCorner = Instance.new("UICorner")
@@ -3203,7 +3203,12 @@ function Astral:MakeWindow(config)
 			local default = sliderConfig.Default or min
 			local callback = sliderConfig.Callback or function() end
 			local icon = parseIcon(sliderConfig.Icon)
-			local calculatedHeight = IsMobile and 50 or 64
+			local calculatedHeight = IsMobile and 56 or 64
+			local icoSz = IsMobile and 32 or 42
+			local icoOff = IsMobile and -16 or -21
+			local icoInner = IsMobile and 20 or 26
+			local textLeft = icon and (IsMobile and 48 or 62) or (IsMobile and 8 or 12)
+			local titleTop = IsMobile and 6 or 10
 			local SliderFrame = Instance.new("Frame")
 			SliderFrame.Name = title .. "_Slider"
 			SliderFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
@@ -3220,8 +3225,8 @@ function Astral:MakeWindow(config)
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
-				IconContainer.Position = UDim2.new(0, 10, 0.5, -21)
-				IconContainer.Size = UDim2.new(0, 42, 0, 42)
+				IconContainer.Position = UDim2.new(0, 10, 0.5, icoOff)
+				IconContainer.Size = UDim2.new(0, icoSz, 0, icoSz)
 				IconContainer.Parent = SliderFrame
 				local IconCorner = Instance.new("UICorner")
 				IconCorner.CornerRadius = UDim.new(0, 6)
@@ -3235,7 +3240,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 26, 0, 26)
+				IconLabel.Size = UDim2.new(0, icoInner, 0, icoInner)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
@@ -3243,8 +3248,8 @@ function Astral:MakeWindow(config)
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Position = icon and UDim2.new(0, 62, 0, 10) or UDim2.new(0, 12, 0, 10)
-			TitleLabel.Size = icon and UDim2.new(1, -134, 0, 16) or UDim2.new(1, -80, 0, 16)
+			TitleLabel.Position = icon and UDim2.new(0, textLeft, 0, titleTop) or UDim2.new(0, 12, 0, titleTop)
+			TitleLabel.Size = icon and UDim2.new(1, -(textLeft + 72), 0, 16) or UDim2.new(1, -80, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -3385,8 +3390,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 10, 0.5, -21)
-				IconContainer.Size = UDim2.new(0, 42, 0, 42)
+				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
+				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
 				IconContainer.Parent = SelectorFrame
 
 				local IconCorner = Instance.new("UICorner")
@@ -3405,7 +3410,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 26, 0, 26)
+				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -3947,8 +3952,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 8, 0.5, -22)
-				IconContainer.Size = UDim2.new(0, 44, 0, 44)
+				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
+				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
 				IconContainer.Parent = LabelFrame
 
 				local IconCorner = Instance.new("UICorner")
@@ -4767,8 +4772,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 10, 0.5, -21)
-				IconContainer.Size = UDim2.new(0, 42, 0, 42)
+				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
+				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
 				IconContainer.Parent = KeybindFrame
 
 				local IconCorner = Instance.new("UICorner")
@@ -5189,13 +5194,14 @@ function Astral:MakeWindow(config)
 				local Content = Instance.new("Frame")
 				Content.Name = "Content"
 				Content.BackgroundTransparency = 1
+				Content.ClipsDescendants = true
 				Content.Size = UDim2.new(1, -12, 1, 0)
 				Content.Position = UDim2.new(0, 6, 0, 0)
 				Content.Parent = Btn
 
 				local ContentLayout = Instance.new("UIListLayout")
 				ContentLayout.FillDirection = Enum.FillDirection.Horizontal
-				ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+				ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 				ContentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 				ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
 				ContentLayout.Padding = UDim.new(0, 6)
@@ -5205,7 +5211,6 @@ function Astral:MakeWindow(config)
 					local BIcon = Instance.new("ImageLabel")
 					BIcon.Name = "Icon"
 					BIcon.BackgroundTransparency = 1
-					-- icon-only tiles get a much bigger icon
 					local iSize = iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 14 or 18)
 					BIcon.Size = UDim2.new(0, iSize, 0, iSize)
 					BIcon.LayoutOrder = 1
@@ -5219,7 +5224,7 @@ function Astral:MakeWindow(config)
 					local BLabel = Instance.new("TextLabel")
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
-					BLabel.Size = UDim2.new(1, 0, 1, 0)
+					BLabel.Size = UDim2.new(1, bIcon and -20 or 0, 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					BLabel.Text = bTitle
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
