@@ -2164,8 +2164,8 @@ function Astral:MakeWindow(config)
 			IconLabel.Name = "TabIcon"
 			IconLabel.BackgroundTransparency = 1
 			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
-			IconLabel.Position = UDim2.new(0, 10, 0.5, 0)
-			IconLabel.Size = UDim2.new(0, IsMobile and 24 or 32, 0, IsMobile and 24 or 32) -- bigger sidebar tab icon
+			IconLabel.Position = UDim2.new(0, 6, 0.5, 0)
+			IconLabel.Size = UDim2.new(0, IsMobile and 18 or 26, 0, IsMobile and 18 or 26)
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2176,12 +2176,12 @@ function Astral:MakeWindow(config)
 			FallbackLabel.Name = "FallbackIcon"
 			FallbackLabel.BackgroundTransparency = 1
 			FallbackLabel.AnchorPoint = Vector2.new(0, 0.5)
-			FallbackLabel.Position = UDim2.new(0, 10, 0.5, 0)
-			FallbackLabel.Size = UDim2.new(0, IsMobile and 20 or 28, 0, IsMobile and 20 or 28) -- Made sidebar icons bigger
+			FallbackLabel.Position = UDim2.new(0, 6, 0.5, 0)
+			FallbackLabel.Size = UDim2.new(0, IsMobile and 16 or 22, 0, IsMobile and 16 or 22)
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
 			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
-			FallbackLabel.TextSize = 16 -- Scaled text size up
+			FallbackLabel.TextSize = IsMobile and 11 or 14
 			FallbackLabel.TextTransparency = isCollapsed and 0 or 1
 			FallbackLabel.ZIndex = 11
 			FallbackLabel.Parent = TabButton
@@ -2192,8 +2192,8 @@ function Astral:MakeWindow(config)
 		ButtonText.BackgroundTransparency = 1
 		
 		local hasIcon = not not (tabIcon or FallbackLabel)
-		ButtonText.Position = UDim2.new(0, hasIcon and (IsMobile and 34 or 44) or 10, 0, 0)
-		ButtonText.Size = UDim2.new(1, hasIcon and (IsMobile and -44 or -54) or -20, 1, 0)
+		ButtonText.Position = UDim2.new(0, hasIcon and (IsMobile and 28 or 38) or 8, 0, 0)
+		ButtonText.Size = UDim2.new(1, hasIcon and (IsMobile and -36 or -46) or -16, 1, 0)
 		ButtonText.Font = Enum.Font.GothamSemibold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
@@ -2849,7 +2849,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 36, 0, 36) -- FIXED: Sized perfectly inside container
+				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -3077,7 +3077,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 36, 0, 36) -- FIXED: Sized perfectly inside container
+				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -3259,8 +3259,8 @@ function Astral:MakeWindow(config)
 			local ValueBox = Instance.new("Frame")
 			ValueBox.Name = "ValueBox"
 			ValueBox.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
-			ValueBox.Position = UDim2.new(1, -64, 0, 7)
-			ValueBox.Size = UDim2.new(0, 48, 0, 20)
+			ValueBox.Position = UDim2.new(1, IsMobile and -52 or -64, 0, titleTop)
+			ValueBox.Size = UDim2.new(0, IsMobile and 40 or 48, 0, IsMobile and 18 or 20)
 			ValueBox.Parent = SliderFrame
 			local ValueCorner = Instance.new("UICorner")
 			ValueCorner.CornerRadius = UDim.new(0, 4)
@@ -3275,13 +3275,19 @@ function Astral:MakeWindow(config)
 			ValueInput.Font = Enum.Font.GothamBold
 			ValueInput.Text = tostring(default)
 			ValueInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-			ValueInput.TextSize = 10
+			ValueInput.TextSize = IsMobile and 9 or 10
 			ValueInput.Parent = ValueBox
+			local trackLeft = icon and textLeft or 12
+			local trackRightPad = icon and (IsMobile and 58 or 82) or (IsMobile and 28 or 32)
+			local trackTop = IsMobile and 28 or 34
+			local trackH = IsMobile and 10 or 14
+			local thumbW = IsMobile and 14 or 18
+			local thumbH = IsMobile and 14 or 20
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
 			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-			SliderTrack.Position = icon and UDim2.new(0, 62, 0, 34) or UDim2.new(0, 12, 0, 34)
-			SliderTrack.Size = icon and UDim2.new(1, -82, 0, 20) or UDim2.new(1, -32, 0, 20)
+			SliderTrack.Position = UDim2.new(0, trackLeft, 0, trackTop)
+			SliderTrack.Size = UDim2.new(1, -trackLeft - trackRightPad, 0, trackH)
 			SliderTrack.Text = ""
 			SliderTrack.AutoButtonColor = false
 			SliderTrack.Parent = SliderFrame
@@ -3301,7 +3307,7 @@ function Astral:MakeWindow(config)
 			SliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SliderThumb.AnchorPoint = Vector2.new(0.5,0.5)
 			SliderThumb.Position = UDim2.new((default - min)/math.max(1,max-min),0,0.5,0)
-			SliderThumb.Size = UDim2.fromOffset(20,28)
+			SliderThumb.Size = UDim2.fromOffset(thumbW, thumbH)
 			SliderThumb.Parent = SliderTrack
 			local ThumbCorner = Instance.new("UICorner")
 			ThumbCorner.CornerRadius = UDim.new(0, 3)
@@ -3971,7 +3977,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 36, 0, 36)
+				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -4792,7 +4798,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, 36, 0, 36)
+				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -5035,7 +5041,7 @@ function Astral:MakeWindow(config)
 			local cardIcon = parseIcon(cfg.Icon)
 			local items = cfg.Buttons or {}
 			local columns = math.max(1, math.floor(cfg.Columns or 2))
-			if IsMobile then columns = 1 end
+			if IsMobile and columns > 2 then columns = 2 end
 			local hasDesc = description and description ~= ""
 			local cardButtonColor = parseButtonColor(cfg.ButtonColor)
 
@@ -5413,7 +5419,7 @@ function Astral:MakeWindow(config)
 		local targetMinIconPos = isCollapsed and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
 		local targetMinIconAnchor = isCollapsed and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
 		local targetMinIconRotation = isCollapsed and 180 or 0
-		local targetMinIconSize = isCollapsed and UDim2.new(0, 28, 0, 28) or UDim2.new(0, 24, 0, 24) -- Bigger minimize icon when collapsed
+		local targetMinIconSize = isCollapsed and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 20, 0, 20)
 
 		TweenService:Create(MinimizeButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = targetMinButtonSize,
@@ -5456,7 +5462,7 @@ function Astral:MakeWindow(config)
 					TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 						Position = UDim2.new(0.5, 0, 0.5, 0),
 						AnchorPoint = Vector2.new(0.5, 0.5),
-						Size = UDim2.new(0, 32, 0, 32) -- Made collapsed icons significantly bigger and cleaner
+						Size = UDim2.new(0, 26, 0, 26)
 					}):Play()
 				elseif tab.FallbackLabel then
 					tab.FallbackLabel.Visible = true
@@ -5464,7 +5470,7 @@ function Astral:MakeWindow(config)
 						Position = UDim2.new(0.5, 0, 0.5, 0),
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						TextTransparency = 0,
-						Size = UDim2.new(0, 32, 0, 32) -- Made collapsed fallback icons significantly bigger and cleaner
+						Size = UDim2.new(0, 26, 0, 26)
 					}):Play()
 				end
 			else
@@ -5472,14 +5478,14 @@ function Astral:MakeWindow(config)
 					TweenService:Create(tab.IconLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 						Position = UDim2.new(0, 10, 0.5, 0),
 						AnchorPoint = Vector2.new(0, 0.5),
-						Size = UDim2.new(0, 28, 0, 28) -- Expanded icon size
+						Size = UDim2.new(0, 22, 0, 22)
 					}):Play()
 				elseif tab.FallbackLabel then
 					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 						Position = UDim2.new(0, 10, 0.5, 0),
 						AnchorPoint = Vector2.new(0, 0.5),
 						TextTransparency = 1,
-						Size = UDim2.new(0, 28, 0, 28) -- Expanded fallback size
+						Size = UDim2.new(0, 22, 0, 22)
 					}):Play()
 				end
 			end
@@ -5500,13 +5506,13 @@ function Astral:MakeWindow(config)
 			if tab.IconLabel then
 				tab.IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				tab.IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-				tab.IconLabel.Size = UDim2.new(0, 32, 0, 32)
+				tab.IconLabel.Size = UDim2.new(0, 26, 0, 26)
 			elseif tab.FallbackLabel then
 				tab.FallbackLabel.Visible = true
 				tab.FallbackLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				tab.FallbackLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				tab.FallbackLabel.TextTransparency = 0
-				tab.FallbackLabel.Size = UDim2.new(0, 32, 0, 32)
+				tab.FallbackLabel.Size = UDim2.new(0, 26, 0, 26)
 			end
 		end
 	end
