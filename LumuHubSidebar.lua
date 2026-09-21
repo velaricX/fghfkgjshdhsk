@@ -885,8 +885,8 @@ function Astral:MakeWindow(config)
 	HorizontalSeparator.Parent = MainFrame
 
 	-- Sidebar Width Configuration
-	local SidebarWidth = IsMobile and 120 or 165
-	local CollapsedSidebarWidth = IsMobile and 40 or 50
+	local SidebarWidth = IsMobile and 140 or 165
+	local CollapsedSidebarWidth = IsMobile and 44 or 50
 
 	-- Sidebar Frame
 	local Sidebar = Instance.new("Frame")
@@ -2121,7 +2121,7 @@ function Astral:MakeWindow(config)
 		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 		TabButton.BackgroundTransparency = 0
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(1, 0, 0, 36)
+		TabButton.Size = UDim2.new(1, 0, 0, IsMobile and 30 or 36)
 		TabButton.AutoButtonColor = false
 		TabButton.Text = ""
 		TabButton.ClipsDescendants = true
@@ -2165,7 +2165,7 @@ function Astral:MakeWindow(config)
 			IconLabel.BackgroundTransparency = 1
 			IconLabel.AnchorPoint = Vector2.new(0, 0.5)
 			IconLabel.Position = UDim2.new(0, 10, 0.5, 0)
-			IconLabel.Size = UDim2.new(0, 32, 0, 32) -- bigger sidebar tab icon
+			IconLabel.Size = UDim2.new(0, IsMobile and 24 or 32, 0, IsMobile and 24 or 32) -- bigger sidebar tab icon
 			Astral.ApplyIcon(IconLabel, tabIcon)
 			IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 			IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2177,7 +2177,7 @@ function Astral:MakeWindow(config)
 			FallbackLabel.BackgroundTransparency = 1
 			FallbackLabel.AnchorPoint = Vector2.new(0, 0.5)
 			FallbackLabel.Position = UDim2.new(0, 10, 0.5, 0)
-			FallbackLabel.Size = UDim2.new(0, 28, 0, 28) -- Made sidebar icons bigger
+			FallbackLabel.Size = UDim2.new(0, IsMobile and 20 or 28, 0, IsMobile and 20 or 28) -- Made sidebar icons bigger
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
 			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
@@ -2192,8 +2192,8 @@ function Astral:MakeWindow(config)
 		ButtonText.BackgroundTransparency = 1
 		
 		local hasIcon = not not (tabIcon or FallbackLabel)
-		ButtonText.Position = UDim2.new(0, hasIcon and 44 or 10, 0, 0) -- Adjusted offset for larger icons
-		ButtonText.Size = UDim2.new(1, hasIcon and -54 or -20, 1, 0) -- Adjusted offset for larger icons
+		ButtonText.Position = UDim2.new(0, hasIcon and (IsMobile and 34 or 44) or 10, 0, 0)
+		ButtonText.Size = UDim2.new(1, hasIcon and (IsMobile and -44 or -54) or -20, 1, 0)
 		ButtonText.Font = Enum.Font.GothamSemibold
 		tr(ButtonText, tabName)
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
@@ -5173,6 +5173,7 @@ function Astral:MakeWindow(config)
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
+				Btn.ClipsDescendants = true
 				Btn.LayoutOrder = i
 				Btn.Parent = Grid
 
@@ -5205,7 +5206,7 @@ function Astral:MakeWindow(config)
 					BIcon.Name = "Icon"
 					BIcon.BackgroundTransparency = 1
 					-- icon-only tiles get a much bigger icon
-					local iSize = iconOnlyMode and 34 or 18
+					local iSize = iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 14 or 18)
 					BIcon.Size = UDim2.new(0, iSize, 0, iSize)
 					BIcon.LayoutOrder = 1
 					Astral.ApplyIcon(BIcon, bIcon)

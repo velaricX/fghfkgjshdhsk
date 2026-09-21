@@ -5354,6 +5354,7 @@ function Astral:MakeWindow(config)
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
+				Btn.ClipsDescendants = true
 				Btn.LayoutOrder = i
 				Btn.Parent = Grid
 
@@ -5386,7 +5387,7 @@ function Astral:MakeWindow(config)
 					BIcon.Name = "Icon"
 					BIcon.BackgroundTransparency = 1
 					-- icon-only tiles get a much bigger icon
-					local iSize = iconOnlyMode and 34 or 18
+					local iSize = iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 14 or 18)
 					BIcon.Size = UDim2.new(0, iSize, 0, iSize)
 					BIcon.LayoutOrder = 1
 					Astral.ApplyIcon(BIcon, bIcon)
