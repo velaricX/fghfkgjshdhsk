@@ -1679,12 +1679,12 @@ function Astral:MakeWindow(config)
 		if H < 10 then H = (refH or 550) - 51 end
 		ColorPickerPanel.Size = UDim2.new(0, curPanelWidth(), 1, -51)
 		local compact = H < 380
-		local pad = compact and 5 or 12
-		local ch = compact and 95 or 190
-		local sh = compact and 12 or 16
-		local ph = compact and 22 or 36
+		local pad = compact and 4 or 12
+		local ch = compact and 80 or 190
+		local sh = compact and 10 or 16
+		local ph = compact and 18 or 36
 		local ih = compact and 22 or 32
-		local bh = compact and 30 or 36
+		local bh = compact and 26 or 36
 		Canvas.Size = UDim2.new(1, -24, 0, ch)
 		Canvas.Position = UDim2.new(0, 12, 0, pad)
 		HueSlider.Size = UDim2.new(1, -24, 0, sh)
@@ -2439,6 +2439,7 @@ function Astral:MakeWindow(config)
 			-- window width so columns never collapse to zero and hide content.
 			local w = PageScroll.AbsoluteSize.X
 			if w < 10 then w = refW end
+			if IsMobile then return true end
 			return w < 380
 		end
 		local function GetTargetColumn()
