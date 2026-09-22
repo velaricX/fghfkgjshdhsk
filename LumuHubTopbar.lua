@@ -6396,7 +6396,9 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		MinBtnCorner.CornerRadius = UDim.new(0, 5)
 		MinBtnCorner.Parent = MinBtn
 
+		local RowsContainer
 		local function resizePanel(animate)
+			if not RowsContainer then return end
 			local rowsH = RowsContainer.CanvasSize.Y.Offset + 14
 			local contentH = gsHeaderH + rowsH
 			local targetH = math.min(contentH, gsMaxPanelH)
@@ -6440,7 +6442,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		Sep.ZIndex = 502
 		Sep.Parent = Header
 
-		local RowsContainer = Instance.new("ScrollingFrame")
+		RowsContainer = Instance.new("ScrollingFrame")
 		RowsContainer.Name = "Rows"
 		RowsContainer.BackgroundTransparency = 1
 		RowsContainer.Size = UDim2.new(1, 0, 1, -(gsHeaderH + 2))

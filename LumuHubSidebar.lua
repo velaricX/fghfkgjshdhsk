@@ -6463,7 +6463,7 @@ function Astral:MakeWindow(config)
 		Sep.Parent = Header
 
 		local maxRowsH = IsMobile and 180 or 260
-		local RowsContainer = Instance.new("ScrollingFrame")
+		RowsContainer = Instance.new("ScrollingFrame")
 		RowsContainer.Name = "Rows"
 		RowsContainer.BackgroundTransparency = 1
 		RowsContainer.Size = UDim2.new(1, 0, 1, -(gsHeaderH + 2))
