@@ -6258,16 +6258,17 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 
 		local Panel = Instance.new("Frame")
 		local gsHeaderH = IsMobile and 36 or 44
-		local gsMaxPanelH = IsMobile and 260 or 340
+		local gsMaxPanelH = IsMobile and 220 or 300
 
 		Panel.Name = "GameStatus"
 		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 		Panel.BorderSizePixel = 0
-		Panel.Size = UDim2.new(0, panelW, 0, gsMaxPanelH)
+		Panel.Size = UDim2.new(0, panelW, 0, gsHeaderH)
 		Panel.Position = config.Position or UDim2.new(0, 1254, 0, 64)
 		Panel.ZIndex = 500
 		Panel.Active = true
 		Panel.Visible = enabled
+		Panel.ClipsDescendants = true
 		Panel.Parent = ScreenGui
 		-- clamp on-screen at spawn (fixes off-screen summon on join)
 		do
@@ -6375,52 +6376,58 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			end)
 		end
 
-		-- Minimize button (shrinks panel to header only, doesn't hide)
+		-- Minimize/Expand "-" button
 		local gsMinimized = false
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Name = "MinimizeBtn"
-		MinBtn.BackgroundTransparency = 1
-		MinBtn.Size = UDim2.new(0, IsMobile and 24 or 28, 0, IsMobile and 24 or 28)
+		MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+		MinBtn.Size = UDim2.new(0, IsMobile and 22 or 26, 0, IsMobile and 22 or 26)
 		MinBtn.AnchorPoint = Vector2.new(1, 0.5)
 		MinBtn.Position = showBeta and UDim2.new(1, -64, 0.5, 0) or UDim2.new(1, -10, 0.5, 0)
-		MinBtn.Text = ""
+		MinBtn.Text = "-"
+		MinBtn.TextColor3 = Color3.fromRGB(180, 180, 185)
+		MinBtn.Font = Enum.Font.GothamBold
+		MinBtn.TextSize = IsMobile and 14 or 16
+		MinBtn.AutoButtonColor = false
 		MinBtn.ZIndex = 503
 		MinBtn.Parent = Header
 
 		local MinBtnCorner = Instance.new("UICorner")
-		MinBtnCorner.CornerRadius = UDim.new(0, 4)
+		MinBtnCorner.CornerRadius = UDim.new(0, 5)
 		MinBtnCorner.Parent = MinBtn
 
-		local MinBtnIcon = Instance.new("ImageLabel")
-		MinBtnIcon.BackgroundTransparency = 1
-		MinBtnIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-		MinBtnIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		MinBtnIcon.Size = UDim2.new(0, 12, 0, 12)
-		MinBtnIcon.Rotation = 0
-		MinBtnIcon.ScaleType = Enum.ScaleType.Fit
-		MinBtnIcon.ZIndex = 504
-		MinBtnIcon.Parent = MinBtn
-		Astral.ApplyIcon(MinBtnIcon, "chevrondown")
+		local function resizePanel(animate)
+			local rowsH = RowsContainer.CanvasSize.Y.Offset + 14
+			local contentH = gsHeaderH + rowsH
+			local targetH = math.min(contentH, gsMaxPanelH)
+			targetH = math.max(targetH, gsHeaderH)
+			if animate then
+				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+					Size = UDim2.new(0, panelW, 0, targetH)
+				}):Play()
+			else
+				Panel.Size = UDim2.new(0, panelW, 0, targetH)
+			end
+		end
 
 		MinBtn.MouseButton1Click:Connect(function()
 			gsMinimized = not gsMinimized
-			TweenService:Create(MinBtnIcon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-				Rotation = gsMinimized and -90 or 0
-			}):Play()
 			if gsMinimized then
+				MinBtn.Text = "+"
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, gsHeaderH)
 				}):Play()
 			else
-				Panel.Size = UDim2.new(0, panelW, 0, gsHeaderH)
-				task.defer(function()
-					local curH = gsHeaderH + RowsContainer.CanvasSize.Y.Offset + 19
-					curH = math.min(curH, gsMaxPanelH)
-					TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-						Size = UDim2.new(0, panelW, 0, curH)
-					}):Play()
-				end)
+				MinBtn.Text = "-"
+				resizePanel(true)
 			end
+		end)
+
+		MinBtn.MouseEnter:Connect(function()
+			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(55, 55, 65)}):Play()
+		end)
+		MinBtn.MouseLeave:Connect(function()
+			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 48)}):Play()
 		end)
 
 		local Sep = Instance.new("Frame")
@@ -6614,6 +6621,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			end
 			row.token = (row.token or 0) + 1
 			applyRow(row, opts)
+			if not gsMinimized then resizePanel(true) end
 
 		return GameStatus
 		end
@@ -6648,6 +6656,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			name = tostring(name)
 			local r = rows[name]
 			if r then pcall(function() r.Frame:Destroy() end); rows[name] = nil end
+			if not gsMinimized then task.defer(function() resizePanel(true) end) end
 
 		return GameStatus
 		end
@@ -6655,6 +6664,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		function GameStatus:Clear()
 			for _, r in pairs(rows) do pcall(function() r.Frame:Destroy() end) end
 			rows = {}
+			if not gsMinimized then task.defer(function() resizePanel(true) end) end
 
 		return GameStatus
 		end
