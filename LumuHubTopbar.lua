@@ -70,6 +70,31 @@ local function translateText(key)
 	return key
 end
 
+-- GET with fallbacks: some executors block game:HttpGet for certain hosts,
+-- so try the executor request functions and HttpService before giving up.
+local function webGet(url)
+	local ok, res = pcall(function() return game:HttpGet(url) end)
+	if ok and type(res) == "string" and res ~= "" then return res end
+	local req = (typeof(request) == "function" and request)
+		or (typeof(http_request) == "function" and http_request)
+		or (syn and type(syn.request) == "function" and syn.request)
+		or nil
+	if req then
+		local ok2, r = pcall(function() return req({Url = url, Method = "GET"}) end)
+		if ok2 then
+			if type(r) == "table" then
+				local body = r.Body or r.body
+				if type(body) == "string" and body ~= "" then return body end
+			elseif type(r) == "string" and r ~= "" then
+				return r
+			end
+		end
+	end
+	local ok3, res3 = pcall(function() return HttpService:GetAsync(url) end)
+	if ok3 and type(res3) == "string" and res3 ~= "" then return res3 end
+	return nil
+end
+
 function Astral:AddTranslations(langName, dict)
 	if type(langName) ~= "string" or type(dict) ~= "table" then return end
 	Astral.Languages[langName] = Astral.Languages[langName] or {}
@@ -4055,8 +4080,8 @@ function Astral:MakeWindow(config)
 							local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
 							url = url .. "&q=" .. ((okE and enc) or k)
 						end
-						local ok, res = pcall(function() return game:HttpGet(url) end)
-						if ok and type(res) == "string" and res ~= "" then
+						local res = webGet(url)
+						if type(res) == "string" and res ~= "" then
 							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
 							if ok2 and type(js) == "table" then
 								for i, k in ipairs(chunk) do
@@ -5041,10 +5066,8 @@ function Astral:MakeWindow(config)
 			-- and real online/member numbers load from Discord's public
 			-- invite API. Falls back to OnlineCount/MemberCount if offline.
 			task.spawn(function()
-				local ok, res = pcall(function()
-					return game:HttpGet("https://discord.com/api/v9/invites/" .. inviteCode .. "?with_counts=true")
-				end)
-				if not ok or type(res) ~= "string" or res == "" then return end
+				local res = webGet("https://discord.com/api/v9/invites/" .. inviteCode .. "?with_counts=true")
+				if type(res) ~= "string" or res == "" then return end
 				local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
 				if not ok2 or type(js) ~= "table" then return end
 				pcall(function()

@@ -459,6 +459,11 @@ Tab:AddDiscordCard({
   }
 })
 -- Minimal: Tab:AddDiscordCard({ ServerData = { InviteCode = "RhQa6kZu9A" } })
+-- LIVE COUNTS: OnlineCount / MemberCount are fallback-only. The card fetches
+-- real online + member numbers from Discord's public invite API using just
+-- InviteCode (no bot token). Server name + icon also auto-fill from the
+-- invite unless you set ServerName / ServerIconId yourself. If the request
+-- fails (offline), the fallback numbers stay.
 ```
 
 ## 4b. Game Status — small draggable overlay (BETA)
@@ -533,6 +538,9 @@ Status:Destroy()
 Look:
 - Header icon + the BETA pill follow the accent colour (`Window:SetAccent()`).
 - The panel has a soft vertical gradient and rows get a rounded hover highlight.
+- The header has fully rounded corners; the `-` button (top-right) shrinks the
+  panel to a header-only pill, `+` expands it back. The panel auto-sizes to its
+  rows (max 220px mobile / 300px PC) and extra rows scroll inside.
 
 Notes:
 - The panel lives on its own, so it stays visible when the main window is
@@ -540,10 +548,13 @@ Notes:
   code only: `:SetEnabled(false)`, `:Hide()`, `:Toggle()`, or a toggle in your UI.
 - Row values follow the accent colour unless the row sets its own `Color`.
 - `:Set` on a row that is counting down stops that row's timer.
+- `:SetRow` / `:Remove` / `:Clear` re-size the panel automatically (unless minimized).
 
 ## 5. Languages
 
-Tab names + element titles translate live. Descriptions stay as written.
+Tab names, element titles **and descriptions** translate live. Selector chrome
+(`Select...`, `None`, `Search...`, `(+N more)`, dropdown title) translates too —
+option values stay as written on purpose (they're data passed to callbacks).
 
 ```lua
 Astral:AddTranslations("Italiano", {
@@ -554,6 +565,37 @@ Astral:SetLanguage("Italiano")   -- English | Español | Français | Deutsch | y
 ```
 
 Ships with English, Español, Français, Deutsch starter packs.
+
+### Auto-translate (Google, no API key)
+
+```lua
+tab:AddAutoTranslations({
+  Title = "Language",      -- optional (default "Language")
+  Icon = "Badge Gear",     -- optional
+  Description = "...",     -- optional
+  -- Search = true,        -- on by default (109 languages)
+  -- Default = "English",  -- optional
+  -- Flag = "lang",        -- optional, like AddSelector
+  -- Callback = function(lang) print("picked", lang) end,  -- optional
+})
+-- Returns the inner AddSelector controller (Set/Get/SetOptions all work).
+```
+
+A normal selector pre-filled with every Google Translate language. Picking one
+machine-translates every registered UI string and applies it live (source
+language auto-detected, so Chinese-key hubs work too). Manual
+`AddTranslations()` packs are separate and untouched — auto-fill only adds keys
+missing from that language, so hand-written entries always win. Picking
+`English` resets instantly.
+
+`Astral.GoogleLanguages` holds the `{Name, Code}` list — read it if you want
+your own picker UI.
+
+Troubleshooting:
+- Picked a language and nothing changed? You loaded a cached lib from before
+  `AddAutoTranslations` existed — re-execute the script for a fresh copy.
+- Red `Translate failed` notice = Google blocked the request (offline or rate
+  limit). Wait a bit and try again; your current language is untouched.
 
 ## 6. Themes & Background
 
