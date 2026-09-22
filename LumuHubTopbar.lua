@@ -4003,8 +4003,9 @@ function Astral:MakeWindow(config)
 		-- =========================================================================
 		-- AUTO TRANSLATIONS (Google-powered language selector)
 		-- A normal selector pre-filled with every Google Translate language.
-		-- Picking one machine-translates every registered English string via
-		-- Google's free endpoint (no API key) and applies it live.
+		-- Picking one machine-translates every registered UI string via
+		-- Google's free endpoint (no API key, source language auto-detected)
+		-- and applies it live.
 		-- Manual Astral:AddTranslations() packs are separate and untouched;
 		-- auto-fill only adds keys missing from that language (manual wins).
 		-- Usage: tab:AddAutoTranslations({ Title = "Language", Icon = "Badge Gear" })
@@ -4045,7 +4046,7 @@ function Astral:MakeWindow(config)
 					local dict = {}
 					for _, k in ipairs(keys) do
 						local ok, res = pcall(function()
-							return game:HttpGet("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" .. code .. "&dt=t&q=" .. HttpService:UrlEncode(k))
+							return game:HttpGet("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" .. code .. "&dt=t&q=" .. HttpService:UrlEncode(k))
 						end)
 						if ok and type(res) == "string" and res ~= "" then
 							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
