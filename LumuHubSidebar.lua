@@ -4606,6 +4606,34 @@ function Astral:MakeWindow(config)
 			MemberLabel.LayoutOrder = 5
 			MemberLabel.Parent = MetricsFrame
 
+			-- Live Discord counts: no bot token needed. Just set
+			-- ServerData.InviteCode = "your-code" (the part after discord.gg/)
+			-- and real online/member numbers load from Discord's public
+			-- invite API. Falls back to OnlineCount/MemberCount if offline.
+			task.spawn(function()
+				local ok, res = pcall(function()
+					return game:HttpGet("https://discord.com/api/v9/invites/" .. inviteCode .. "?with_counts=true")
+				end)
+				if not ok or type(res) ~= "string" or res == "" then return end
+				local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
+				if not ok2 or type(js) ~= "table" then return end
+				pcall(function()
+					local online = tonumber(js.approximate_presence_count)
+					local members = tonumber(js.approximate_member_count)
+					if online then OnlineLabel.Text = tostring(online) .. " Online" end
+					if members then MemberLabel.Text = tostring(members) .. " Members" end
+					local guild = js.guild
+					if type(guild) == "table" then
+						if data.ServerName == nil and type(guild.name) == "string" and guild.name ~= "" then
+							ServerName.Text = guild.name
+						end
+						if data.ServerIconId == nil and type(guild.id) == "string" and type(guild.icon) == "string" and guild.icon ~= "" then
+							ServerIcon.Image = "https://cdn.discordapp.com/icons/" .. guild.id .. "/" .. guild.icon .. ".png?size=128"
+						end
+					end
+				end)
+			end)
+
 			local EstLabel = Instance.new("TextLabel")
 			EstLabel.Name = "EstLabel"
 			EstLabel.Size = UDim2.new(1, 0, 0, 14)
@@ -6297,8 +6325,9 @@ function Astral:MakeWindow(config)
 			table.insert(statusPanels, { Panel = Panel, DefaultPos = Panel.Position })
 		end
 
+		local gsCornerR = IsMobile and 8 or 12
 		local PanelCorner = Instance.new("UICorner")
-		PanelCorner.CornerRadius = UDim.new(0, IsMobile and 8 or 12)
+		PanelCorner.CornerRadius = UDim.new(0, gsCornerR)
 		PanelCorner.Parent = Panel
 
 		local PanelStroke = Instance.new("UIStroke")
@@ -6329,6 +6358,24 @@ function Astral:MakeWindow(config)
 		Header.ZIndex = 501
 		Header.Active = true
 		Header.Parent = Panel
+
+		local HeaderCorner = Instance.new("UICorner")
+		HeaderCorner.CornerRadius = UDim.new(0, gsCornerR)
+		HeaderCorner.Parent = Header
+
+		-- Square cover over the header's bottom rounded corners while
+		-- expanded, so the header flows into the rows. Hidden when the
+		-- panel is header-only so the pill keeps perfect round corners.
+		local HeaderBottomCover = Instance.new("Frame")
+		HeaderBottomCover.Name = "BottomCover"
+		HeaderBottomCover.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+		HeaderBottomCover.BackgroundTransparency = 0.35
+		HeaderBottomCover.BorderSizePixel = 0
+		HeaderBottomCover.Size = UDim2.new(1, 0, 0, gsCornerR)
+		HeaderBottomCover.Position = UDim2.new(0, 0, 1, -gsCornerR)
+		HeaderBottomCover.ZIndex = 501
+		HeaderBottomCover.Visible = false
+		HeaderBottomCover.Parent = Header
 
 		local HeaderIcon = Instance.new("ImageLabel")
 		HeaderIcon.Name = "Icon"
@@ -6423,6 +6470,7 @@ function Astral:MakeWindow(config)
 			local contentH = gsHeaderH + rowsH
 			local targetH = math.min(contentH, gsMaxPanelH)
 			targetH = math.max(targetH, gsHeaderH)
+			HeaderBottomCover.Visible = (targetH > gsHeaderH + 1)
 			if animate then
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, targetH)
@@ -6436,6 +6484,7 @@ function Astral:MakeWindow(config)
 			gsMinimized = not gsMinimized
 			if gsMinimized then
 				MinBtn.Text = "+"
+				HeaderBottomCover.Visible = false
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, gsHeaderH)
 				}):Play()
