@@ -60,6 +60,7 @@ Astral.Registry = {} -- Global registry to track all toggle/tick controllers for
 Astral.Languages = { English = {} }
 Astral.CurrentLanguage = "English"
 local translatableLabels = {}
+local languageRefreshers = {} -- fn() list re-run on SetLanguage (dynamic texts)
 
 local function translateText(key)
 	local lang = Astral.Languages[Astral.CurrentLanguage]
@@ -86,16 +87,24 @@ function Astral:SetLanguage(langName)
 	for _, item in ipairs(translatableLabels) do
 		pcall(function()
 			if item.Label and item.Label.Parent then
-				item.Label.Text = translateText(item.Key)
+				item.Label[item.Prop or "Text"] = translateText(item.Key)
 			end
 		end)
 	end
+	for _, fn in ipairs(languageRefreshers) do
+		pcall(fn)
+	end
+	pcall(function()
+		if Astral._OpenSelectorRefresh then Astral._OpenSelectorRefresh() end
+	end)
 end
 
--- Register a label's English text for live translation
-local function tr(label, englishText)
-	table.insert(translatableLabels, {Label = label, Key = englishText})
-	label.Text = translateText(englishText)
+-- Register a label's English text for live translation.
+-- Optional prop lets inputs translate other string props too:
+-- tr(SearchInput, "Search...", "PlaceholderText")
+local function tr(label, englishText, prop)
+	table.insert(translatableLabels, {Label = label, Key = englishText, Prop = prop})
+	label[prop or "Text"] = translateText(englishText)
 	return label
 end
 
@@ -120,6 +129,11 @@ Astral:AddTranslations("Español", {
 	["Spam With Actions"] = "Spam con acciones",
 	["Menu Keybind"] = "Tecla de menú",
 	["Status Label"] = "Etiqueta de estado",
+	["Select..."] = "Seleccionar...",
+	["None"] = "Ninguno",
+	["Search..."] = "Buscar...",
+	["Select Option"] = "Seleccionar opción",
+	["(+%d more)"] = "(+%d más)",
 })
 Astral:AddTranslations("Français", {
 	["Settings"] = "Paramètres",
@@ -140,6 +154,11 @@ Astral:AddTranslations("Français", {
 	["Spam With Actions"] = "Spam avec actions",
 	["Menu Keybind"] = "Touche du menu",
 	["Status Label"] = "Étiquette de statut",
+	["Select..."] = "Sélectionner...",
+	["None"] = "Aucun",
+	["Search..."] = "Rechercher...",
+	["Select Option"] = "Choisir une option",
+	["(+%d more)"] = "(+%d autres)",
 })
 Astral:AddTranslations("Deutsch", {
 	["Settings"] = "Einstellungen",
@@ -160,6 +179,11 @@ Astral:AddTranslations("Deutsch", {
 	["Spam With Actions"] = "Spam mit Aktionen",
 	["Menu Keybind"] = "Menütaste",
 	["Status Label"] = "Statusanzeige",
+	["Select..."] = "Auswählen...",
+	["None"] = "Keine",
+	["Search..."] = "Suchen...",
+	["Select Option"] = "Option wählen",
+	["(+%d more)"] = "(+%d weitere)",
 })
 
 -- Comprehensive Icon Dictionary
@@ -1840,7 +1864,7 @@ function Astral:MakeWindow(config)
 	SearchInput.Position = UDim2.new(0, 30, 0, 0)
 	SearchInput.BackgroundTransparency = 1
 	SearchInput.Font = Enum.Font.Gotham
-	SearchInput.PlaceholderText = "Search..."
+	tr(SearchInput, "Search...", "PlaceholderText")
 	SearchInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 	SearchInput.Text = ""
 	SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -2048,9 +2072,9 @@ function Astral:MakeWindow(config)
 									table.insert(selectedList, optStr)
 								end
 							end
-						local newText = #selectedList > 0 and table.concat(selectedList, ", ") or "None"
+						local newText = #selectedList > 0 and table.concat(selectedList, ", ") or translateText("None")
 						buttonTextLabel.Text = newText
-						SelectorPanelTitle.Text = #selectedList > 0 and (title .. " (" .. #selectedList .. ")") or title
+						SelectorPanelTitle.Text = #selectedList > 0 and (translateText(title) .. " (" .. #selectedList .. ")") or translateText(title)
 							if callback then
 								task.spawn(callback, selectedList)
 							end
@@ -2087,6 +2111,10 @@ function Astral:MakeWindow(config)
 		activeSelectorRefresh = function()
 			populate(SearchInput.Text)
 		end
+		Astral._OpenSelectorRefresh = function()
+			SelectorPanelTitle.Text = translateText(title)
+			populate(SearchInput.Text)
+		end
 		populate("")
 
 		if searchConn then searchConn:Disconnect() end
@@ -2105,6 +2133,7 @@ function Astral:MakeWindow(config)
 	closeSelector = function()
 		selectorOpen = false
 		SelectorCatcher.Visible = false
+		Astral._OpenSelectorRefresh = nil
 		if searchConn then
 			searchConn:Disconnect()
 			searchConn = nil
@@ -3715,10 +3744,10 @@ function Astral:MakeWindow(config)
 			local function updateValueLabel()
 				local list = selectedList()
 				if #list == 0 then
-					ValueLabel.Text = "Select..."
+					ValueLabel.Text = translateText("Select...")
 					ValueLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				elseif #list > 2 then
-					ValueLabel.Text = string.format("%s, %s (+%d more)", list[1], list[2], #list - 2)
+					ValueLabel.Text = string.format("%s, %s " .. translateText("(+%d more)"), list[1], list[2], #list - 2)
 					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				else
 					ValueLabel.Text = table.concat(list, ", ")
@@ -3731,6 +3760,7 @@ function Astral:MakeWindow(config)
 					CountBadge.Visible = false
 				end
 			end
+			table.insert(languageRefreshers, updateValueLabel)
 			updateValueLabel()
 
 			local DropIcon = Instance.new("ImageLabel")
