@@ -186,6 +186,118 @@ Astral:AddTranslations("Deutsch", {
 	["(+%d more)"] = "(+%d weitere)",
 })
 
+-- Every language Google Translate supports. AddAutoTranslations() builds a
+-- normal selector from this list; picking one machine-translates every
+-- registered English string via Google's free endpoint (no API key needed).
+Astral.GoogleLanguages = {
+	{Name = "English", Code = "en"},
+	{Name = "Afrikaans", Code = "af"},
+	{Name = "Albanian", Code = "sq"},
+	{Name = "Amharic", Code = "am"},
+	{Name = "Arabic", Code = "ar"},
+	{Name = "Armenian", Code = "hy"},
+	{Name = "Azerbaijani", Code = "az"},
+	{Name = "Basque", Code = "eu"},
+	{Name = "Belarusian", Code = "be"},
+	{Name = "Bengali", Code = "bn"},
+	{Name = "Bosnian", Code = "bs"},
+	{Name = "Bulgarian", Code = "bg"},
+	{Name = "Catalan", Code = "ca"},
+	{Name = "Cebuano", Code = "ceb"},
+	{Name = "Chichewa", Code = "ny"},
+	{Name = "Chinese (Simplified)", Code = "zh-cn"},
+	{Name = "Chinese (Traditional)", Code = "zh-tw"},
+	{Name = "Corsican", Code = "co"},
+	{Name = "Croatian", Code = "hr"},
+	{Name = "Czech", Code = "cs"},
+	{Name = "Danish", Code = "da"},
+	{Name = "Deutsch", Code = "de"},
+	{Name = "Dutch", Code = "nl"},
+	{Name = "Esperanto", Code = "eo"},
+	{Name = "Estonian", Code = "et"},
+	{Name = "Filipino", Code = "tl"},
+	{Name = "Finnish", Code = "fi"},
+	{Name = "Français", Code = "fr"},
+	{Name = "Frisian", Code = "fy"},
+	{Name = "Galician", Code = "gl"},
+	{Name = "Georgian", Code = "ka"},
+	{Name = "Greek", Code = "el"},
+	{Name = "Gujarati", Code = "gu"},
+	{Name = "Haitian Creole", Code = "ht"},
+	{Name = "Hausa", Code = "ha"},
+	{Name = "Hawaiian", Code = "haw"},
+	{Name = "Hebrew", Code = "he"},
+	{Name = "Hindi", Code = "hi"},
+	{Name = "Hmong", Code = "hmn"},
+	{Name = "Hungarian", Code = "hu"},
+	{Name = "Icelandic", Code = "is"},
+	{Name = "Igbo", Code = "ig"},
+	{Name = "Indonesian", Code = "id"},
+	{Name = "Irish", Code = "ga"},
+	{Name = "Italian", Code = "it"},
+	{Name = "Japanese", Code = "ja"},
+	{Name = "Javanese", Code = "jv"},
+	{Name = "Kannada", Code = "kn"},
+	{Name = "Kazakh", Code = "kk"},
+	{Name = "Khmer", Code = "km"},
+	{Name = "Korean", Code = "ko"},
+	{Name = "Kurdish", Code = "ku"},
+	{Name = "Kyrgyz", Code = "ky"},
+	{Name = "Lao", Code = "lo"},
+	{Name = "Latin", Code = "la"},
+	{Name = "Latvian", Code = "lv"},
+	{Name = "Lithuanian", Code = "lt"},
+	{Name = "Luxembourgish", Code = "lb"},
+	{Name = "Macedonian", Code = "mk"},
+	{Name = "Malagasy", Code = "mg"},
+	{Name = "Malay", Code = "ms"},
+	{Name = "Malayalam", Code = "ml"},
+	{Name = "Maltese", Code = "mt"},
+	{Name = "Maori", Code = "mi"},
+	{Name = "Marathi", Code = "mr"},
+	{Name = "Mongolian", Code = "mn"},
+	{Name = "Myanmar", Code = "my"},
+	{Name = "Nepali", Code = "ne"},
+	{Name = "Norwegian", Code = "no"},
+	{Name = "Odia", Code = "or"},
+	{Name = "Pashto", Code = "ps"},
+	{Name = "Persian", Code = "fa"},
+	{Name = "Polish", Code = "pl"},
+	{Name = "Portuguese", Code = "pt"},
+	{Name = "Punjabi", Code = "pa"},
+	{Name = "Romanian", Code = "ro"},
+	{Name = "Russian", Code = "ru"},
+	{Name = "Samoan", Code = "sm"},
+	{Name = "Scots Gaelic", Code = "gd"},
+	{Name = "Serbian", Code = "sr"},
+	{Name = "Sesotho", Code = "st"},
+	{Name = "Shona", Code = "sn"},
+	{Name = "Sindhi", Code = "sd"},
+	{Name = "Sinhala", Code = "si"},
+	{Name = "Slovak", Code = "sk"},
+	{Name = "Slovenian", Code = "sl"},
+	{Name = "Somali", Code = "so"},
+	{Name = "Español", Code = "es"},
+	{Name = "Sundanese", Code = "su"},
+	{Name = "Swahili", Code = "sw"},
+	{Name = "Swedish", Code = "sv"},
+	{Name = "Tajik", Code = "tg"},
+	{Name = "Tamil", Code = "ta"},
+	{Name = "Telugu", Code = "te"},
+	{Name = "Thai", Code = "th"},
+	{Name = "Turkish", Code = "tr"},
+	{Name = "Ukrainian", Code = "uk"},
+	{Name = "Urdu", Code = "ur"},
+	{Name = "Uyghur", Code = "ug"},
+	{Name = "Uzbek", Code = "uz"},
+	{Name = "Vietnamese", Code = "vi"},
+	{Name = "Welsh", Code = "cy"},
+	{Name = "Xhosa", Code = "xh"},
+	{Name = "Yiddish", Code = "yi"},
+	{Name = "Yoruba", Code = "yo"},
+	{Name = "Zulu", Code = "zu"},
+}
+
 -- Comprehensive Icon Dictionary
 Astral.Icons = {
 	Heart = "rbxassetid://10747374161", -- Globe/Home
@@ -3888,6 +4000,92 @@ function Astral:MakeWindow(config)
 
 			return SelectorController
 		end
+		-- =========================================================================
+		-- AUTO TRANSLATIONS (Google-powered language selector)
+		-- A normal selector pre-filled with every Google Translate language.
+		-- Picking one machine-translates every registered English string via
+		-- Google's free endpoint (no API key) and applies it live.
+		-- Manual Astral:AddTranslations() packs are separate and untouched;
+		-- auto-fill only adds keys missing from that language (manual wins).
+		-- Usage: tab:AddAutoTranslations({ Title = "Language", Icon = "Badge Gear" })
+		-- =========================================================================
+		function TabObject:AddAutoTranslations(config)
+			config = config or {}
+			local names = {}
+			local codeByName = {}
+			for _, lang in ipairs(Astral.GoogleLanguages or {}) do
+				if type(lang.Name) == "string" and type(lang.Code) == "string" then
+					table.insert(names, lang.Name)
+					codeByName[lang.Name] = lang.Code
+				end
+			end
+			local busy = false
+			local function applyGoogleLanguage(pick)
+				local langName = tostring(pick or "")
+				local code = codeByName[langName]
+				if code == nil or code == "" or busy then return end
+				if code == "en" then
+					Astral:SetLanguage("English")
+					task.spawn(config.Callback or function() end, langName)
+					return
+				end
+				busy = true
+				Window:Notify({ Type = "info", Title = "Translating", Message = "Fetching " .. langName .. "...", Duration = 5 })
+				task.spawn(function()
+					local seen, keys = {}, {}
+					local function addKey(k)
+						if type(k) == "string" and k ~= "" and not seen[k] then
+							seen[k] = true
+							table.insert(keys, k)
+						end
+					end
+					for _, item in ipairs(translatableLabels) do addKey(item.Key) end
+					addKey("Select..."); addKey("None"); addKey("Search...")
+					addKey("Select Option"); addKey("(+%d more)")
+					local dict = {}
+					for _, k in ipairs(keys) do
+						local ok, res = pcall(function()
+							return game:HttpGet("https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=" .. code .. "&dt=t&q=" .. HttpService:UrlEncode(k))
+						end)
+						if ok and type(res) == "string" and res ~= "" then
+							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
+							if ok2 and type(js) == "table" and type(js[1]) == "table" then
+								local parts = {}
+								for _, seg in ipairs(js[1]) do
+									if type(seg) == "table" and type(seg[1]) == "string" then
+										table.insert(parts, seg[1])
+									end
+								end
+								if #parts > 0 then dict[k] = table.concat(parts) end
+							end
+						end
+						task.wait(0.05)
+					end
+					Astral.Languages[langName] = Astral.Languages[langName] or {}
+					for k, v in pairs(dict) do
+						if Astral.Languages[langName][k] == nil then
+							Astral.Languages[langName][k] = v
+						end
+					end
+					Astral:SetLanguage(langName)
+					busy = false
+					Window:Notify({ Type = "good", Title = "Language", Message = langName .. " applied.", Duration = 4 })
+					task.spawn(config.Callback or function() end, langName)
+				end)
+			end
+			return TabObject:AddSelector({
+				Title = config.Title or "Language",
+				Description = config.Description,
+				Icon = config.Icon,
+				Options = names,
+				Default = config.Default or "English",
+				Search = (config.Search == nil) and true or config.Search,
+				Callback = applyGoogleLanguage,
+				Flag = config.Flag,
+				Position = config.Position,
+			})
+		end
+		TabObject.Addautotranslations = TabObject.AddAutoTranslations
 		TabObject.Addselector = TabObject.AddSelector -- Alias to support lowercase calls
 
 
@@ -4737,7 +4935,7 @@ function Astral:MakeWindow(config)
 			local ServerName = Instance.new("TextLabel")
 			ServerName.Size = UDim2.new(0, 0, 1, 0)
 			ServerName.AutomaticSize = Enum.AutomaticSize.X
-			ServerName.Text = data.ServerName or "Astral Hub"
+			ServerName.Text = data.ServerName or "LumuHub"
 			ServerName.Font = Enum.Font.GothamBold
 			mTS(ServerName, 16)
 			ServerName.TextColor3 = Color3.fromHex("#ffffff")
@@ -4862,7 +5060,7 @@ function Astral:MakeWindow(config)
 			local DescLabel = Instance.new("TextLabel")
 			DescLabel.Name = "DescLabel"
 			DescLabel.Size = UDim2.new(1, 0, 0, 18)
-			DescLabel.Text = data.Description or "Official Astral Hub Community"
+			DescLabel.Text = data.Description or "Official LumuHub Community"
 			DescLabel.Font = Enum.Font.GothamMedium
 			regText(DescLabel, 12)
 			DescLabel.TextColor3 = Color3.fromHex("#dbdee1")
@@ -5555,7 +5753,7 @@ function Astral:MakeWindow(config)
 		-- Any failing Add* call is skipped and reported instead of aborting.
 		do
 			local addNames = {"AddButton", "AddToggle", "AddTick", "AddSlider", "AddTextbox",
-				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton"}
+				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton", "AddAutoTranslations"}
 			for _, addName in ipairs(addNames) do
 				local orig = TabObject[addName]
 				if type(orig) == "function" then
