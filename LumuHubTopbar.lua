@@ -5981,8 +5981,8 @@ function Astral:MakeWindow(config)
 
 			-- Text
 			local TextFrame = Instance.new("Frame")
-			TextFrame.Size = UDim2.new(1, -60, 0, hasActions and 38 or 34)
-			TextFrame.Position = UDim2.new(0, 42, 0, hasActions and 6 or 8)
+TextFrame.Size = UDim2.new(1, IsMobile and -60 or -68, 0, hasActions and 38 or 34)
+			TextFrame.Position = UDim2.new(0, IsMobile and 42 or 50, 0, hasActions and 6 or 8)
 			TextFrame.BackgroundTransparency = 1
 			TextFrame.ZIndex = 200
 			TextFrame.Parent = Frame
