@@ -4044,23 +4044,41 @@ function Astral:MakeWindow(config)
 					addKey("Select..."); addKey("None"); addKey("Search...")
 					addKey("Select Option"); addKey("(+%d more)")
 					local dict = {}
-					for _, k in ipairs(keys) do
-						local ok, res = pcall(function()
-							return game:HttpGet("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" .. code .. "&dt=t&q=" .. HttpService:UrlEncode(k))
-						end)
+					local CHUNK = 20
+					for ci = 1, #keys, CHUNK do
+						local chunk = {}
+						for i = ci, math.min(ci + CHUNK - 1, #keys) do
+							table.insert(chunk, keys[i])
+						end
+						local url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" .. code .. "&dt=t"
+						for _, k in ipairs(chunk) do
+							local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
+							url = url .. "&q=" .. ((okE and enc) or k)
+						end
+						local ok, res = pcall(function() return game:HttpGet(url) end)
 						if ok and type(res) == "string" and res ~= "" then
 							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
-							if ok2 and type(js) == "table" and type(js[1]) == "table" then
-								local parts = {}
-								for _, seg in ipairs(js[1]) do
-									if type(seg) == "table" and type(seg[1]) == "string" then
-										table.insert(parts, seg[1])
+							if ok2 and type(js) == "table" then
+								for i, k in ipairs(chunk) do
+									local block = js[i]
+									if type(block) == "table" then
+										local parts = {}
+										for _, seg in ipairs(block) do
+											if type(seg) == "table" and type(seg[1]) == "string" then
+												table.insert(parts, seg[1])
+											end
+										end
+										if #parts > 0 then dict[k] = table.concat(parts) end
 									end
 								end
-								if #parts > 0 then dict[k] = table.concat(parts) end
 							end
 						end
-						task.wait(0.05)
+						task.wait(0.1)
+					end
+					if next(dict) == nil then
+						busy = false
+						Window:Notify({ Type = "bad", Title = "Translate failed", Message = "Google blocked the request. Try again later.", Duration = 6 })
+						return
 					end
 					Astral.Languages[langName] = Astral.Languages[langName] or {}
 					for k, v in pairs(dict) do
