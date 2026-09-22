@@ -2721,7 +2721,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -2904,7 +2904,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 24)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3073,7 +3073,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3299,7 +3299,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3461,9 +3461,9 @@ function Astral:MakeWindow(config)
 			local trackLeft = icon and textLeft or 12
 			local trackRightPad = icon and (IsMobile and 58 or 82) or (IsMobile and 28 or 32)
 			local trackTop = IsMobile and 28 or 34
-			local trackH = IsMobile and 10 or 14
-			local thumbW = IsMobile and 14 or 18
-			local thumbH = IsMobile and 14 or 20
+			local trackH = IsMobile and 14 or 16
+			local thumbW = IsMobile and 16 or 20
+			local thumbH = IsMobile and 16 or 22
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
 			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
@@ -3635,7 +3635,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3981,7 +3981,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -4547,7 +4547,7 @@ function Astral:MakeWindow(config)
 			DescLabel.Size = UDim2.new(1, 0, 0, 0)
 			DescLabel.AutomaticSize = Enum.AutomaticSize.Y
 			DescLabel.Font = Enum.Font.Gotham
-			DescLabel.Text = description
+			tr(DescLabel, description)
 			DescLabel.TextColor3 = Color3.fromRGB(175, 175, 182)
 			regText(DescLabel, 13)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5321,7 +5321,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				DescLabel.Text = description
+				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -6257,12 +6257,14 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		end
 
 		local Panel = Instance.new("Frame")
+		local gsHeaderH = IsMobile and 36 or 44
+		local gsMaxPanelH = IsMobile and 260 or 340
+
 		Panel.Name = "GameStatus"
 		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 		Panel.BorderSizePixel = 0
-		Panel.Size = UDim2.new(0, panelW, 0, 46)
+		Panel.Size = UDim2.new(0, panelW, 0, gsMaxPanelH)
 		Panel.Position = config.Position or UDim2.new(0, 1254, 0, 64)
-		Panel.AutomaticSize = Enum.AutomaticSize.Y
 		Panel.ZIndex = 500
 		Panel.Active = true
 		Panel.Visible = enabled
@@ -6373,46 +6375,51 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			end)
 		end
 
-		-- Collapse/Expand arrow button
-		local gsCollapsed = false
-		local ArrowBtn = Instance.new("TextButton")
-		ArrowBtn.Name = "CollapseBtn"
-		ArrowBtn.BackgroundTransparency = 1
-		ArrowBtn.Size = UDim2.new(0, IsMobile and 24 or 28, 0, IsMobile and 24 or 28)
-		ArrowBtn.AnchorPoint = Vector2.new(1, 0.5)
-		ArrowBtn.Position = showBeta and UDim2.new(1, -64, 0.5, 0) or UDim2.new(1, -10, 0.5, 0)
-		ArrowBtn.Text = ""
-		ArrowBtn.ZIndex = 503
-		ArrowBtn.Parent = Header
+		-- Minimize button (shrinks panel to header only, doesn't hide)
+		local gsMinimized = false
+		local MinBtn = Instance.new("TextButton")
+		MinBtn.Name = "MinimizeBtn"
+		MinBtn.BackgroundTransparency = 1
+		MinBtn.Size = UDim2.new(0, IsMobile and 24 or 28, 0, IsMobile and 24 or 28)
+		MinBtn.AnchorPoint = Vector2.new(1, 0.5)
+		MinBtn.Position = showBeta and UDim2.new(1, -64, 0.5, 0) or UDim2.new(1, -10, 0.5, 0)
+		MinBtn.Text = ""
+		MinBtn.ZIndex = 503
+		MinBtn.Parent = Header
 
-		local ArrowIcon = Instance.new("ImageLabel")
-		ArrowIcon.BackgroundTransparency = 1
-		ArrowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-		ArrowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		ArrowIcon.Size = UDim2.new(0, 12, 0, 12)
-		ArrowIcon.Rotation = 0
-		ArrowIcon.ScaleType = Enum.ScaleType.Fit
-		ArrowIcon.ZIndex = 504
-		ArrowIcon.Parent = ArrowBtn
-		Astral.ApplyIcon(ArrowIcon, "chevrondown")
+		local MinBtnCorner = Instance.new("UICorner")
+		MinBtnCorner.CornerRadius = UDim.new(0, 4)
+		MinBtnCorner.Parent = MinBtn
 
-		ArrowBtn.MouseButton1Click:Connect(function()
-			gsCollapsed = not gsCollapsed
-			TweenService:Create(ArrowIcon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-				Rotation = gsCollapsed and -90 or 0
+		local MinBtnIcon = Instance.new("ImageLabel")
+		MinBtnIcon.BackgroundTransparency = 1
+		MinBtnIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		MinBtnIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		MinBtnIcon.Size = UDim2.new(0, 12, 0, 12)
+		MinBtnIcon.Rotation = 0
+		MinBtnIcon.ScaleType = Enum.ScaleType.Fit
+		MinBtnIcon.ZIndex = 504
+		MinBtnIcon.Parent = MinBtn
+		Astral.ApplyIcon(MinBtnIcon, "chevrondown")
+
+		MinBtn.MouseButton1Click:Connect(function()
+			gsMinimized = not gsMinimized
+			TweenService:Create(MinBtnIcon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+				Rotation = gsMinimized and -90 or 0
 			}):Play()
-			TweenService:Create(RowsContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-				Size = gsCollapsed and UDim2.new(1, 0, 0, 0) or UDim2.new(1, 0, 0, 0),
-				Visible = not gsCollapsed
-			}):Play()
-			local targetH = gsCollapsed and (IsMobile and 36 or 44) or nil
-			if targetH then
-				TweenService:Create(Panel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-					Size = UDim2.new(0, panelW, 0, targetH)
+			if gsMinimized then
+				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+					Size = UDim2.new(0, panelW, 0, gsHeaderH)
 				}):Play()
 			else
-				Panel.Size = UDim2.new(0, panelW, 0, 46)
-				Panel.AutomaticSize = Enum.AutomaticSize.Y
+				Panel.Size = UDim2.new(0, panelW, 0, gsHeaderH)
+				task.defer(function()
+					local curH = gsHeaderH + RowsContainer.CanvasSize.Y.Offset + 19
+					curH = math.min(curH, gsMaxPanelH)
+					TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Size = UDim2.new(0, panelW, 0, curH)
+					}):Play()
+				end)
 			end
 		end)
 
@@ -6426,11 +6433,15 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		Sep.ZIndex = 502
 		Sep.Parent = Header
 
-		local RowsContainer = Instance.new("Frame")
+		local RowsContainer = Instance.new("ScrollingFrame")
 		RowsContainer.Name = "Rows"
 		RowsContainer.BackgroundTransparency = 1
-		RowsContainer.Size = UDim2.new(1, 0, 0, 0)
-		RowsContainer.AutomaticSize = Enum.AutomaticSize.Y
+		RowsContainer.Size = UDim2.new(1, 0, 1, -(gsHeaderH + 2))
+		RowsContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+		RowsContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		RowsContainer.ScrollBarThickness = 3
+		RowsContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+		RowsContainer.ScrollBarImageTransparency = 0.4
 		RowsContainer.LayoutOrder = 2
 		RowsContainer.ZIndex = 501
 		RowsContainer.Parent = Panel
