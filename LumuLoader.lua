@@ -158,7 +158,7 @@ local auto = Main:AddLabel({ Title = "Auto count 10", Description = "counts by i
 auto:SetCountdown(10, { Where = "badge", Suffix = "s" })
 local loop = Main:AddLabel({ Title = "Looping timer", Description = "restarts by itself", Icon = "Trophy1", Status = "waiting" })
 local function startLoop()
-	loop:SetCountdown(10, { Where = "badge", Suffix = "s", OnDone = function() task.wait(1) startLoop() end })
+	loop:SetCountdown(10, { Where = "badge", Suffix = "s", OnDone = function() task.wait(1); startLoop() end })
 end
 startLoop()
 
@@ -173,7 +173,7 @@ Tests:AddButton({ Title = "Restart timers", Icon = "Trophy1", Callback = functio
 end})
 Tests:AddButton({ Title = "Reset loop", Icon = "Trophy1", Callback = function() startLoop() end })
 Tests:AddButton({ Title = "Timer UP", Icon = "Trophy1", Callback = function() t2:SetCountdown(0, "up") end })
-Tests:AddButton({ Title = "Stop timers", Icon = "Close", Callback = function() t1:StopCountdown() t2:StopCountdown() end })
+Tests:AddButton({ Title = "Stop timers", Icon = "Close", Callback = function() t1:StopCountdown(); t2:StopCountdown() end })
 
 -- notifications: black cards, coloured icon/border/countdown/progress
 Tests:AddButton({ Title = "Notify green", Icon = "Checkmark", Callback = function()

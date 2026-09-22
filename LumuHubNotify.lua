@@ -391,7 +391,7 @@ function Notify:Send(config)
 		task.delay(0.24, function()
 			pcall(function() card:Destroy() end)
 			for i, e in ipairs(live) do
-				if e == entry then table.remove(live, i) break end
+				if e == entry then table.remove(live, i); break end
 			end
 		end)
 	end

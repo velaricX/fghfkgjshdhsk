@@ -327,7 +327,7 @@ local function makeElementDraggable(guiObject, dragHandle)
 			-- abort mid-press if the status panel grabbed after us
 			local okS, sT = pcall(function() return guiObject:GetAttribute("StatusDragT") end)
 			local okM, mT = pcall(function() return guiObject:GetAttribute("MainDragT") end)
-			if okS and okM and sT and mT and sT > mT then dragging = false return end
+			if okS and okM and sT and mT and sT > mT then dragging = false; return end
 			update(input)
 		end
 	end)
@@ -3634,7 +3634,7 @@ function Astral:MakeWindow(config)
 				for s in pairs(selectedOptions) do
 					local stillThere = false
 					for _, opt in ipairs(options) do
-						if tostring(opt) == s then stillThere = true break end
+						if tostring(opt) == s then stillThere = true; break end
 					end
 					if not stillThere then selectedOptions[s] = nil end
 				end
@@ -5048,7 +5048,7 @@ function Astral:MakeWindow(config)
 			-- icon-only mode: every button has no title -> big square tiles
 			local iconOnlyMode = #items > 0
 			for _, it in ipairs(items) do
-				if it and it.Title and it.Title ~= "" then iconOnlyMode = false break end
+				if it and it.Title and it.Title ~= "" then iconOnlyMode = false; break end
 			end
 
 			local pad = IsMobile and 6 or 10
@@ -6416,7 +6416,9 @@ function Astral:MakeWindow(config)
 		MinBtnCorner.CornerRadius = UDim.new(0, 5)
 		MinBtnCorner.Parent = MinBtn
 
+		local RowsContainer
 		local function resizePanel(animate)
+			if not RowsContainer then return end
 			local rowsH = RowsContainer.CanvasSize.Y.Offset + 14
 			local contentH = gsHeaderH + rowsH
 			local targetH = math.min(contentH, gsMaxPanelH)
