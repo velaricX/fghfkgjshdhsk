@@ -472,7 +472,6 @@ local Status = Window:AddGameStatus({
   Width = 232,                    -- optional panel width in px
   Position = UDim2.new(0, 20, 0, 130), -- optional start position
   Enabled = true,                 -- start shown (default true)
-  Beta = true,                    -- shows the BETA pill (default true)
   Width = 268,                    -- optional panel width (default 268)
   RowHeight = 28,                 -- optional row height (default 28)
   Rows = {                        -- optional starting rows
@@ -529,7 +528,7 @@ Status:Destroy()
 ```
 
 Look:
-- Header icon + the BETA pill follow the accent colour (`Window:SetAccent()`).
+- Header icon follows the accent colour (`Window:SetAccent()`).
 - The panel has a soft vertical gradient and rows get a rounded hover highlight.
 - The header has fully rounded corners; the `-` button (top-right) shrinks the
   panel to a header-only pill, `+` expands it back. The panel auto-sizes to its

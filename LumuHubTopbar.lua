@@ -6503,7 +6503,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		end
 
 	-- =========================================================================
-	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	-- GAME STATUS -- small draggable overlay panel outside the window
 	--   local S = Window:AddGameStatus({ Title = "Game Status" })
 	--   S:Set("Server Uptime", "56h")
 	--   S:Countdown("Next Boss", 300)            -- 5m 0s -> 0s
@@ -6511,14 +6511,14 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 	--   S:Countdown("Uptime", 56*3600, "up")
 	-- =========================================================================
 	-- =========================================================================
-	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	-- GAME STATUS -- small draggable overlay panel outside the window
 	--   local S = Window:AddGameStatus({ Title = "Game Status" })
 	--   S:Set("Server Uptime", "56h")
 	--   S:SetRow("Next Boss", { Value = "5m", Icon = "timer", Color = "gold" })
 	--   S:Countdown("Next Full Moon", 1380)
 	-- =========================================================================
 	-- =========================================================================
-	-- GAME STATUS  (BETA) -- small draggable overlay panel outside the window
+	-- GAME STATUS -- small draggable overlay panel outside the window
 	--   local S = Window:AddGameStatus({ Title = "Game Status" })
 	--   S:Set("Server Uptime", "56h")
 	--   S:SetRow("Next Boss", { Value = "5m", Icon = "timer", Color = "gold" })
@@ -6530,8 +6530,6 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		local icon = parseIcon(config.Icon or "timer")
 		local panelW = tonumber(config.Width) or (IsMobile and 170 or 276)
 		local rowH = tonumber(config.RowHeight) or (IsMobile and 24 or 30)
-		local showBeta = config.Beta
-		if showBeta == nil then showBeta = true end
 		local enabled = config.Enabled
 		if enabled == nil then enabled = true end
 		local rows = {}
@@ -6639,44 +6637,6 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		TitleLabel.ZIndex = 502
 		TitleLabel.Parent = Header
 
-		if showBeta then
-			local BetaPill = Instance.new("Frame")
-			BetaPill.Name = "Beta"
-			BetaPill.BackgroundColor3 = Color3.fromRGB(34, 30, 14)
-			BetaPill.BorderSizePixel = 0
-			BetaPill.AnchorPoint = Vector2.new(1, 0.5)
-			BetaPill.Position = UDim2.new(1, -12, 0.5, 0)
-			BetaPill.Size = UDim2.new(0, 46, 0, 18)
-			BetaPill.ZIndex = 502
-			BetaPill.Parent = Header
-
-			local BetaCorner = Instance.new("UICorner")
-			BetaCorner.CornerRadius = UDim.new(0, 5)
-			BetaCorner.Parent = BetaPill
-
-			local BetaStroke = Instance.new("UIStroke")
-			BetaStroke.Color = AccentColor
-			BetaStroke.Thickness = 1
-			BetaStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			BetaStroke.Parent = BetaPill
-
-			local BetaText = Instance.new("TextLabel")
-			BetaText.Name = "Label"
-			BetaText.BackgroundTransparency = 1
-			BetaText.Size = UDim2.new(1, 0, 1, 0)
-			BetaText.Font = Enum.Font.GothamBold
-			BetaText.Text = "BETA"
-			BetaText.TextSize = 10
-			BetaText.TextColor3 = AccentColor
-			BetaText.ZIndex = 503
-			BetaText.Parent = BetaPill
-
-			onAccentChange(function(c)
-				BetaText.TextColor3 = c
-				BetaStroke.Color = c
-			end)
-		end
-
 		-- Minimize/Expand "-" button
 		local gsMinimized = false
 		local MinBtn = Instance.new("TextButton")
@@ -6684,7 +6644,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
 		MinBtn.Size = UDim2.new(0, IsMobile and 22 or 26, 0, IsMobile and 22 or 26)
 		MinBtn.AnchorPoint = Vector2.new(1, 0.5)
-		MinBtn.Position = showBeta and UDim2.new(1, -64, 0.5, 0) or UDim2.new(1, -10, 0.5, 0)
+		MinBtn.Position = UDim2.new(1, -10, 0.5, 0)
 		MinBtn.Text = "-"
 		MinBtn.TextColor3 = Color3.fromRGB(180, 180, 185)
 		MinBtn.Font = Enum.Font.GothamBold
@@ -6718,11 +6678,13 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			gsMinimized = not gsMinimized
 			if gsMinimized then
 				MinBtn.Text = "+"
+				RowsContainer.Visible = false
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, gsHeaderH)
 				}):Play()
 			else
 				MinBtn.Text = "-"
+				RowsContainer.Visible = true
 				resizePanel(true)
 			end
 		end)
