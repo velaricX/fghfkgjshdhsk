@@ -6629,24 +6629,8 @@ function Astral:MakeWindow(config)
 		Header.Active = true
 		Header.Parent = Panel
 
-		local HeaderCorner = Instance.new("UICorner")
-		HeaderCorner.CornerRadius = UDim.new(0, gsCornerR)
-		HeaderCorner.Parent = Header
-
-		-- Square cover over the header's bottom rounded corners while
-		-- expanded, so the header flows into the rows. Hidden when the
-		-- panel is header-only so the pill keeps perfect round corners.
-		local HeaderBottomCover = Instance.new("Frame")
-		HeaderBottomCover.Name = "BottomCover"
-		HeaderBottomCover.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
-		HeaderBottomCover.BackgroundTransparency = 0.35
-		HeaderBottomCover.BorderSizePixel = 0
-		HeaderBottomCover.Size = UDim2.new(1, 0, 0, gsCornerR)
-		HeaderBottomCover.Position = UDim2.new(0, 0, 1, -gsCornerR)
-		HeaderBottomCover.ZIndex = 501
-		HeaderBottomCover.Visible = false
-		HeaderBottomCover.Parent = Header
-
+		-- NOTE: no UICorner on the header on purpose. The panel clips children
+		-- to its own rounded shape, so header corners are always perfect.
 		local HeaderIcon = Instance.new("ImageLabel")
 		HeaderIcon.Name = "Icon"
 		HeaderIcon.BackgroundTransparency = 1
@@ -6734,13 +6718,13 @@ function Astral:MakeWindow(config)
 		MinBtnCorner.Parent = MinBtn
 
 		local RowsContainer
+		local RowsLayout
 		local function resizePanel(animate)
-			if not RowsContainer then return end
-			local rowsH = RowsContainer.CanvasSize.Y.Offset + 14
+			if not RowsContainer or not RowsLayout then return end
+			local rowsH = RowsLayout.AbsoluteContentSize.Y + 14
 			local contentH = gsHeaderH + rowsH
 			local targetH = math.min(contentH, gsMaxPanelH)
 			targetH = math.max(targetH, gsHeaderH)
-			HeaderBottomCover.Visible = (targetH > gsHeaderH + 1)
 			if animate then
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, targetH)
@@ -6754,7 +6738,6 @@ function Astral:MakeWindow(config)
 			gsMinimized = not gsMinimized
 			if gsMinimized then
 				MinBtn.Text = "+"
-				HeaderBottomCover.Visible = false
 				TweenService:Create(Panel, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 					Size = UDim2.new(0, panelW, 0, gsHeaderH)
 				}):Play()
@@ -6795,7 +6778,7 @@ function Astral:MakeWindow(config)
 		RowsContainer.ZIndex = 501
 		RowsContainer.Parent = Panel
 
-		local RowsLayout = Instance.new("UIListLayout")
+		RowsLayout = Instance.new("UIListLayout")
 		RowsLayout.FillDirection = Enum.FillDirection.Vertical
 		RowsLayout.SortOrder = Enum.SortOrder.LayoutOrder
 		RowsLayout.Padding = UDim.new(0, 3)
@@ -6807,6 +6790,13 @@ function Astral:MakeWindow(config)
 		RowsPad.PaddingTop = UDim.new(0, 7)
 		RowsPad.PaddingBottom = UDim.new(0, 12)
 		RowsPad.Parent = RowsContainer
+
+		-- Auto-fit the panel whenever rows change. AbsoluteContentSize only
+		-- updates after layout runs, so this also fixes initial sizing where
+		-- a synchronous read still sees 0.
+		RowsLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			if not gsMinimized then resizePanel(false) end
+		end)
 
 		local ICON_GAP = 25
 
@@ -6963,7 +6953,7 @@ function Astral:MakeWindow(config)
 			end
 			row.token = (row.token or 0) + 1
 			applyRow(row, opts)
-			if not gsMinimized then resizePanel(true) end
+			if not gsMinimized then task.defer(function() resizePanel(false) end) end
 
 		return GameStatus
 		end
@@ -6998,7 +6988,7 @@ function Astral:MakeWindow(config)
 			name = tostring(name)
 			local r = rows[name]
 			if r then pcall(function() r.Frame:Destroy() end); rows[name] = nil end
-			if not gsMinimized then task.defer(function() resizePanel(true) end) end
+			if not gsMinimized then task.defer(function() resizePanel(false) end) end
 
 		return GameStatus
 		end
@@ -7006,7 +6996,7 @@ function Astral:MakeWindow(config)
 		function GameStatus:Clear()
 			for _, r in pairs(rows) do pcall(function() r.Frame:Destroy() end) end
 			rows = {}
-			if not gsMinimized then task.defer(function() resizePanel(true) end) end
+			if not gsMinimized then task.defer(function() resizePanel(false) end) end
 
 		return GameStatus
 		end
