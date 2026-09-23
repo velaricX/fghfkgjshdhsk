@@ -3869,9 +3869,9 @@ function Astral:MakeWindow(config)
 		-- =========================================================================
 		-- AUTO TRANSLATIONS (Google-powered language selector)
 		-- A normal selector pre-filled with every Google Translate language.
-		-- Picking one machine-translates every registered UI string via
-		-- Google's free endpoint (no API key, source language auto-detected)
-		-- and applies it live.
+		-- Picking one machine-translates every registered UI string through
+		-- free endpoints (Google batch, Google batchexecute, then MyMemory -
+		-- no API keys, source language auto-detected) and applies it live.
 		-- Manual Astral:AddTranslations() packs are separate and untouched;
 		-- auto-fill only adds keys missing from that language (manual wins).
 		-- Usage: tab:AddAutoTranslations({ Title = "Language", Icon = "Badge Gear" })
@@ -3942,7 +3942,68 @@ function Astral:MakeWindow(config)
 						end
 						task.wait(0.1)
 					end
-					-- Pass 2: MyMemory (free, no key) for anything Google missed.
+					-- Pass 2: translate.google.com batchexecute (POST + consent
+					-- cookie, the method working chat-translator scripts use).
+					do
+						local reqFn = (typeof(request) == "function" and request)
+							or (typeof(http_request) == "function" and http_request)
+							or (syn and type(syn.request) == "function" and syn.request)
+							or nil
+						if reqFn then
+							local function rpc(opts)
+								local okR, r = pcall(function() return reqFn(opts) end)
+								if not okR then return nil end
+								if type(r) == "table" then return r.Body or r.body end
+								if type(r) == "string" then return r end
+								return nil
+							end
+							local googlev = ""
+							local function consentOf(body)
+								if type(body) ~= "string" then return end
+								if string.find(body, "https://consent.google.com/s", 1, true) then
+									for k, v in string.gmatch(body, '<input type="hidden" name="(.-)" value="(.-)">') do
+										if k == "v" then googlev = v end
+									end
+								end
+							end
+							local rootBody = rpc({Url = "https://translate.google.com/", Method = "GET", Headers = {cookie = "CONSENT=YES+" .. googlev}})
+							consentOf(rootBody)
+							if type(rootBody) == "string" and string.find(rootBody, "https://consent.google.com/s", 1, true) then
+								rootBody = rpc({Url = "https://translate.google.com/", Method = "GET", Headers = {cookie = "CONSENT=YES+" .. googlev}})
+							end
+							local fsid, bl
+							if type(rootBody) == "string" then
+								fsid = string.match(rootBody, '"FdrFJe":"(.-)"')
+								bl = string.match(rootBody, '"cfb2h":"(.-)"')
+							end
+							if type(fsid) == "string" and fsid ~= "" and type(bl) == "string" and bl ~= "" then
+								local reqid = math.random(1000, 9999)
+								for _, k in ipairs(keys) do
+									if dict[k] == nil then
+										reqid = reqid + 10000
+										local okT, txt = pcall(function()
+											local data = {{{k, "auto", code, true}, {nil}}}
+											local freq = {{{"MkEWBc", HttpService:JSONEncode(data), nil, "generic"}}}
+											local q = "rpcids=MkEWBc&f.sid=" .. HttpService:UrlEncode(fsid) .. "&bl=" .. HttpService:UrlEncode(bl) .. "&hl=en&_reqid=" .. tostring(reqid - 10000) .. "&rt=c"
+											local postBody = "f.req=" .. HttpService:UrlEncode(HttpService:JSONEncode(freq))
+											local b = rpc({Url = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute?" .. q, Method = "POST", Headers = {cookie = "CONSENT=YES+" .. googlev, ["Content-Type"] = "application/x-www-form-urlencoded"}, Body = postBody})
+											if type(b) ~= "string" then return nil end
+											consentOf(b)
+											local line = string.match(b, "(%[.-%])\n")
+											if not line then return nil end
+											local outer = HttpService:JSONDecode(line)
+											local innerRaw = outer[1][3]
+											local td = HttpService:JSONDecode(innerRaw)
+											return td[2][1][1][6][1][1]
+										end)
+										if okT and type(txt) == "string" and txt ~= "" then dict[k] = txt end
+										task.wait(0.1)
+									end
+								end
+							end
+						end
+					end
+					-- Pass 3: MyMemory (free, no key) for anything still missing.
 					do
 						local tgt = code
 						if tgt == "zh-cn" then tgt = "zh-CN" end
