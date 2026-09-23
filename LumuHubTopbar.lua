@@ -988,6 +988,81 @@ function Astral:MakeWindow(config)
 	if IsMobile then DecoArrows.Visible = false end
 	DecoArrows.Parent = HeaderLayoutContainer
 
+	-- Global element search: right side of the header, outside the title flow.
+	-- Filters the current tab's elements by name as you type.
+	local headerSearchQuery = ""
+	local function applyHeaderSearch()
+		local tab = currentTab
+		if not tab or not tab.Elements then return end
+		local q = string.lower(string.match(headerSearchQuery, "^%s*(.-)%s*$") or "")
+		for _, item in ipairs(tab.Elements) do
+			local fr = item.Frame
+			if fr then
+				pcall(function()
+					if q == "" then
+						fr.Visible = true
+					else
+						fr.Visible = (string.find(string.lower(fr.Name or ""), q, 1, true) ~= nil)
+					end
+				end)
+			end
+		end
+	end
+
+	local HeaderSearch = Instance.new("Frame")
+	HeaderSearch.Name = "HeaderSearch"
+	HeaderSearch.AnchorPoint = Vector2.new(1, 0.5)
+	HeaderSearch.Position = UDim2.new(1, -12, 0.5, 0)
+	HeaderSearch.Size = UDim2.new(0, IsMobile and 130 or 200, 0, 30)
+	HeaderSearch.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+	HeaderSearch.BorderSizePixel = 0
+	HeaderSearch.ZIndex = 5
+	HeaderSearch.Parent = TopBar
+
+	local HeaderSearchCorner = Instance.new("UICorner")
+	HeaderSearchCorner.CornerRadius = UDim.new(0, 8)
+	HeaderSearchCorner.Parent = HeaderSearch
+
+	local HeaderSearchStroke = Instance.new("UIStroke")
+	HeaderSearchStroke.Color = Color3.fromRGB(50, 50, 55)
+	HeaderSearchStroke.Thickness = 1
+	HeaderSearchStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	HeaderSearchStroke.Parent = HeaderSearch
+
+	local HeaderSearchIcon = Instance.new("ImageLabel")
+	HeaderSearchIcon.Name = "SearchIcon"
+	HeaderSearchIcon.BackgroundTransparency = 1
+	HeaderSearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+	HeaderSearchIcon.Position = UDim2.new(0, 8, 0.5, 0)
+	HeaderSearchIcon.Size = UDim2.new(0, 16, 0, 16)
+	HeaderSearchIcon.Image = Astral.Icons.search
+	HeaderSearchIcon.ImageColor3 = Color3.fromRGB(140, 140, 145)
+	HeaderSearchIcon.ScaleType = Enum.ScaleType.Fit
+	HeaderSearchIcon.ZIndex = 6
+	HeaderSearchIcon.Parent = HeaderSearch
+
+	local HeaderSearchBox = Instance.new("TextBox")
+	HeaderSearchBox.Name = "SearchBox"
+	HeaderSearchBox.BackgroundTransparency = 1
+	HeaderSearchBox.Position = UDim2.new(0, 30, 0, 0)
+	HeaderSearchBox.Size = UDim2.new(1, -36, 1, 0)
+	HeaderSearchBox.Font = Enum.Font.Gotham
+	HeaderSearchBox.Text = ""
+	HeaderSearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+	HeaderSearchBox.TextSize = 13
+	HeaderSearchBox.TextXAlignment = Enum.TextXAlignment.Left
+	HeaderSearchBox.ClearTextOnFocus = false
+	HeaderSearchBox.ZIndex = 6
+	HeaderSearchBox.Parent = HeaderSearch
+	mTS(HeaderSearchBox, 13)
+	tr(HeaderSearchBox, "Search...", "PlaceholderText")
+	HeaderSearchBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
+
+	HeaderSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+		headerSearchQuery = HeaderSearchBox.Text or ""
+		applyHeaderSearch()
+	end)
+
 	-- (no separator line above the tab bar - clean look)
 
 	-- =====================================================================
@@ -2253,6 +2328,7 @@ function Astral:MakeWindow(config)
 
 		local oldTab = currentTab
 		currentTab = targetTab
+		task.defer(function() pcall(applyHeaderSearch) end)
 
 		-- Update Tab Button Visuals
 		for _, tab in ipairs(tabs) do
