@@ -3910,6 +3910,7 @@ function Astral:MakeWindow(config)
 					addKey("Select..."); addKey("None"); addKey("Search...")
 					addKey("Select Option"); addKey("(+%d more)")
 					local dict = {}
+					-- Pass 1: Google, 20 keys per request (fast, auto-detects source).
 					local CHUNK = 20
 					for ci = 1, #keys, CHUNK do
 						local chunk = {}
@@ -3941,9 +3942,33 @@ function Astral:MakeWindow(config)
 						end
 						task.wait(0.1)
 					end
+					-- Pass 2: MyMemory (free, no key) for anything Google missed.
+					do
+						local tgt = code
+						if tgt == "zh-cn" then tgt = "zh-CN" end
+						if tgt == "zh-tw" then tgt = "zh-TW" end
+						for _, k in ipairs(keys) do
+							if dict[k] == nil then
+								local src = "en"
+								if string.find(k, "[\227-\239]") then src = "zh-CN" end
+								local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
+								if okE and type(enc) == "string" and enc ~= "" then
+									local resM = webGet("https://api.mymemory.translated.net/get?q=" .. enc .. "&langpair=" .. src .. "|" .. tgt)
+									if type(resM) == "string" and resM ~= "" then
+										local okM, jsM = pcall(function() return HttpService:JSONDecode(resM) end)
+										if okM and type(jsM) == "table" and jsM.responseStatus == 200 and type(jsM.responseData) == "table" then
+											local t = jsM.responseData.translatedText
+											if type(t) == "string" and t ~= "" then dict[k] = t end
+										end
+									end
+								end
+								task.wait(0.1)
+							end
+						end
+					end
 					if next(dict) == nil then
 						busy = false
-						Window:Notify({ Type = "bad", Title = "Translate failed", Message = "Google blocked the request. Try again later.", Duration = 6 })
+						Window:Notify({ Type = "bad", Title = "Translate failed", Message = "No translation server reachable. Try again later.", Duration = 6 })
 						return
 					end
 					Astral.Languages[langName] = Astral.Languages[langName] or {}
