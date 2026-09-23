@@ -800,6 +800,21 @@ function Astral:MakeWindow(config)
 		end
 	end
 
+	-- Kill orphaned LumuHub GUIs first (re-execute / design-switch leftovers).
+	-- gethui() is invisible to normal wipe code, so without this the old
+	-- GameStatus panel stays alive UNDER the new one and its gray edges
+	-- stick out at the corners.
+	pcall(function()
+		local parent = getGuiParent()
+		if parent then
+			for _, g in ipairs(parent:GetChildren()) do
+				if g:IsA("ScreenGui") and g.Name:match("^LumuHubMain") then
+					pcall(function() g:Destroy() end)
+				end
+			end
+		end
+	end)
+
 	-- Create ScreenGui
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = makeGuiName("LumuHubMain")
