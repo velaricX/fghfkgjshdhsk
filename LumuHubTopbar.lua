@@ -159,6 +159,18 @@ Astral:AddTranslations("Español", {
 	["Search..."] = "Buscar...",
 	["Select Option"] = "Seleccionar opción",
 	["(+%d more)"] = "(+%d más)",
+	["Online"] = "En línea",
+	["Members"] = "Miembros",
+	["Join Server"] = "Unirse al servidor",
+	["Opened!"] = "¡Abierto!",
+	["Invite copied"] = "Invitación copiada",
+	["is on your clipboard."] = "está en tu portapapeles.",
+	["CURRENT"] = "ACTUAL",
+	["NEW"] = "NUEVO",
+	["Apply"] = "Aplicar",
+	["Cancel"] = "Cancelar",
+	["Minimize"] = "Minimizar",
+	["Select Option"] = "Seleccionar opción",
 })
 Astral:AddTranslations("Français", {
 	["Settings"] = "Paramètres",
@@ -184,6 +196,18 @@ Astral:AddTranslations("Français", {
 	["Search..."] = "Rechercher...",
 	["Select Option"] = "Choisir une option",
 	["(+%d more)"] = "(+%d autres)",
+	["Online"] = "En ligne",
+	["Members"] = "Membres",
+	["Join Server"] = "Rejoindre le serveur",
+	["Opened!"] = "Ouvert !",
+	["Invite copied"] = "Invitation copiée",
+	["is on your clipboard."] = "est dans ton presse-papiers.",
+	["CURRENT"] = "ACTUEL",
+	["NEW"] = "NOUVEAU",
+	["Apply"] = "Appliquer",
+	["Cancel"] = "Annuler",
+	["Minimize"] = "Réduire",
+	["Select Option"] = "Choisir une option",
 })
 Astral:AddTranslations("Deutsch", {
 	["Settings"] = "Einstellungen",
@@ -209,119 +233,20 @@ Astral:AddTranslations("Deutsch", {
 	["Search..."] = "Suchen...",
 	["Select Option"] = "Option wählen",
 	["(+%d more)"] = "(+%d weitere)",
+	["Online"] = "Online",
+	["Members"] = "Mitglieder",
+	["Join Server"] = "Server beitreten",
+	["Opened!"] = "Geöffnet!",
+	["Invite copied"] = "Einladung kopiert",
+	["is on your clipboard."] = "ist in deiner Zwischenablage.",
+	["CURRENT"] = "AKTUELL",
+	["NEW"] = "NEU",
+	["Apply"] = "Anwenden",
+	["Cancel"] = "Abbrechen",
+	["Minimize"] = "Minimieren",
+	["Select Option"] = "Option wählen",
 })
 
--- Every language Google Translate supports. AddAutoTranslations() builds a
--- normal selector from this list; picking one machine-translates every
--- registered English string via Google's free endpoint (no API key needed).
-Astral.GoogleLanguages = {
-	{Name = "English", Code = "en"},
-	{Name = "Afrikaans", Code = "af"},
-	{Name = "Albanian", Code = "sq"},
-	{Name = "Amharic", Code = "am"},
-	{Name = "Arabic", Code = "ar"},
-	{Name = "Armenian", Code = "hy"},
-	{Name = "Azerbaijani", Code = "az"},
-	{Name = "Basque", Code = "eu"},
-	{Name = "Belarusian", Code = "be"},
-	{Name = "Bengali", Code = "bn"},
-	{Name = "Bosnian", Code = "bs"},
-	{Name = "Bulgarian", Code = "bg"},
-	{Name = "Catalan", Code = "ca"},
-	{Name = "Cebuano", Code = "ceb"},
-	{Name = "Chichewa", Code = "ny"},
-	{Name = "Chinese (Simplified)", Code = "zh-cn"},
-	{Name = "Chinese (Traditional)", Code = "zh-tw"},
-	{Name = "Corsican", Code = "co"},
-	{Name = "Croatian", Code = "hr"},
-	{Name = "Czech", Code = "cs"},
-	{Name = "Danish", Code = "da"},
-	{Name = "Deutsch", Code = "de"},
-	{Name = "Dutch", Code = "nl"},
-	{Name = "Esperanto", Code = "eo"},
-	{Name = "Estonian", Code = "et"},
-	{Name = "Filipino", Code = "tl"},
-	{Name = "Finnish", Code = "fi"},
-	{Name = "Français", Code = "fr"},
-	{Name = "Frisian", Code = "fy"},
-	{Name = "Galician", Code = "gl"},
-	{Name = "Georgian", Code = "ka"},
-	{Name = "Greek", Code = "el"},
-	{Name = "Gujarati", Code = "gu"},
-	{Name = "Haitian Creole", Code = "ht"},
-	{Name = "Hausa", Code = "ha"},
-	{Name = "Hawaiian", Code = "haw"},
-	{Name = "Hebrew", Code = "he"},
-	{Name = "Hindi", Code = "hi"},
-	{Name = "Hmong", Code = "hmn"},
-	{Name = "Hungarian", Code = "hu"},
-	{Name = "Icelandic", Code = "is"},
-	{Name = "Igbo", Code = "ig"},
-	{Name = "Indonesian", Code = "id"},
-	{Name = "Irish", Code = "ga"},
-	{Name = "Italian", Code = "it"},
-	{Name = "Japanese", Code = "ja"},
-	{Name = "Javanese", Code = "jv"},
-	{Name = "Kannada", Code = "kn"},
-	{Name = "Kazakh", Code = "kk"},
-	{Name = "Khmer", Code = "km"},
-	{Name = "Korean", Code = "ko"},
-	{Name = "Kurdish", Code = "ku"},
-	{Name = "Kyrgyz", Code = "ky"},
-	{Name = "Lao", Code = "lo"},
-	{Name = "Latin", Code = "la"},
-	{Name = "Latvian", Code = "lv"},
-	{Name = "Lithuanian", Code = "lt"},
-	{Name = "Luxembourgish", Code = "lb"},
-	{Name = "Macedonian", Code = "mk"},
-	{Name = "Malagasy", Code = "mg"},
-	{Name = "Malay", Code = "ms"},
-	{Name = "Malayalam", Code = "ml"},
-	{Name = "Maltese", Code = "mt"},
-	{Name = "Maori", Code = "mi"},
-	{Name = "Marathi", Code = "mr"},
-	{Name = "Mongolian", Code = "mn"},
-	{Name = "Myanmar", Code = "my"},
-	{Name = "Nepali", Code = "ne"},
-	{Name = "Norwegian", Code = "no"},
-	{Name = "Odia", Code = "or"},
-	{Name = "Pashto", Code = "ps"},
-	{Name = "Persian", Code = "fa"},
-	{Name = "Polish", Code = "pl"},
-	{Name = "Portuguese", Code = "pt"},
-	{Name = "Punjabi", Code = "pa"},
-	{Name = "Romanian", Code = "ro"},
-	{Name = "Russian", Code = "ru"},
-	{Name = "Samoan", Code = "sm"},
-	{Name = "Scots Gaelic", Code = "gd"},
-	{Name = "Serbian", Code = "sr"},
-	{Name = "Sesotho", Code = "st"},
-	{Name = "Shona", Code = "sn"},
-	{Name = "Sindhi", Code = "sd"},
-	{Name = "Sinhala", Code = "si"},
-	{Name = "Slovak", Code = "sk"},
-	{Name = "Slovenian", Code = "sl"},
-	{Name = "Somali", Code = "so"},
-	{Name = "Español", Code = "es"},
-	{Name = "Sundanese", Code = "su"},
-	{Name = "Swahili", Code = "sw"},
-	{Name = "Swedish", Code = "sv"},
-	{Name = "Tajik", Code = "tg"},
-	{Name = "Tamil", Code = "ta"},
-	{Name = "Telugu", Code = "te"},
-	{Name = "Thai", Code = "th"},
-	{Name = "Turkish", Code = "tr"},
-	{Name = "Ukrainian", Code = "uk"},
-	{Name = "Urdu", Code = "ur"},
-	{Name = "Uyghur", Code = "ug"},
-	{Name = "Uzbek", Code = "uz"},
-	{Name = "Vietnamese", Code = "vi"},
-	{Name = "Welsh", Code = "cy"},
-	{Name = "Xhosa", Code = "xh"},
-	{Name = "Yiddish", Code = "yi"},
-	{Name = "Yoruba", Code = "yo"},
-	{Name = "Zulu", Code = "zu"},
-}
 
 -- Comprehensive Icon Dictionary
 Astral.Icons = {
@@ -1496,7 +1421,7 @@ function Astral:MakeWindow(config)
 	CurrentLabel.Size = UDim2.new(1, 0, 1, 0)
 	CurrentLabel.BackgroundTransparency = 1
 	CurrentLabel.Font = Enum.Font.GothamBold
-	CurrentLabel.Text = "CURRENT"
+	tr(CurrentLabel, "CURRENT")
 	CurrentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	CurrentLabel.			TextSize = 11
 	CurrentLabel.ZIndex = 204
@@ -1518,7 +1443,7 @@ function Astral:MakeWindow(config)
 	NewLabel.Size = UDim2.new(1, 0, 1, 0)
 	NewLabel.BackgroundTransparency = 1
 	NewLabel.Font = Enum.Font.GothamBold
-	NewLabel.Text = "NEW"
+	tr(NewLabel, "NEW")
 	NewLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	NewLabel.			TextSize = 11
 	NewLabel.ZIndex = 204
@@ -1701,7 +1626,7 @@ function Astral:MakeWindow(config)
 	ApplyButton.Position = UDim2.new(0, 12, 1, -buttonHeight - buttonHeight - padding - 8)
 	ApplyButton.BackgroundColor3 = AccentColor
 	ApplyButton.Font = Enum.Font.GothamBold
-	ApplyButton.Text = "Apply"
+	tr(ApplyButton, "Apply")
 			ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 	ApplyButton.			TextSize = 14
 	ApplyButton.ZIndex = 203
@@ -1722,7 +1647,7 @@ function Astral:MakeWindow(config)
 	CancelButton.Position = UDim2.new(0, 12, 1, -buttonHeight - 8)
 		CancelButton.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 	CancelButton.Font = Enum.Font.GothamBold
-	CancelButton.Text = "Cancel"
+	tr(CancelButton, "Cancel")
 	CancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 	CancelButton.			TextSize = 14
 	CancelButton.ZIndex = 203
@@ -1978,7 +1903,7 @@ function Astral:MakeWindow(config)
 	SelectorPanelTitle.Position = UDim2.new(0, 8, 0, 6) -- FIXED: Moved slightly left and higher
 	SelectorPanelTitle.BackgroundTransparency = 1
 	SelectorPanelTitle.Font = Enum.Font.GothamBold
-	SelectorPanelTitle.Text = "Select Option"
+	tr(SelectorPanelTitle, "Select Option")
 	SelectorPanelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 	mTS(SelectorPanelTitle, 14)
 	SelectorPanelTitle.ZIndex = 202
@@ -2125,8 +2050,11 @@ function Astral:MakeWindow(config)
 
 			for _, option in ipairs(options) do
 				local optionStr = tostring(option)
-				if filter and filter ~= "" and not string.find(string.lower(optionStr), string.lower(filter), 1, true) then
-					continue
+				if filter and filter ~= "" then
+					local f = string.lower(filter)
+					local hit = string.find(string.lower(optionStr), f, 1, true)
+					if not hit then hit = string.find(string.lower(translateText(optionStr)), f, 1, true) end
+					if not hit then continue end
 				end
 
 				local isSelected = false
@@ -2200,7 +2128,7 @@ function Astral:MakeWindow(config)
 				OptionLabel.Size = UDim2.new(1, -26, 1, 0)
 				OptionLabel.BackgroundTransparency = 1
 				OptionLabel.Font = Enum.Font.GothamBold
-				OptionLabel.Text = optionStr
+				OptionLabel.Text = translateText(optionStr)
 				OptionLabel.TextColor3 = isSelected and AccentColor or Color3.fromRGB(232, 232, 237)
 				mTS(OptionLabel, 12)
 				OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -2224,7 +2152,9 @@ function Astral:MakeWindow(config)
 									table.insert(selectedList, optStr)
 								end
 							end
-						local newText = #selectedList > 0 and table.concat(selectedList, ", ") or translateText("None")
+						local dispList = {}
+						for _, s in ipairs(selectedList) do table.insert(dispList, translateText(s)) end
+						local newText = #dispList > 0 and table.concat(dispList, ", ") or translateText("None")
 						buttonTextLabel.Text = newText
 						SelectorPanelTitle.Text = #selectedList > 0 and (translateText(title) .. " (" .. #selectedList .. ")") or translateText(title)
 							if callback then
@@ -2232,7 +2162,7 @@ function Astral:MakeWindow(config)
 							end
 							populate(SearchInput.Text)
 						else
-							buttonTextLabel.Text = optionStr
+							buttonTextLabel.Text = translateText(optionStr)
 							if callback then
 								task.spawn(callback, option)
 							end
@@ -3904,14 +3834,16 @@ function Astral:MakeWindow(config)
 
 			local function updateValueLabel()
 				local list = selectedList()
+				local disp = {}
+				for _, s in ipairs(list) do table.insert(disp, translateText(s)) end
 				if #list == 0 then
 					ValueLabel.Text = translateText("Select...")
 					ValueLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				elseif #list > 2 then
-					ValueLabel.Text = string.format("%s, %s " .. translateText("(+%d more)"), list[1], list[2], #list - 2)
+					ValueLabel.Text = string.format("%s, %s " .. translateText("(+%d more)"), disp[1], disp[2], #list - 2)
 					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				else
-					ValueLabel.Text = table.concat(list, ", ")
+					ValueLabel.Text = table.concat(disp, ", ")
 					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				end
 				if multi then
@@ -4049,197 +3981,6 @@ function Astral:MakeWindow(config)
 
 			return SelectorController
 		end
-		-- =========================================================================
-		-- AUTO TRANSLATIONS (Google-powered language selector)
-		-- A normal selector pre-filled with every Google Translate language.
-		-- Picking one machine-translates every registered UI string through
-		-- free endpoints (Google batch, Google batchexecute, then MyMemory -
-		-- no API keys, source language auto-detected) and applies it live.
-		-- Manual Astral:AddTranslations() packs are separate and untouched;
-		-- auto-fill only adds keys missing from that language (manual wins).
-		-- Usage: tab:AddAutoTranslations({ Title = "Language", Icon = "Badge Gear" })
-		-- =========================================================================
-		function TabObject:AddAutoTranslations(config)
-			config = config or {}
-			local names = {}
-			local codeByName = {}
-			for _, lang in ipairs(Astral.GoogleLanguages or {}) do
-				if type(lang.Name) == "string" and type(lang.Code) == "string" then
-					table.insert(names, lang.Name)
-					codeByName[lang.Name] = lang.Code
-				end
-			end
-			local busy = false
-			local function applyGoogleLanguage(pick)
-				local langName = tostring(pick or "")
-				local code = codeByName[langName]
-				if code == nil or code == "" or busy then return end
-				if code == "en" then
-					Astral:SetLanguage("English")
-					task.spawn(config.Callback or function() end, langName)
-					return
-				end
-				busy = true
-				Window:Notify({ Type = "info", Title = "Translating", Message = "Fetching " .. langName .. "...", Duration = 5 })
-				task.spawn(function()
-					local seen, keys = {}, {}
-					local function addKey(k)
-						if type(k) == "string" and k ~= "" and not seen[k] then
-							seen[k] = true
-							table.insert(keys, k)
-						end
-					end
-					for _, item in ipairs(translatableLabels) do addKey(item.Key) end
-					addKey("Select..."); addKey("None"); addKey("Search...")
-					addKey("Select Option"); addKey("(+%d more)")
-					local dict = {}
-					-- Pass 1: Google, 20 keys per request (fast, auto-detects source).
-					local CHUNK = 20
-					for ci = 1, #keys, CHUNK do
-						local chunk = {}
-						for i = ci, math.min(ci + CHUNK - 1, #keys) do
-							table.insert(chunk, keys[i])
-						end
-						local url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" .. code .. "&dt=t"
-						for _, k in ipairs(chunk) do
-							local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
-							url = url .. "&q=" .. ((okE and enc) or k)
-						end
-						local res = webGet(url)
-						if type(res) == "string" and res ~= "" then
-							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
-							if ok2 and type(js) == "table" then
-								for i, k in ipairs(chunk) do
-									local block = js[i]
-									if type(block) == "table" then
-										local parts = {}
-										for _, seg in ipairs(block) do
-											if type(seg) == "table" and type(seg[1]) == "string" then
-												table.insert(parts, seg[1])
-											end
-										end
-										if #parts > 0 then dict[k] = table.concat(parts) end
-									end
-								end
-							end
-						end
-						task.wait(0.1)
-					end
-					-- Pass 2: translate.google.com batchexecute (POST + consent
-					-- cookie, the method working chat-translator scripts use).
-					do
-						local reqFn = (typeof(request) == "function" and request)
-							or (typeof(http_request) == "function" and http_request)
-							or (syn and type(syn.request) == "function" and syn.request)
-							or nil
-						if reqFn then
-							local function rpc(opts)
-								local okR, r = pcall(function() return reqFn(opts) end)
-								if not okR then return nil end
-								if type(r) == "table" then return r.Body or r.body end
-								if type(r) == "string" then return r end
-								return nil
-							end
-							local googlev = ""
-							local function consentOf(body)
-								if type(body) ~= "string" then return end
-								if string.find(body, "https://consent.google.com/s", 1, true) then
-									for k, v in string.gmatch(body, '<input type="hidden" name="(.-)" value="(.-)">') do
-										if k == "v" then googlev = v end
-									end
-								end
-							end
-							local rootBody = rpc({Url = "https://translate.google.com/", Method = "GET", Headers = {cookie = "CONSENT=YES+" .. googlev}})
-							consentOf(rootBody)
-							if type(rootBody) == "string" and string.find(rootBody, "https://consent.google.com/s", 1, true) then
-								rootBody = rpc({Url = "https://translate.google.com/", Method = "GET", Headers = {cookie = "CONSENT=YES+" .. googlev}})
-							end
-							local fsid, bl
-							if type(rootBody) == "string" then
-								fsid = string.match(rootBody, '"FdrFJe":"(.-)"')
-								bl = string.match(rootBody, '"cfb2h":"(.-)"')
-							end
-							if type(fsid) == "string" and fsid ~= "" and type(bl) == "string" and bl ~= "" then
-								local reqid = math.random(1000, 9999)
-								for _, k in ipairs(keys) do
-									if dict[k] == nil then
-										reqid = reqid + 10000
-										local okT, txt = pcall(function()
-											local data = {{{k, "auto", code, true}, {nil}}}
-											local freq = {{{"MkEWBc", HttpService:JSONEncode(data), nil, "generic"}}}
-											local q = "rpcids=MkEWBc&f.sid=" .. HttpService:UrlEncode(fsid) .. "&bl=" .. HttpService:UrlEncode(bl) .. "&hl=en&_reqid=" .. tostring(reqid - 10000) .. "&rt=c"
-											local postBody = "f.req=" .. HttpService:UrlEncode(HttpService:JSONEncode(freq))
-											local b = rpc({Url = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute?" .. q, Method = "POST", Headers = {cookie = "CONSENT=YES+" .. googlev, ["Content-Type"] = "application/x-www-form-urlencoded"}, Body = postBody})
-											if type(b) ~= "string" then return nil end
-											consentOf(b)
-											local line = string.match(b, "(%[.-%])\n")
-											if not line then return nil end
-											local outer = HttpService:JSONDecode(line)
-											local innerRaw = outer[1][3]
-											local td = HttpService:JSONDecode(innerRaw)
-											return td[2][1][1][6][1][1]
-										end)
-										if okT and type(txt) == "string" and txt ~= "" then dict[k] = txt end
-										task.wait(0.1)
-									end
-								end
-							end
-						end
-					end
-					-- Pass 3: MyMemory (free, no key) for anything still missing.
-					do
-						local tgt = code
-						if tgt == "zh-cn" then tgt = "zh-CN" end
-						if tgt == "zh-tw" then tgt = "zh-TW" end
-						for _, k in ipairs(keys) do
-							if dict[k] == nil then
-								local src = "en"
-								if string.find(k, "[\227-\239]") then src = "zh-CN" end
-								local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
-								if okE and type(enc) == "string" and enc ~= "" then
-									local resM = webGet("https://api.mymemory.translated.net/get?q=" .. enc .. "&langpair=" .. src .. "|" .. tgt)
-									if type(resM) == "string" and resM ~= "" then
-										local okM, jsM = pcall(function() return HttpService:JSONDecode(resM) end)
-										if okM and type(jsM) == "table" and jsM.responseStatus == 200 and type(jsM.responseData) == "table" then
-											local t = jsM.responseData.translatedText
-											if type(t) == "string" and t ~= "" then dict[k] = t end
-										end
-									end
-								end
-								task.wait(0.1)
-							end
-						end
-					end
-					if next(dict) == nil then
-						busy = false
-						Window:Notify({ Type = "bad", Title = "Translate failed", Message = "No translation server reachable. Try again later.", Duration = 6 })
-						return
-					end
-					Astral.Languages[langName] = Astral.Languages[langName] or {}
-					for k, v in pairs(dict) do
-						if Astral.Languages[langName][k] == nil then
-							Astral.Languages[langName][k] = v
-						end
-					end
-					Astral:SetLanguage(langName)
-					busy = false
-					Window:Notify({ Type = "good", Title = "Language", Message = langName .. " applied.", Duration = 4 })
-					task.spawn(config.Callback or function() end, langName)
-				end)
-			end
-			return TabObject:AddSelector({
-				Title = config.Title or "Language",
-				Description = config.Description,
-				Icon = config.Icon,
-				Options = names,
-				Default = config.Default or "English",
-				Search = (config.Search == nil) and true or config.Search,
-				Callback = applyGoogleLanguage,
-				Flag = config.Flag,
-				Position = config.Position,
-			})
-		end
-		TabObject.Addautotranslations = TabObject.AddAutoTranslations
 		TabObject.Addselector = TabObject.AddSelector -- Alias to support lowercase calls
 
 
@@ -5090,7 +4831,7 @@ function Astral:MakeWindow(config)
 			local ServerName = Instance.new("TextLabel")
 			ServerName.Size = UDim2.new(0, 0, 1, 0)
 			ServerName.AutomaticSize = Enum.AutomaticSize.X
-			ServerName.Text = data.ServerName or "LumuHub"
+			tr(ServerName, data.ServerName or "LumuHub")
 			ServerName.Font = Enum.Font.GothamBold
 			mTS(ServerName, 16)
 			ServerName.TextColor3 = Color3.fromHex("#ffffff")
@@ -5135,7 +4876,7 @@ function Astral:MakeWindow(config)
 			local OnlineLabel = Instance.new("TextLabel")
 			OnlineLabel.Size = UDim2.new(0, 0, 1, 0)
 			OnlineLabel.AutomaticSize = Enum.AutomaticSize.X
-			OnlineLabel.Text = tostring(data.OnlineCount or 46) .. " Online"
+			OnlineLabel.Text = tostring(data.OnlineCount or 46) .. " " .. translateText("Online")
 			OnlineLabel.Font = Enum.Font.GothamMedium
 			mTS(OnlineLabel, 12)
 			OnlineLabel.TextColor3 = Color3.fromHex("#949ba4")
@@ -5164,7 +4905,7 @@ function Astral:MakeWindow(config)
 			local MemberLabel = Instance.new("TextLabel")
 			MemberLabel.Size = UDim2.new(0, 0, 1, 0)
 			MemberLabel.AutomaticSize = Enum.AutomaticSize.X
-			MemberLabel.Text = tostring(data.MemberCount or 593) .. " Members"
+			MemberLabel.Text = tostring(data.MemberCount or 593) .. " " .. translateText("Members")
 			MemberLabel.Font = Enum.Font.GothamMedium
 			mTS(MemberLabel, 12)
 			MemberLabel.TextColor3 = Color3.fromHex("#949ba4")
@@ -5184,8 +4925,8 @@ function Astral:MakeWindow(config)
 				pcall(function()
 					local online = tonumber(js.approximate_presence_count)
 					local members = tonumber(js.approximate_member_count)
-					if online then OnlineLabel.Text = tostring(online) .. " Online" end
-					if members then MemberLabel.Text = tostring(members) .. " Members" end
+					if online then OnlineLabel.Text = tostring(online) .. " " .. translateText("Online") end
+					if members then MemberLabel.Text = tostring(members) .. " " .. translateText("Members") end
 					local guild = js.guild
 					if type(guild) == "table" then
 						if data.ServerName == nil and type(guild.name) == "string" and guild.name ~= "" then
@@ -5201,7 +4942,7 @@ function Astral:MakeWindow(config)
 			local EstLabel = Instance.new("TextLabel")
 			EstLabel.Name = "EstLabel"
 			EstLabel.Size = UDim2.new(1, 0, 0, 14)
-			EstLabel.Text = data.EstablishedDate or "Est. Jun 2025"
+			tr(EstLabel, data.EstablishedDate or "Est. Jun 2025")
 			EstLabel.Font = Enum.Font.GothamMedium
 			mTS(EstLabel, 12)
 			EstLabel.TextColor3 = Color3.fromHex("#949ba4")
@@ -5213,7 +4954,7 @@ function Astral:MakeWindow(config)
 			local DescLabel = Instance.new("TextLabel")
 			DescLabel.Name = "DescLabel"
 			DescLabel.Size = UDim2.new(1, 0, 0, 18)
-			DescLabel.Text = data.Description or "Official LumuHub Community"
+			tr(DescLabel, data.Description or "Official LumuHub Community")
 			DescLabel.Font = Enum.Font.GothamMedium
 			regText(DescLabel, 12)
 			DescLabel.TextColor3 = Color3.fromHex("#dbdee1")
@@ -5248,7 +4989,7 @@ function Astral:MakeWindow(config)
 			local GameLabel = Instance.new("TextLabel")
 			GameLabel.Size = UDim2.new(1, -28, 1, 0)
 			GameLabel.Position = UDim2.new(0, 28, 0, 0)
-			GameLabel.Text = data.GameLabel or "ROBLOX"
+			tr(GameLabel, data.GameLabel or "ROBLOX")
 			GameLabel.Font = Enum.Font.GothamBold
 			mTS(GameLabel, 12)
 			GameLabel.TextColor3 = Color3.fromHex("#ffffff")
@@ -5262,7 +5003,7 @@ function Astral:MakeWindow(config)
 			ActionButton.Position = UDim2.new(0, 14, 1, -40)
 			ActionButton.BackgroundColor3 = Color3.fromHex("#248046")
 			ActionButton.BorderSizePixel = 0
-			ActionButton.Text = "Join Server"
+			tr(ActionButton, "Join Server")
 			ActionButton.Font = Enum.Font.GothamBold
 			mTS(ActionButton, 13)
 			ActionButton.TextColor3 = Color3.fromHex("#ffffff")
@@ -5295,8 +5036,8 @@ function Astral:MakeWindow(config)
 
 				Window:Notify({
 					Type = "good",
-					Title = "Invite copied",
-					Message = "discord.gg/" .. tostring(inviteCode) .. " is on your clipboard.",
+					Title = translateText("Invite copied"),
+					Message = "discord.gg/" .. tostring(inviteCode) .. " " .. translateText("is on your clipboard."),
 					Duration = 6,
 				})
 
@@ -5318,10 +5059,10 @@ function Astral:MakeWindow(config)
 					end
 				end)
 
-				ActionButton.Text = "Opened!"
+				tr(ActionButton, "Opened!")
 				ActionButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 				task.wait(2)
-				ActionButton.Text = "Join Server"
+				tr(ActionButton, "Join Server")
 				ActionButton.BackgroundColor3 = baseColor
 			end)
 
@@ -5906,7 +5647,7 @@ function Astral:MakeWindow(config)
 		-- Any failing Add* call is skipped and reported instead of aborting.
 		do
 			local addNames = {"AddButton", "AddToggle", "AddTick", "AddSlider", "AddTextbox",
-				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton", "AddAutoTranslations"}
+				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton"}
 			for _, addName in ipairs(addNames) do
 				local orig = TabObject[addName]
 				if type(orig) == "function" then
