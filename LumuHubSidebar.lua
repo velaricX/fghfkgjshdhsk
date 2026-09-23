@@ -6565,7 +6565,7 @@ function Astral:MakeWindow(config)
 		config = config or {}
 		local title = config.Title or "Game Status"
 		local icon = parseIcon(config.Icon or "timer")
-		local panelW = tonumber(config.Width) or (IsMobile and 170 or 276)
+		local panelW = tonumber(config.Width) or (IsMobile and 150 or 240)
 		local rowH = tonumber(config.RowHeight) or (IsMobile and 24 or 30)
 		local enabled = config.Enabled
 		if enabled == nil then enabled = true end
