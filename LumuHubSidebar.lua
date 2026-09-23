@@ -2468,6 +2468,15 @@ function Astral:MakeWindow(config)
 			local leftHeight = 0
 			local rightHeight = 0
 
+			-- Drop frames destroyed by a UI rebuild (re-execute / design
+			-- switch); touching them throws "Parent property is locked".
+			for i = #elements, 1, -1 do
+				local f = elements[i].Frame
+				if f == nil or f.Parent == nil then
+					table.remove(elements, i)
+				end
+			end
+
 			for _, item in ipairs(elements) do
 				if isSingleColumn then
 					item.Frame.Parent = LeftColumn
@@ -4663,6 +4672,7 @@ function Astral:MakeWindow(config)
 
 			-- Adjust frame height dynamically based on text size
 			local function adjustHeight()
+				if ParaFrame.Parent == nil then return end
 				local textHeight = TextLayout.AbsoluteContentSize.Y
 				local imageOffset = hasImage and 162 or 24
 				local totalHeight = imageOffset + textHeight
