@@ -989,7 +989,7 @@ function Astral:MakeWindow(config)
 					if q == "" then
 						fr.Visible = true
 					else
-						fr.Visible = (string.find(string.lower(fr.Name or ""), q, 1, true) ~= nil)
+						fr.Visible = elementSearchHit(fr, q)
 					end
 				end)
 			end
@@ -1097,6 +1097,32 @@ function Astral:MakeWindow(config)
 		return s
 	end
 
+	local function elementSearchHit(fr, q)
+		local nm = ""
+		pcall(function() nm = string.lower(fr.Name or "") end)
+		if nm ~= "" and string.find(nm, q, 1, true) then return true end
+		local disp, desc = "", ""
+		pcall(function()
+			local t = fr:FindFirstChild("Title", true)
+			if t and t:IsA("TextLabel") then disp = string.lower(t.Text or "") end
+			local d = fr:FindFirstChild("Description", true)
+			if d and d:IsA("TextLabel") then desc = string.lower(d.Text or "") end
+		end)
+		if disp ~= "" and string.find(disp, q, 1, true) then return true end
+		if desc ~= "" and string.find(desc, q, 1, true) then return true end
+		return false
+	end
+
+	local function elementDisplayTitle(fr)
+		local disp = nil
+		pcall(function()
+			local t = fr:FindFirstChild("Title", true)
+			if t and t:IsA("TextLabel") and t.Text ~= "" then disp = t.Text end
+		end)
+		if disp then return disp end
+		return cleanSearchName(fr.Name)
+	end
+
 	local function updateSearchResults()
 		for _, c in ipairs(SearchResults:GetChildren()) do
 			if c:IsA("TextButton") then pcall(function() c:Destroy() end) end
@@ -1115,12 +1141,10 @@ function Astral:MakeWindow(config)
 					if found >= 20 then break end
 					local fr = item.Frame
 					if fr then
-						local nm = ""
-						pcall(function() nm = string.lower(fr.Name or "") end)
-						if nm ~= "" and string.find(nm, q, 1, true) then
+						if elementSearchHit(fr, q) then
 							found = found + 1
 							local goTab = tab
-							local title = cleanSearchName(fr.Name)
+							local title = elementDisplayTitle(fr)
 							local Row = Instance.new("TextButton")
 							Row.Name = "Result"
 							Row.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
