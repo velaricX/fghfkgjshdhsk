@@ -1061,7 +1061,121 @@ function Astral:MakeWindow(config)
 	HeaderSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
 		headerSearchQuery = HeaderSearchBox.Text or ""
 		applyHeaderSearch()
+		updateSearchResults()
 	end)
+
+	-- Search results: matching buttons from ALL tabs. Click one to jump there.
+	local SearchResults = Instance.new("ScrollingFrame")
+	SearchResults.Name = "SearchResults"
+	SearchResults.AnchorPoint = Vector2.new(1, 0)
+	SearchResults.Position = UDim2.new(1, -12, 0, 54)
+	SearchResults.Size = UDim2.new(0, IsMobile and 200 or 260, 0, 0)
+	SearchResults.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+	SearchResults.BorderSizePixel = 0
+	SearchResults.Visible = false
+	SearchResults.ScrollBarThickness = 3
+	SearchResults.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+	SearchResults.ScrollBarImageTransparency = 0.4
+	SearchResults.CanvasSize = UDim2.new(0, 0, 0, 0)
+	SearchResults.ZIndex = 150
+	SearchResults.ClipsDescendants = true
+	SearchResults.Parent = MainFrame
+
+	local SearchResultsCorner = Instance.new("UICorner")
+	SearchResultsCorner.CornerRadius = UDim.new(0, 8)
+	SearchResultsCorner.Parent = SearchResults
+
+	local SearchResultsStroke = Instance.new("UIStroke")
+	SearchResultsStroke.Color = Color3.fromRGB(54, 54, 64)
+	SearchResultsStroke.Thickness = 1
+	SearchResultsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	SearchResultsStroke.Parent = SearchResults
+
+	local SearchResultsPad = Instance.new("UIPadding")
+	SearchResultsPad.PaddingTop = UDim.new(0, 4)
+	SearchResultsPad.PaddingBottom = UDim.new(0, 4)
+	SearchResultsPad.PaddingLeft = UDim.new(0, 4)
+	SearchResultsPad.PaddingRight = UDim.new(0, 4)
+	SearchResultsPad.Parent = SearchResults
+
+	local SearchResultsLayout = Instance.new("UIListLayout")
+	SearchResultsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SearchResultsLayout.Padding = UDim.new(0, 4)
+	SearchResultsLayout.Parent = SearchResults
+
+	local function cleanSearchName(raw)
+		local s = tostring(raw or "")
+		local base = string.match(s, "^(.*)_(Button|Toggle|Tick|Colorpicker|Slider|Selector|Textbox|Label|Paragraph|Keybind|MultiButton)$")
+		if base and base ~= "" then return base end
+		return s
+	end
+
+	local function updateSearchResults()
+		for _, c in ipairs(SearchResults:GetChildren()) do
+			if c:IsA("TextButton") then pcall(function() c:Destroy() end) end
+		end
+		local q = string.lower(string.match(headerSearchQuery, "^%s*(.-)%s*$") or "")
+		if q == "" then SearchResults.Visible = false; return end
+		local found = 0
+		for _, tab in ipairs(tabs) do
+			if found >= 20 then break end
+			if tab and tab.Elements then
+				local tabName = "Tab"
+				pcall(function()
+					if tab.ButtonText then tabName = tab.ButtonText.Text or "Tab" end
+				end)
+				for _, item in ipairs(tab.Elements) do
+					if found >= 20 then break end
+					local fr = item.Frame
+					if fr then
+						local nm = ""
+						pcall(function() nm = string.lower(fr.Name or "") end)
+						if nm ~= "" and string.find(nm, q, 1, true) then
+							found = found + 1
+							local goTab = tab
+							local title = cleanSearchName(fr.Name)
+							local Row = Instance.new("TextButton")
+							Row.Name = "Result"
+							Row.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+							Row.BorderSizePixel = 0
+							Row.Size = UDim2.new(1, -8, 0, 30)
+							Row.Text = ""
+							Row.AutoButtonColor = false
+							Row.LayoutOrder = found
+							Row.ZIndex = 151
+							Row.Parent = SearchResults
+
+							local RowCorner = Instance.new("UICorner")
+							RowCorner.CornerRadius = UDim.new(0, 6)
+							RowCorner.Parent = Row
+
+							local RowLabel = Instance.new("TextLabel")
+							RowLabel.BackgroundTransparency = 1
+							RowLabel.Position = UDim2.new(0, 10, 0, 0)
+							RowLabel.Size = UDim2.new(1, -20, 1, 0)
+							RowLabel.Font = Enum.Font.GothamBold
+							RowLabel.Text = title .. "  (" .. tabName .. ")"
+							RowLabel.TextColor3 = Color3.fromRGB(232, 232, 237)
+							RowLabel.TextXAlignment = Enum.TextXAlignment.Left
+							RowLabel.TextTruncate = Enum.TextTruncate.AtEnd
+							RowLabel.ZIndex = 152
+							RowLabel.Parent = Row
+							mTS(RowLabel, 12)
+
+							Row.MouseButton1Click:Connect(function()
+								if pickerOpen or selectorOpen then return end
+								switchTab(goTab)
+								HeaderSearchBox.Text = ""
+							end)
+						end
+					end
+				end
+			end
+		end
+		SearchResults.CanvasSize = UDim2.new(0, 0, 0, found * 34 + 8)
+		SearchResults.Size = UDim2.new(0, IsMobile and 200 or 260, 0, math.min(found * 34 + 8, 280))
+		SearchResults.Visible = found > 0
+	end
 
 	-- (no separator line above the tab bar - clean look)
 
