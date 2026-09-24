@@ -763,11 +763,13 @@ function Astral:MakeWindow(config)
 	NotificationContainer.ZIndex = 200
 	NotificationContainer.Parent = ScreenGui
 
+	do
 	local NotifLayout = Instance.new("UIListLayout")
 	NotifLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
 	NotifLayout.Padding = UDim.new(0, 8)
 	NotifLayout.Parent = NotificationContainer
+	end
 
 	-- Main Frame (Responsive Sizing for Mobile & PC)
 	local MainFrame = Instance.new("Frame")
@@ -864,9 +866,11 @@ function Astral:MakeWindow(config)
 	local UICorner = Instance.new("UICorner")
 	UICorner.CornerRadius = UDim.new(0, 10)
 	UICorner.Parent = MainFrame
+	do
 	local BgCorner = Instance.new("UICorner")
 	BgCorner.CornerRadius = UDim.new(0, 10)
 	BgCorner.Parent = BackgroundImage
+	end
 
 	-- Dim overlay so text stays readable over bright photos (image still shows through)
 	local BgDim = Instance.new("Frame")
@@ -879,9 +883,11 @@ function Astral:MakeWindow(config)
 	BgDim.ZIndex = 1
 	BgDim.Parent = MainFrame
 
+	do
 	local BgDimCorner = Instance.new("UICorner")
 	BgDimCorner.CornerRadius = UDim.new(0, 10)
 	BgDimCorner.Parent = BgDim
+	end
 
 	local UIStroke = Instance.new("UIStroke")
 	UIStroke.Color = Color3.fromRGB(32, 32, 36)
@@ -909,12 +915,14 @@ function Astral:MakeWindow(config)
 	HeaderLayoutContainer.Size = UDim2.new(1, -24, 0, 36)
 	HeaderLayoutContainer.Parent = TopBar
 
+	do
 	local HeaderListLayout = Instance.new("UIListLayout")
 	HeaderListLayout.FillDirection = Enum.FillDirection.Horizontal
 	HeaderListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	HeaderListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	HeaderListLayout.Padding = UDim.new(0, 10)
 	HeaderListLayout.Parent = HeaderLayoutContainer
+	end
 
 	-- Title Label (FIXED: Added TextWrapped = false to prevent layout wrapping bugs)
 	local TitleLabel = Instance.new("TextLabel")
@@ -943,14 +951,18 @@ function Astral:MakeWindow(config)
 	PremiumBadge.LayoutOrder = 2
 	PremiumBadge.Parent = HeaderLayoutContainer
 
+	do
 	local PremiumCorner = Instance.new("UICorner")
 	PremiumCorner.CornerRadius = UDim.new(0, 5)
 	PremiumCorner.Parent = PremiumBadge
+	end
 
+	do
 	local PremiumPadding = Instance.new("UIPadding")
 	PremiumPadding.PaddingLeft = UDim.new(0, 8)
 	PremiumPadding.PaddingRight = UDim.new(0, 8)
 	PremiumPadding.Parent = PremiumBadge
+	end
 
 	local PremiumLabel = Instance.new("TextLabel")
 	PremiumLabel.Name = "PremiumLabel"
@@ -990,8 +1002,13 @@ function Astral:MakeWindow(config)
 
 	-- Global element search: right side of the header, outside the title flow.
 	-- Filters the current tab's elements by name as you type.
+	-- NOTE: wrapped in do-end on purpose. MakeWindow is near the 200-local
+	-- compiler limit, so these locals must not live for the whole function.
+	-- Only applyHeaderSearch / updateSearchResults are exported (used below).
+	local applyHeaderSearch, updateSearchResults
+	do
 	local headerSearchQuery = ""
-	local function applyHeaderSearch()
+	applyHeaderSearch = function()
 		local tab = currentTab
 		if not tab or not tab.Elements then return end
 		local q = string.lower(string.match(headerSearchQuery, "^%s*(.-)%s*$") or "")
@@ -1136,7 +1153,7 @@ function Astral:MakeWindow(config)
 		return cleanSearchName(fr.Name)
 	end
 
-	local function updateSearchResults()
+	updateSearchResults = function()
 		for _, c in ipairs(SearchResults:GetChildren()) do
 			if c:IsA("TextButton") then pcall(function() c:Destroy() end) end
 		end
@@ -1200,6 +1217,7 @@ function Astral:MakeWindow(config)
 		SearchResults.Size = UDim2.new(0, IsMobile and 200 or 260, 0, math.min(found * 34 + 8, 280))
 		SearchResults.Visible = found > 0
 	end
+	end -- end header-search scope (register budget)
 
 	-- (no separator line above the tab bar - clean look)
 
@@ -1227,9 +1245,11 @@ function Astral:MakeWindow(config)
 	TabBarSection.ZIndex = 2
 	TabBarSection.Parent = MainFrame
 
+	do
 	local TabBarCorner = Instance.new("UICorner")
 	TabBarCorner.CornerRadius = UDim.new(0, 8)
 	TabBarCorner.Parent = TabBarSection
+	end
 
 	-- (no border stroke on the tab bar box - clean look)
 
@@ -1245,9 +1265,11 @@ function Astral:MakeWindow(config)
 	CollapseBox.ZIndex = 2
 	CollapseBox.Parent = MainFrame
 
+	do
 	local CollapseBoxCorner = Instance.new("UICorner")
 	CollapseBoxCorner.CornerRadius = UDim.new(0, 8)
 	CollapseBoxCorner.Parent = CollapseBox
+	end
 
 	-- (no border stroke on the collapse box - clean look)
 
@@ -1282,12 +1304,14 @@ function Astral:MakeWindow(config)
 		TabContainer.CanvasSize = UDim2.new(0, TabListLayout.AbsoluteContentSize.X + 16, 0, 0)
 	end)
 
+	do
 	local TabPadding = Instance.new("UIPadding")
 	TabPadding.PaddingTop = UDim.new(0, 3)
 	TabPadding.PaddingBottom = UDim.new(0, 3)
 	TabPadding.PaddingLeft = UDim.new(0, 4)
 	TabPadding.PaddingRight = UDim.new(0, 10)
 	TabPadding.Parent = TabContainer
+	end
 
 	-- ===== Scroll helpers (wheel + drag; no arrow buttons) =====
 	local function tabMaxScroll()
@@ -1434,9 +1458,11 @@ function Astral:MakeWindow(config)
 	ContentContainer.Size = UDim2.new(1, -20, 1, -ContentTop - 10)
 	ContentContainer.Parent = MainFrame
 
+	do
 	local ContentCorner = Instance.new("UICorner")
 	ContentCorner.CornerRadius = UDim.new(0, 8)
 	ContentCorner.Parent = ContentContainer
+	end
 
 	-- Apply Lag-Free Dragging
 	makeElementDraggable(MainFrame, TopBar)
@@ -1501,9 +1527,11 @@ function Astral:MakeWindow(config)
 	Canvas.ZIndex = 202
 	Canvas.Parent = ColorPickerPanel
 
+	do
 	local CanvasCorner = Instance.new("UICorner")
 	CanvasCorner.CornerRadius = UDim.new(0, 8)
 	CanvasCorner.Parent = Canvas
+	end
 
 	-- White overlay, transparent on the right = saturation axis
 	local SatOverlay = Instance.new("Frame")
@@ -1514,10 +1542,13 @@ function Astral:MakeWindow(config)
 	SatOverlay.ZIndex = 203
 	SatOverlay.Parent = Canvas
 
+	do
 	local SatOverlayCorner = Instance.new("UICorner")
 	SatOverlayCorner.CornerRadius = UDim.new(0, 8)
 	SatOverlayCorner.Parent = SatOverlay
+	end
 
+	do
 	local SatGradient = Instance.new("UIGradient")
 	SatGradient.Rotation = 0
 	SatGradient.Transparency = NumberSequence.new({
@@ -1525,6 +1556,7 @@ function Astral:MakeWindow(config)
 		NumberSequenceKeypoint.new(1, 1)
 	})
 	SatGradient.Parent = SatOverlay
+	end
 
 	-- Black overlay, transparent on top = value axis
 	local ValOverlay = Instance.new("Frame")
@@ -1535,10 +1567,13 @@ function Astral:MakeWindow(config)
 	ValOverlay.ZIndex = 204
 	ValOverlay.Parent = Canvas
 
+	do
 	local ValOverlayCorner = Instance.new("UICorner")
 	ValOverlayCorner.CornerRadius = UDim.new(0, 8)
 	ValOverlayCorner.Parent = ValOverlay
+	end
 
+	do
 	local ValGradient = Instance.new("UIGradient")
 	ValGradient.Rotation = 90
 	ValGradient.Transparency = NumberSequence.new({
@@ -1546,6 +1581,7 @@ function Astral:MakeWindow(config)
 		NumberSequenceKeypoint.new(1, 0)
 	})
 	ValGradient.Parent = ValOverlay
+	end
 
 	local CanvasHandle = Instance.new("Frame")
 	CanvasHandle.Name = "CanvasHandle"
@@ -1555,14 +1591,18 @@ function Astral:MakeWindow(config)
 	CanvasHandle.ZIndex = 205
 	CanvasHandle.Parent = Canvas
 
+	do
 	local HandleCorner = Instance.new("UICorner")
 	HandleCorner.CornerRadius = UDim.new(1, 0)
 	HandleCorner.Parent = CanvasHandle
+	end
 
+	do
 	local HandleStroke = Instance.new("UIStroke")
 	HandleStroke.Color = Color3.fromRGB(0, 0, 0)
 	HandleStroke.Thickness = 1.5
 	HandleStroke.Parent = CanvasHandle
+	end
 
 	-- Hue Slider (FIXED: Subtle curve, not too curved)
 	local HueSlider = Instance.new("Frame")
@@ -1572,10 +1612,13 @@ function Astral:MakeWindow(config)
 	HueSlider.ZIndex = 202
 	HueSlider.Parent = ColorPickerPanel
 
+	do
 	local HueCorner = Instance.new("UICorner")
 	HueCorner.CornerRadius = UDim.new(0, 3) -- FIXED: Subtle curve, not too curved
 	HueCorner.Parent = HueSlider
+	end
 
+	do
 	local HueGradient = Instance.new("UIGradient")
 	HueGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
@@ -1587,6 +1630,7 @@ function Astral:MakeWindow(config)
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
 	})
 	HueGradient.Parent = HueSlider
+	end
 
 	local HueHandle = Instance.new("Frame")
 	HueHandle.Name = "HueHandle"
@@ -1597,14 +1641,18 @@ function Astral:MakeWindow(config)
 	HueHandle.ZIndex = 203
 	HueHandle.Parent = HueSlider
 
+	do
 	local HueHandleCorner = Instance.new("UICorner")
 	HueHandleCorner.CornerRadius = UDim.new(0, 4)
 	HueHandleCorner.Parent = HueHandle
+	end
 
+	do
 	local HueHandleStroke = Instance.new("UIStroke")
 	HueHandleStroke.Color = Color3.fromRGB(0, 0, 0)
 	HueHandleStroke.Thickness = 1
 	HueHandleStroke.Parent = HueHandle
+	end
 
 	-- Current / New Preview Buttons
 	local PreviewContainer = Instance.new("Frame")
@@ -1622,13 +1670,17 @@ function Astral:MakeWindow(config)
 	CurrentPreview.ZIndex = 203
 	CurrentPreview.Parent = PreviewContainer
 	-- LAYOUT AROUND BOX (copied from good UI)
+	do
 	local PreviewPadding = Instance.new("UIPadding", PreviewContainer)
 	PreviewPadding.PaddingLeft = UDim.new(0, 0)
 	PreviewPadding.PaddingRight = UDim.new(0, 0)
+	end
 
+	do
 	local CurrentCorner = Instance.new("UICorner")
 	CurrentCorner.CornerRadius = UDim.new(0, 6)
 	CurrentCorner.Parent = CurrentPreview
+	end
 
 	local CurrentLabel = Instance.new("TextLabel")
 	CurrentLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -1648,9 +1700,11 @@ function Astral:MakeWindow(config)
 	NewPreview.ZIndex = 203
 	NewPreview.Parent = PreviewContainer
 
+	do
 	local NewCorner = Instance.new("UICorner")
 	NewCorner.CornerRadius = UDim.new(0, 6)
 	NewCorner.Parent = NewPreview
+	end
 
 	local NewLabel = Instance.new("TextLabel")
 	NewLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -1673,24 +1727,31 @@ function Astral:MakeWindow(config)
 	RGBContainer.ZIndex = 202
 	RGBContainer.Parent = ColorPickerPanel
 
+	do
 	local RGBCorner = Instance.new("UICorner")
 	RGBCorner.CornerRadius = UDim.new(0, 8)
 	RGBCorner.Parent = RGBContainer
+	end
 
+	do
 	local RGBStroke = Instance.new("UIStroke")
 	RGBStroke.Color = Color3.fromRGB(52, 52, 60)
 	RGBStroke.Thickness = 1
 	RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	RGBStroke.Parent = RGBContainer
+	end
 
+	do
 	local RGBPad = Instance.new("UIPadding")
 	RGBPad.PaddingLeft = UDim.new(0, 6)
 	RGBPad.PaddingRight = UDim.new(0, 6)
 	RGBPad.PaddingTop = UDim.new(0, 5)
 	RGBPad.PaddingBottom = UDim.new(0, 5)
 	RGBPad.Parent = RGBContainer
+	end
 
 	-- RGB Inputs: one real horizontal layout (no manual math, no dup padding)
+	do
 	local RGBLayout = Instance.new("UIListLayout")
 	RGBLayout.FillDirection = Enum.FillDirection.Horizontal
 	RGBLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -1698,6 +1759,7 @@ function Astral:MakeWindow(config)
 	RGBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	RGBLayout.Padding = UDim.new(0, 8)
 	RGBLayout.Parent = RGBContainer
+	end
 
 	local function createRGBInput(name, placeholder, order)
 		local Box = Instance.new("TextBox")
@@ -1754,29 +1816,37 @@ function Astral:MakeWindow(config)
 	HexRow.ZIndex = 202
 	HexRow.Parent = ColorPickerPanel
 
+	do
 	local HexCardCorner = Instance.new("UICorner")
 	HexCardCorner.CornerRadius = UDim.new(0, 8)
 	HexCardCorner.Parent = HexRow
+	end
 
+	do
 	local HexCardStroke = Instance.new("UIStroke")
 	HexCardStroke.Color = Color3.fromRGB(52, 52, 60)
 	HexCardStroke.Thickness = 1
 	HexCardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	HexCardStroke.Parent = HexRow
+	end
 
+	do
 	local HexCardPad = Instance.new("UIPadding")
 	HexCardPad.PaddingLeft = UDim.new(0, 6)
 	HexCardPad.PaddingRight = UDim.new(0, 6)
 	HexCardPad.PaddingTop = UDim.new(0, 5)
 	HexCardPad.PaddingBottom = UDim.new(0, 5)
 	HexCardPad.Parent = HexRow
+	end
 
+	do
 	local HexRowLayout = Instance.new("UIListLayout")
 	HexRowLayout.FillDirection = Enum.FillDirection.Horizontal
 	HexRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	HexRowLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	HexRowLayout.Padding = UDim.new(0, 8)
 	HexRowLayout.Parent = HexRow
+	end
 
 	local HexCaption = Instance.new("TextLabel")
 	HexCaption.Name = "HexCaption"
@@ -1810,14 +1880,18 @@ function Astral:MakeWindow(config)
 	HexInput.ZIndex = 203
 	HexInput.LayoutOrder = 2
 	HexInput.Parent = HexRow
+	do
 	local HexInnerPadding = Instance.new("UIPadding")
 	HexInnerPadding.PaddingLeft = UDim.new(0, 8)
 	HexInnerPadding.PaddingRight = UDim.new(0, 8)
 	HexInnerPadding.Parent = HexInput
+	end
 
+	do
 	local HexCorner = Instance.new("UICorner")
 	HexCorner.CornerRadius = UDim.new(0, 6)
 	HexCorner.Parent = HexInput
+	end
 
 	local HexStroke = Instance.new("UIStroke")
 	HexStroke.Color = Color3.fromRGB(35, 35, 40)
@@ -1845,9 +1919,11 @@ function Astral:MakeWindow(config)
 	ApplyButton.ZIndex = 203
 	ApplyButton.Parent = ColorPickerPanel
 
+	do
 	local ApplyCorner = Instance.new("UICorner")
 	ApplyCorner.CornerRadius = UDim.new(0, 8)
 	ApplyCorner.Parent = ApplyButton
+	end
 
 	-- Apply button follows theme accent
 	onAccentChange(function(c)
@@ -1866,9 +1942,11 @@ function Astral:MakeWindow(config)
 	CancelButton.ZIndex = 203
 	CancelButton.Parent = ColorPickerPanel -- FIXED: Corrected parent from CancelButton to ColorPickerPanel to prevent crash
 
+	do
 	local CancelCorner = Instance.new("UICorner")
 	CancelCorner.CornerRadius = UDim.new(0, 8)
 	CancelCorner.Parent = CancelButton
+	end
 
 	-- Color Picker State & Math Logic
 	local currentHue, currentSat, currentValue = 0, 1, 1
@@ -2070,12 +2148,16 @@ function Astral:MakeWindow(config)
 	SelectorPanel.Parent = MainFrame
 
 	-- FIXED: Clean, matching border stroke for the Selector Panel (No mismatched colors)
+	do
 	local SelectorPanelStroke = Instance.new("UIStroke")
 	SelectorPanelStroke.Color = Color3.fromRGB(32, 32, 36) -- Matches MainFrame border exactly
 	SelectorPanelStroke.Thickness = 1.5
+	do
 	local SelectorPadding = Instance.new("UIPadding", SelectorPanel)
 	SelectorPadding.PaddingTop = UDim.new(0, 4)
 	SelectorPadding.PaddingBottom = UDim.new(0, 4)
+	end
+	end
 	SelectorPanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	SelectorPanelStroke.Parent = SelectorPanel
 
@@ -2131,14 +2213,18 @@ function Astral:MakeWindow(config)
 	SearchContainer.ZIndex = 202
 	SearchContainer.Parent = SelectorPanel
 
+	do
 	local SearchCorner = Instance.new("UICorner")
 	SearchCorner.CornerRadius = UDim.new(0, 6)
 	SearchCorner.Parent = SearchContainer
+	end
 
+	do
 	local SearchStroke = Instance.new("UIStroke")
 	SearchStroke.Color = Color3.fromRGB(55, 55, 65) -- Higher contrast border
 	SearchStroke.Thickness = 1
 	SearchStroke.Parent = SearchContainer
+	end
 
 	local SearchIcon = Instance.new("ImageLabel")
 	SearchIcon.Size = UDim2.new(0, 16, 0, 16)
@@ -2194,22 +2280,28 @@ function Astral:MakeWindow(config)
 	OptionsScroll.ZIndex = 202
 	OptionsScroll.Parent = SelectorPanel
 
+	do
 	local OptionsCorner = Instance.new("UICorner")
 	OptionsCorner.CornerRadius = UDim.new(0, 8)
 	OptionsCorner.Parent = OptionsScroll
+	end
 
+	do
 	local OptionsStroke = Instance.new("UIStroke")
 	OptionsStroke.Color = Color3.fromRGB(52, 52, 60)
 	OptionsStroke.Thickness = 1
 	OptionsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	OptionsStroke.Parent = OptionsScroll
+	end
 
+	do
 	local OptionsPadding = Instance.new("UIPadding")
 	OptionsPadding.PaddingLeft = UDim.new(0, 6)
 	OptionsPadding.PaddingRight = UDim.new(0, 6)
 	OptionsPadding.PaddingTop = UDim.new(0, 6)
 	OptionsPadding.PaddingBottom = UDim.new(0, 6)
 	OptionsPadding.Parent = OptionsScroll
+	end
 
 	local OptionsList = Instance.new("UIListLayout")
 	OptionsList.SortOrder = Enum.SortOrder.LayoutOrder
@@ -5912,15 +6004,19 @@ function Astral:MakeWindow(config)
 	LogoButton.ZIndex = 101
 	LogoButton.Parent = ScreenGui
 
+	do
 	local LogoCorner = Instance.new("UICorner")
 	LogoCorner.CornerRadius = UDim.new(1, 0) -- Perfect Circle
 	LogoCorner.Parent = LogoButton
+	end
 
+	do
 	local LogoStroke = Instance.new("UIStroke")
 	LogoStroke.Color = Color3.fromRGB(58, 58, 66) -- Neutral ring (no accent)
 	LogoStroke.Thickness = 1.5
 	LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	LogoStroke.Parent = LogoButton
+	end
 
 	-- Logo Icon (Sized perfectly to fit snugly inside the button)
 	local LogoIcon = Instance.new("ImageLabel")
@@ -5934,9 +6030,11 @@ function Astral:MakeWindow(config)
 	LogoIcon.ZIndex = 103
 	LogoIcon.Parent = LogoButton
 
+	do
 	local LogoIconCorner = Instance.new("UICorner") -- FIXED: Rounds the square image asset itself into a perfect circle
 	LogoIconCorner.CornerRadius = UDim.new(1, 0)
 	LogoIconCorner.Parent = LogoIcon
+	end
 
 	-- Logo Button Drop Shadow Frame
 	local LogoShadow = Instance.new("Frame")
@@ -5948,9 +6046,11 @@ function Astral:MakeWindow(config)
 	LogoShadow.ZIndex = 100
 	LogoShadow.Parent = ScreenGui
 
+	do
 	local LogoShadowCorner = Instance.new("UICorner")
 	LogoShadowCorner.CornerRadius = UDim.new(1, 0)
 	LogoShadowCorner.Parent = LogoShadow
+	end
 
 	-- Sync Shadow Position with Dragging
 	LogoButton:GetPropertyChangedSignal("Position"):Connect(function()
@@ -6259,12 +6359,13 @@ function Astral:MakeWindow(config)
 		-- ==========================================
 		-- NOTIFICATION SYSTEM
 		-- ==========================================
-		local notifTypeColors = {
+		-- Stored on Window, not locals: MakeWindow is near the 200-local compiler limit.
+		Window._NotifColors = {
 			good = {bg = Color3.fromRGB(46, 204, 113)},
 			warning = {bg = Color3.fromRGB(255, 196, 40)},
 			bad = {bg = Color3.fromRGB(231, 76, 60)}
 		}
-		local notifTypeIcons = {
+		Window._NotifIcons = {
 			good = Astral.Icons.Checkmark,
 			warning = Astral.Icons.Warning,
 			bad = Astral.Icons.Close
@@ -6279,8 +6380,8 @@ function Astral:MakeWindow(config)
 			if duration <= 0 then duration = 1 end
 			local actions = config.Actions or {}
 			local hasActions = #actions > 0
-			local tColor = notifTypeColors[nType] or notifTypeColors.good
-			local tIcon = notifTypeIcons[nType] or notifTypeIcons.good
+			local tColor = Window._NotifColors[nType] or Window._NotifColors.good
+			local tIcon = Window._NotifIcons[nType] or Window._NotifIcons.good
 			local notifH = (IsMobile and (hasActions and 90 or 56) or (hasActions and 88 or 62))
 
 			-- type colour drives the whole card so good/warning/bad read instantly
@@ -6458,7 +6559,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 
 				for i, action in ipairs(actions) do
 					local aType = action.Type or nType
-					local aColor = (notifTypeColors[aType] or tColor).bg
+					local aColor = (Window._NotifColors[aType] or tColor).bg
 					local isPrimary = (i == 1)
 					local Btn = Instance.new("TextButton")
 					Btn.Size = UDim2.new(0, IsMobile and 44 or 72, 0, IsMobile and 22 or 26)
