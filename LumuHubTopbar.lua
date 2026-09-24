@@ -2152,14 +2152,12 @@ function Astral:MakeWindow(config)
 	local SelectorPanelStroke = Instance.new("UIStroke")
 	SelectorPanelStroke.Color = Color3.fromRGB(32, 32, 36) -- Matches MainFrame border exactly
 	SelectorPanelStroke.Thickness = 1.5
-	do
 	local SelectorPadding = Instance.new("UIPadding", SelectorPanel)
 	SelectorPadding.PaddingTop = UDim.new(0, 4)
 	SelectorPadding.PaddingBottom = UDim.new(0, 4)
-	end
-	end
 	SelectorPanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	SelectorPanelStroke.Parent = SelectorPanel
+	end
 
 	-- Input Sinker to completely block click-throughs to elements behind the panel
 	local SelectorInputSinker = Instance.new("TextButton")
