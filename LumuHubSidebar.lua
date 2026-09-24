@@ -6664,7 +6664,7 @@ function Astral:MakeWindow(config)
 		TitleLabel.Position = UDim2.new(0, 39, 0.5, 0)
 		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 39 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
-		TitleLabel.Text = title
+		tr(TitleLabel, title)
 		TitleLabel.TextSize = IsMobile and 13 or 15
 		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -6819,7 +6819,7 @@ function Astral:MakeWindow(config)
 			NameLabel.Position = UDim2.new(0, 0, 0.5, 0)
 			NameLabel.Size = UDim2.new(0.58, 0, 1, 0)
 			NameLabel.Font = Enum.Font.Gotham
-			NameLabel.Text = tostring(name)
+			tr(NameLabel, tostring(name))
 			NameLabel.TextSize = IsMobile and 12 or 14
 			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -6881,7 +6881,7 @@ function Astral:MakeWindow(config)
 				row.Value.Text = tostring(opts.Value)
 			end
 			if opts.Name ~= nil then
-				row.Name.Text = tostring(opts.Name)
+				tr(row.Name, tostring(opts.Name))
 			end
 		end
 
