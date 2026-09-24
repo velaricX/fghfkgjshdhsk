@@ -1214,6 +1214,23 @@ function Astral:MakeWindow(config)
 				end
 			end
 		end
+		-- Hide tab buttons that have zero matches (current tab filters separately).
+		for _, tab in ipairs(tabs) do
+			pcall(function()
+				if tab and tab.Button and tab.Elements then
+					if q == "" then
+						tab.Button.Visible = true
+					else
+						local hit = false
+						for _, item in ipairs(tab.Elements) do
+							local fr = item.Frame
+							if fr and elementSearchHit(fr, q) then hit = true; break end
+						end
+						tab.Button.Visible = hit
+					end
+				end
+			end)
+		end
 		SearchResults.CanvasSize = UDim2.new(0, 0, 0, found * 34 + 8)
 		SearchResults.Size = UDim2.new(0, IsMobile and 200 or 260, 0, math.min(found * 34 + 8, 280))
 		SearchResults.Visible = found > 0
@@ -5892,10 +5909,12 @@ function Astral:MakeWindow(config)
 				end)
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = (bColor or AccentColor):Lerp(Color3.new(1, 1, 1), 0.15)}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = (bColor or AccentColor):Lerp(Color3.new(1, 1, 1), 0.25)}):Play()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1.04}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
 					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = bColor or AccentColor}):Play()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1}):Play()
 				end)
 
 				-- only buttons without an explicit color follow the accent
