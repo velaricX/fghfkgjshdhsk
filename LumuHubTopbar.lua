@@ -1077,6 +1077,7 @@ function Astral:MakeWindow(config)
 
 	HeaderSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
 		headerSearchQuery = HeaderSearchBox.Text or ""
+		print("[LumuSearch] q=" .. tostring(headerSearchQuery))
 		applyHeaderSearch()
 		updateSearchResults()
 	end)
