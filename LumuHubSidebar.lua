@@ -5715,12 +5715,13 @@ function Astral:MakeWindow(config)
 						if pickerOpen or selectorOpen then return end
 						local t = tiles[tileIndex]
 						if not t then return end
-					openColorPicker(t.Color, function(c)
-						t.Color = c
-						if t.Preview then t.Preview.BackgroundColor3 = c end
-						task.spawn(t.Callback, tileIndex, c)
+						openColorPicker(t.Color, function(c)
+							t.Color = c
+							if t.Preview then t.Preview.BackgroundColor3 = c end
+							task.spawn(t.Callback, tileIndex, c)
+						end)
 					end)
-				end)
+				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
 					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
