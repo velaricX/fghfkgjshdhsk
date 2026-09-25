@@ -2395,6 +2395,61 @@ function Astral:MakeWindow(config)
 		TabPage.Size = UDim2.new(1, 0, 1, 0)
 		TabPage.Visible = false
 		TabPage.Parent = ContentContainer
+		-- 横向 sub-tab 栏，首次调用 MakeSubTab 时才显示
+		local SubTabBarHeight = IsMobile and 46 or 56
+		local SubTabBtnHeight = IsMobile and 30 or 36
+		local SubTabBar = Instance.new("Frame")
+		SubTabBar.Name = "SubTabBar"
+		SubTabBar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+		SubTabBar.BackgroundTransparency = 0
+		SubTabBar.BorderSizePixel = 0
+		SubTabBar.Size = UDim2.new(1, 0, 0, SubTabBarHeight)
+		SubTabBar.Position = UDim2.new(0, 0, 0, 0)
+		SubTabBar.ClipsDescendants = true
+		SubTabBar.Visible = false
+		SubTabBar.ZIndex = 5
+		SubTabBar.Parent = TabPage
+
+		local SubTabBarSeparator = Instance.new("Frame")
+		SubTabBarSeparator.BackgroundColor3 = Color3.fromRGB(32, 32, 38)
+		SubTabBarSeparator.BorderSizePixel = 0
+		SubTabBarSeparator.Position = UDim2.new(0, 0, 1, -1)
+		SubTabBarSeparator.Size = UDim2.new(1, 0, 0, 1)
+		SubTabBarSeparator.ZIndex = 6
+		SubTabBarSeparator.Parent = SubTabBar
+
+		local SubTabScroll = Instance.new("ScrollingFrame")
+		SubTabScroll.Name = "SubTabScroll"
+		SubTabScroll.BackgroundTransparency = 1
+		SubTabScroll.BorderSizePixel = 0
+		SubTabScroll.Size = UDim2.new(1, 0, 1, 0)
+		SubTabScroll.Position = UDim2.new(0, 0, 0, 0)
+		SubTabScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+		SubTabScroll.ScrollBarThickness = 0
+		SubTabScroll.ScrollingDirection = Enum.ScrollingDirection.X
+		SubTabScroll.ZIndex = 6
+		SubTabScroll.Parent = SubTabBar
+
+		local SubTabScrollLayout = Instance.new("UIListLayout")
+		SubTabScrollLayout.FillDirection = Enum.FillDirection.Horizontal
+		SubTabScrollLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		SubTabScrollLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+		SubTabScrollLayout.Padding = UDim.new(0, 6)
+		SubTabScrollLayout.Parent = SubTabScroll
+
+		local SubTabScrollPad = Instance.new("UIPadding")
+		SubTabScrollPad.PaddingLeft = UDim.new(0, 12)
+		SubTabScrollPad.PaddingRight = UDim.new(0, 12)
+		SubTabScrollPad.Parent = SubTabScroll
+
+		SubTabScrollLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			SubTabScroll.CanvasSize = UDim2.new(0, SubTabScrollLayout.AbsoluteContentSize.X + 16, 0, 0)
+		end)
+
+		local subTabs = {}
+		local currentSubTab = nil
+		local subTabBarShown = false
+		local currentBuildSubTab = 0
 
 		-- Create Scrolling Container inside TabPage (FIXED: Changed from PageScroll to ScrollingFrame)
 		local PageScroll = Instance.new("ScrollingFrame")
@@ -2452,7 +2507,6 @@ function Astral:MakeWindow(config)
 			-- window width so columns never collapse to zero and hide content.
 			local w = PageScroll.AbsoluteSize.X
 			if w < 10 then w = refW end
-			if IsMobile then return true end
 			return w < 380
 		end
 		local function GetTargetColumn()
@@ -2529,6 +2583,43 @@ function Astral:MakeWindow(config)
 			refreshTabColumns()
 			distributeElements()
 		end)
+
+		-- sub-tab 过滤：只显示当前 sub-tab 注册的元素，SubTabIdx = 0 的常驻
+		local function applySubTabFilter()
+			for _, item in ipairs(elements) do
+				local idx = item.SubTabIdx or 0
+				item.Frame.Visible = (idx == 0) or (idx == currentSubTab)
+			end
+			updateCanvas()
+		end
+
+		-- sub-tab 切换：按钮高亮 + 重排可见元素
+		local function switchSubTab(idx)
+			if currentSubTab == idx then return end
+			currentSubTab = idx
+			for _, st in ipairs(subTabs) do
+				local on = (st.Index == idx)
+				TweenService:Create(st.Button, TweenInfo.new(0.18), {
+					BackgroundColor3 = on and AccentColor or Color3.fromRGB(26, 26, 32),
+					BackgroundTransparency = on and 0 or 1
+				}):Play()
+				TweenService:Create(st.BStroke, TweenInfo.new(0.18), {
+					Color = AccentColor,
+					Transparency = on and 0 or 1
+				}):Play()
+				TweenService:Create(st.BText, TweenInfo.new(0.18), {
+					TextColor3 = on and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 160, 168)
+				}):Play()
+			end
+			applySubTabFilter()
+			task.defer(function()
+				pcall(function()
+					refreshTabColumns()
+					distributeElements()
+					updateCanvas()
+				end)
+			end)
+		end
 
 		local tabData = {
 			Button = TabButton,
@@ -2619,13 +2710,15 @@ function Astral:MakeWindow(config)
 			local col = forced or GetTargetColumn()
 			frame.Parent = col
 			frame.Size = UDim2.new(1,0,0,height)
-			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced})
+			-- 记下所属 sub-tab，切换时按 idx 决定显隐
+			frame:SetAttribute("SubTabIdx", currentBuildSubTab)
+			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced, SubTabIdx = currentBuildSubTab})
 			table.insert(tabData.Elements, elements[#elements])
 			-- if a non-dark theme is active, theme this new element too (idempotent)
 			if CurrentThemeName and CurrentThemeName ~= "Dark" then
 				applyThemeToGui(ScreenGui, AccentColor, "Dark", CurrentThemeName)
 			end
-			updateCanvas()
+			applySubTabFilter()
 		end
 
 		-- AddButton: COPIED FROM GOOD UI (Script_with_Example) - right_arrow + hover, no click_icon
@@ -2819,7 +2912,7 @@ function Astral:MakeWindow(config)
 			return ButtonController
 		end
 
-		-- AddToggle Implementation (FIXED: Standardized to exactly 60px height)
+		-- AddToggle creates an interactive toggle card.
 		function TabObject:AddToggle(toggleConfig)
 			toggleConfig = toggleConfig or {}
 			local title = toggleConfig.Title or "Toggle"
@@ -2828,7 +2921,13 @@ function Astral:MakeWindow(config)
 			local callback = toggleConfig.Callback or function() end
 			local icon = parseIcon(toggleConfig.Icon)
 			local hasDesc = description and description ~= ""
-			local calculatedHeight = IsMobile and 50 or 64
+			local calculatedHeight = IsMobile and (hasDesc and 72 or 48) or 64
+			local switchTrackWidth = IsMobile and 44 or 68
+			local switchTrackHeight = IsMobile and 26 or 32
+			local switchThumbSize = IsMobile and 20 or 28
+			local switchInset = IsMobile and 2 or 3
+			local switchThumbOffPosition = UDim2.new(0, switchInset, 0.5, -switchThumbSize / 2)
+			local switchThumbOnPosition = UDim2.new(1, -switchThumbSize - switchInset, 0.5, -switchThumbSize / 2)
 			local TargetColumn = GetTargetColumn()
 			local ToggleFrame = Instance.new("TextButton")
 			ToggleFrame.Name = title .. "_Toggle"
@@ -2850,8 +2949,8 @@ function Astral:MakeWindow(config)
 				IconContainer.Name = "IconContainer"
 				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 				IconContainer.BorderSizePixel = 0
-				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
-				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
+				IconContainer.Position = UDim2.new(0, IsMobile and 8 or 10, 0.5, IsMobile and -13 or -21)
+				IconContainer.Size = UDim2.new(0, IsMobile and 26 or 42, 0, IsMobile and 26 or 42)
 				IconContainer.Parent = ToggleFrame
 				local IconCorner = Instance.new("UICorner")
 				IconCorner.CornerRadius = UDim.new(0, 6)
@@ -2867,7 +2966,7 @@ function Astral:MakeWindow(config)
 				IconLabel.BackgroundTransparency = 1
 				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
+				IconLabel.Size = UDim2.new(0, IsMobile and 16 or 26, 0, IsMobile and 16 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
 				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				IconLabel.ScaleType = Enum.ScaleType.Fit
@@ -2876,8 +2975,8 @@ function Astral:MakeWindow(config)
 			local TextContainer = Instance.new("Frame")
 			TextContainer.Name = "TextContainer"
 			TextContainer.BackgroundTransparency = 1
-			TextContainer.Position = icon and UDim2.new(0, 62, 0, 0) or UDim2.new(0, 14, 0, 0)
-			TextContainer.Size = icon and UDim2.new(1, -146, 1, 0) or UDim2.new(1, -96, 1, 0)
+			TextContainer.Position = icon and UDim2.new(0, IsMobile and 40 or 62, 0, 0) or UDim2.new(0, IsMobile and 12 or 14, 0, 0)
+			TextContainer.Size = icon and UDim2.new(1, IsMobile and -104 or -146, 1, 0) or UDim2.new(1, IsMobile and -76 or -96, 1, 0)
 			TextContainer.Parent = ToggleFrame
 			local TextListLayout = Instance.new("UIListLayout")
 			TextListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -2887,20 +2986,20 @@ function Astral:MakeWindow(config)
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
+			TitleLabel.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-			TitleLabel.TextWrapped = false
-			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.TextWrapped = IsMobile
+			TitleLabel.TextTruncate = IsMobile and Enum.TextTruncate.None or Enum.TextTruncate.AtEnd
 			TitleLabel.Parent = TextContainer
 			if hasDesc then
 				local DescLabel = Instance.new("TextLabel")
 				DescLabel.Name = "Description"
 				DescLabel.BackgroundTransparency = 1
-				DescLabel.Size = UDim2.new(1, 0, 0, 24)
+				DescLabel.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 24)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
@@ -2914,8 +3013,8 @@ function Astral:MakeWindow(config)
 			SwitchTrack.Name = "SwitchTrack"
 			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
 			SwitchTrack.BorderSizePixel = 0
-			SwitchTrack.Position = UDim2.new(1, -80, 0.5, -16)
-			SwitchTrack.Size = UDim2.new(0, 68, 0, 32)
+			SwitchTrack.Position = UDim2.new(1, -switchTrackWidth - 10, 0.5, -switchTrackHeight / 2)
+			SwitchTrack.Size = UDim2.new(0, switchTrackWidth, 0, switchTrackHeight)
 			SwitchTrack.Parent = ToggleFrame
 			local TrackCorner = Instance.new("UICorner")
 			TrackCorner.CornerRadius = UDim.new(0, 8)
@@ -2930,8 +3029,8 @@ function Astral:MakeWindow(config)
 			SwitchThumb.Name = "SwitchThumb"
 			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SwitchThumb.BorderSizePixel = 0
-			SwitchThumb.Position = default and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
-			SwitchThumb.Size = UDim2.new(0, 28, 0, 28)
+			SwitchThumb.Position = default and switchThumbOnPosition or switchThumbOffPosition
+			SwitchThumb.Size = UDim2.new(0, switchThumbSize, 0, switchThumbSize)
 			SwitchThumb.Parent = SwitchTrack
 			local ThumbCorner = Instance.new("UICorner")
 			ThumbCorner.CornerRadius = UDim.new(0, 6)
@@ -2940,7 +3039,7 @@ function Astral:MakeWindow(config)
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
 				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
-				local targetThumbPos = enabled and UDim2.new(1, -31, 0.5, -14) or UDim2.new(0, 3, 0.5, -14)
+				local targetThumbPos = enabled and switchThumbOnPosition or switchThumbOffPosition
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
 				task.spawn(callback, enabled)
@@ -5646,6 +5745,135 @@ function Astral:MakeWindow(config)
 		end
 
 		-- if a non-dark theme is active, theme the new tab too (idempotent)
+
+		-- MakeSubTab：在内容区顶部加一个横向 sub-tab 按钮；返回的代理把后续 AddXxx 归到该 sub-tab
+		function TabObject:AddSubTab(stCfg)
+			local stName = "SubTab"
+			local stIcon = nil
+			if type(stCfg) == "table" then
+				stName = stCfg[1] or stCfg.Name or "SubTab"
+				stIcon = parseIcon(stCfg[2] or stCfg.Icon)
+			elseif type(stCfg) == "string" then
+				stName = stCfg
+			end
+
+			-- 首次调用才显示 sub-tab 栏，原 PageScroll 下移让位
+			if not subTabBarShown then
+				subTabBarShown = true
+				SubTabBar.Visible = true
+				PageScroll.Position = UDim2.new(0, 0, 0, SubTabBarHeight)
+				PageScroll.Size = UDim2.new(1, 0, 1, -SubTabBarHeight)
+			end
+
+			local stIdx = #subTabs + 1
+
+			local StBtn = Instance.new("TextButton")
+			StBtn.Name = stName .. "_SubTabBtn"
+			StBtn.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+			StBtn.BackgroundTransparency = 1
+			StBtn.BorderSizePixel = 0
+			StBtn.Size = UDim2.new(0, 0, 0, SubTabBtnHeight)
+			StBtn.AutomaticSize = Enum.AutomaticSize.X
+			StBtn.AutoButtonColor = false
+			StBtn.Text = ""
+			StBtn.ClipsDescendants = true
+			StBtn.LayoutOrder = stIdx
+			StBtn.ZIndex = 7
+			StBtn.Parent = SubTabScroll
+
+			local StBtnCorner = Instance.new("UICorner")
+			StBtnCorner.CornerRadius = UDim.new(0, 8)
+			StBtnCorner.Parent = StBtn
+
+			local StBtnStroke = Instance.new("UIStroke")
+			StBtnStroke.Color = AccentColor
+			StBtnStroke.Thickness = 1
+			StBtnStroke.Transparency = 1
+			StBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			StBtnStroke.Parent = StBtn
+
+			local StBtnLayout = Instance.new("UIListLayout")
+			StBtnLayout.FillDirection = Enum.FillDirection.Horizontal
+			StBtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			StBtnLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			StBtnLayout.Padding = UDim.new(0, 8)
+			StBtnLayout.Parent = StBtn
+
+			local StBtnPad = Instance.new("UIPadding")
+			StBtnPad.PaddingLeft = UDim.new(0, 14)
+			StBtnPad.PaddingRight = UDim.new(0, 14)
+			StBtnPad.Parent = StBtn
+
+			if stIcon then
+				local StBtnIco = Instance.new("ImageLabel")
+				StBtnIco.BackgroundTransparency = 1
+				StBtnIco.Size = UDim2.fromOffset(IsMobile and 16 or 18, IsMobile and 16 or 18)
+				StBtnIco.LayoutOrder = 1
+				StBtnIco.ZIndex = 8
+				Astral.ApplyIcon(StBtnIco, stIcon)
+				StBtnIco.ImageColor3 = Color3.fromRGB(160, 160, 168)
+				StBtnIco.Parent = StBtn
+			end
+
+			local StBtnText = Instance.new("TextLabel")
+			StBtnText.Name = "SubTabText"
+			StBtnText.BackgroundTransparency = 1
+			StBtnText.Size = UDim2.new(0, 0, 1, 0)
+			StBtnText.AutomaticSize = Enum.AutomaticSize.X
+			StBtnText.Font = Enum.Font.GothamBold
+			tr(StBtnText, stName)
+			StBtnText.TextColor3 = Color3.fromRGB(160, 160, 168)
+			mTS(StBtnText, 15)
+			StBtnText.TextXAlignment = Enum.TextXAlignment.Center
+			StBtnText.TextYAlignment = Enum.TextYAlignment.Center
+			StBtnText.TextTruncate = Enum.TextTruncate.None
+			StBtnText.LayoutOrder = 2
+			StBtnText.ZIndex = 8
+			StBtnText.Parent = StBtn
+
+			local stData = {Button = StBtn, BStroke = StBtnStroke, BText = StBtnText, Index = stIdx}
+			table.insert(subTabs, stData)
+
+			StBtn.MouseEnter:Connect(function()
+				if currentSubTab ~= stIdx then
+					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.8}):Play()
+					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(220, 220, 228)}):Play()
+				end
+			end)
+			StBtn.MouseLeave:Connect(function()
+				if currentSubTab ~= stIdx then
+					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 1}):Play()
+					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(160, 160, 168)}):Play()
+				end
+			end)
+			StBtn.MouseButton1Click:Connect(function()
+				switchSubTab(stIdx)
+			end)
+
+			if stIdx == 1 then switchSubTab(stIdx) end
+
+			-- 代理：借用 TabObject 的全部 AddXxx，注册期间把 currentBuildSubTab 指向本 sub-tab
+			local proxy = {Name = stName, Index = stIdx}
+			return setmetatable(proxy, {
+				__index = function(_, key)
+					local fn = TabObject[key]
+					if type(fn) == "function" then
+						return function(_, ...)
+							local prev = currentBuildSubTab
+							currentBuildSubTab = stIdx
+							local ok, res = pcall(fn, TabObject, ...)
+							currentBuildSubTab = prev
+							if not ok then
+								warn("[Astral] SubTab " .. stName .. ":" .. tostring(key) .. " failed: " .. tostring(res))
+							end
+							return res
+						end
+					end
+					return fn
+				end
+			})
+		end
+		TabObject.Addsubtab = TabObject.AddSubTab
 
 		return TabObject
 	end
