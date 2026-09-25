@@ -5629,12 +5629,9 @@ function Astral:MakeWindow(config)
 				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
 
-				local BtnStroke = Instance.new("UIStroke")
-				BtnStroke.Color = Color3.fromRGB(255, 255, 255)
-				BtnStroke.Transparency = 0.75
-				BtnStroke.Thickness = 1
-				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-				BtnStroke.Parent = Btn
+				local BtnScale = Instance.new("UIScale")
+				BtnScale.Scale = 1
+				BtnScale.Parent = Btn
 
 				local TilePreview = nil
 				if not iconOnlyMode then
@@ -5673,7 +5670,7 @@ function Astral:MakeWindow(config)
 						BIcon.AnchorPoint = Vector2.new(0, 0.5)
 						BIcon.Position = UDim2.new(0, 10, 0.5, 0)
 					end
-					BIcon.Size = UDim2.new(0, IsMobile and 18 or 22, 0, IsMobile and 18 or 22)
+					BIcon.Size = UDim2.new(0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22), 0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22))
 					Astral.ApplyIcon(BIcon, bIcon)
 					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
 					BIcon.ScaleType = Enum.ScaleType.Fit
@@ -5690,7 +5687,7 @@ function Astral:MakeWindow(config)
 					tr(BLabel, bTitle)
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 					BLabel.TextSize = IsMobile and 10 or 12
-					BLabel.TextXAlignment = Enum.TextXAlignment.Left
+					BLabel.TextXAlignment = Enum.TextXAlignment.Center
 					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
 					BLabel.Parent = Btn
 				end
@@ -5723,10 +5720,22 @@ function Astral:MakeWindow(config)
 				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.18)}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.25)}):Play()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1.04}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
 					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1}):Play()
+				end)
+				Btn.InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						TweenService:Create(BtnScale, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 0.95}):Play()
+					end
+				end)
+				Btn.InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
+					end
 				end)
 			end
 
