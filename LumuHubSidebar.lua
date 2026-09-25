@@ -2400,7 +2400,7 @@ function Astral:MakeWindow(config)
 		local SubTabBtnHeight = IsMobile and 30 or 36
 		local SubTabBar = Instance.new("Frame")
 		SubTabBar.Name = "SubTabBar"
-		SubTabBar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+		SubTabBar.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
 		SubTabBar.BackgroundTransparency = 0
 		SubTabBar.BorderSizePixel = 0
 		SubTabBar.Size = UDim2.new(1, -24, 0, SubTabBarHeight)
@@ -2413,6 +2413,12 @@ function Astral:MakeWindow(config)
 		local SubTabBarCorner = Instance.new("UICorner")
 		SubTabBarCorner.CornerRadius = UDim.new(0, 10)
 		SubTabBarCorner.Parent = SubTabBar
+
+		local SubTabBarStroke = Instance.new("UIStroke")
+		SubTabBarStroke.Color = Color3.fromRGB(60, 60, 70)
+		SubTabBarStroke.Thickness = 1
+		SubTabBarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		SubTabBarStroke.Parent = SubTabBar
 
 		-- (rounded floating card needs no separator line)
 
@@ -2598,12 +2604,12 @@ function Astral:MakeWindow(config)
 			for _, st in ipairs(subTabs) do
 				local on = (st.Index == idx)
 				TweenService:Create(st.Button, TweenInfo.new(0.18), {
-					BackgroundColor3 = on and AccentColor or Color3.fromRGB(26, 26, 32),
-					BackgroundTransparency = on and 0 or 1
+					BackgroundColor3 = on and AccentColor or Color3.fromRGB(32, 32, 40),
+					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(st.BStroke, TweenInfo.new(0.18), {
-					Color = AccentColor,
-					Transparency = on and 0 or 1
+					Color = on and AccentColor or Color3.fromRGB(70, 70, 80),
+					Transparency = on and 0 or 0.5
 				}):Play()
 				TweenService:Create(st.BText, TweenInfo.new(0.18), {
 					TextColor3 = on and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 160, 168)
@@ -5767,8 +5773,8 @@ function Astral:MakeWindow(config)
 
 			local StBtn = Instance.new("TextButton")
 			StBtn.Name = stName .. "_SubTabBtn"
-			StBtn.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
-			StBtn.BackgroundTransparency = 1
+			StBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+			StBtn.BackgroundTransparency = 0
 			StBtn.BorderSizePixel = 0
 			StBtn.Size = UDim2.new(0, 0, 0, SubTabBtnHeight)
 			StBtn.AutomaticSize = Enum.AutomaticSize.X
@@ -5786,7 +5792,7 @@ function Astral:MakeWindow(config)
 			local StBtnStroke = Instance.new("UIStroke")
 			StBtnStroke.Color = AccentColor
 			StBtnStroke.Thickness = 1
-			StBtnStroke.Transparency = 1
+			StBtnStroke.Transparency = 0.5
 			StBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			StBtnStroke.Parent = StBtn
 
@@ -5834,13 +5840,13 @@ function Astral:MakeWindow(config)
 
 			StBtn.MouseEnter:Connect(function()
 				if currentSubTab ~= stIdx then
-					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.8}):Play()
+					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.55}):Play()
 					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(220, 220, 228)}):Play()
 				end
 			end)
 			StBtn.MouseLeave:Connect(function()
 				if currentSubTab ~= stIdx then
-					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 1}):Play()
+					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
 					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(160, 160, 168)}):Play()
 				end
 			end)
