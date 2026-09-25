@@ -5896,10 +5896,6 @@ function Astral:MakeWindow(config)
 				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
 
-				local BtnScale = Instance.new("UIScale")
-				BtnScale.Scale = 1
-				BtnScale.Parent = Btn
-
 				local TilePreview = nil
 				if not iconOnlyMode then
 					TilePreview = Instance.new("TextButton")
@@ -5987,22 +5983,10 @@ function Astral:MakeWindow(config)
 				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.25)}):Play()
-					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1.04}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.12)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
-					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
-					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1}):Play()
-				end)
-				Btn.InputBegan:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-						TweenService:Create(BtnScale, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = 0.95}):Play()
-					end
-				end)
-				Btn.InputEnded:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-						TweenService:Create(BtnScale, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
-					end
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
 				end)
 			end
 
