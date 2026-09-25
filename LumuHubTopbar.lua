@@ -5795,7 +5795,7 @@ function Astral:MakeWindow(config)
 
 				local Btn = Instance.new("TextButton")
 				Btn.Name = baseName .. "_MultiColorBtn"
-				Btn.BackgroundColor3 = iconOnlyMode and bColor or Color3.fromRGB(26, 26, 30)
+				Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
@@ -5851,7 +5851,7 @@ function Astral:MakeWindow(config)
 					end
 					BIcon.Size = UDim2.new(0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22), 0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22))
 					Astral.ApplyIcon(BIcon, bIcon)
-					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					BIcon.ImageColor3 = iconOnlyMode and bColor or Color3.fromRGB(255, 255, 255)
 					BIcon.ScaleType = Enum.ScaleType.Fit
 					BIcon.Parent = Btn
 				end
@@ -5879,8 +5879,12 @@ function Astral:MakeWindow(config)
 					if not t then return end
 					openColorPicker(t.Color, function(c)
 						t.Color = c
-						t.Btn.BackgroundColor3 = c
-						if t.Preview then t.Preview.BackgroundColor3 = c end
+						if t.Preview then
+							t.Preview.BackgroundColor3 = c
+						else
+							local ic = t.Btn:FindFirstChild("Icon")
+							if ic then ic.ImageColor3 = c end
+						end
 						task.spawn(t.Callback, tileIndex, c)
 					end)
 				end)
@@ -5899,18 +5903,10 @@ function Astral:MakeWindow(config)
 				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					if iconOnlyMode then
-						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.12)}):Play()
-					else
-						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
-					end
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
-					if iconOnlyMode then
-						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
-					else
-						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
-					end
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
 				end)
 			end
 
@@ -5930,7 +5926,14 @@ function Astral:MakeWindow(config)
 			function MultiColorController:SetColor(index, color)
 				if typeof(color) ~= "Color3" then return end
 				local t = tiles[index]
-				if t then t.Color = color; t.Btn.BackgroundColor3 = color; if t.Preview then t.Preview.BackgroundColor3 = color end end
+				if not t then return end
+				t.Color = color
+				if t.Preview then
+					t.Preview.BackgroundColor3 = color
+				else
+					local ic = t.Btn:FindFirstChild("Icon")
+					if ic then ic.ImageColor3 = color end
+				end
 			end
 			function MultiColorController:Click(index)
 				local t = tiles[index]
