@@ -5967,11 +5967,195 @@ function Astral:MakeWindow(config)
 			return MultiController
 		end
 
+		-- MultiColorPicker: grid of color wells. Tap one to open the color
+		-- picker panel; the picked color fills the tile. Callback(index, color).
+		-- Usage: tab:AddMultiColorPicker({ Title = "Theme Colors", Columns = 4,
+		--   Colors = { Color3.fromRGB(255,0,0), "green", "blue" },
+		--   Callback = function(i, c) print(i, c) end })
+		function TabObject:AddMultiColorPicker(cfg)
+			cfg = cfg or {}
+			local title = cfg.Title or "Colors"
+			local description = cfg.Description
+			local callback = cfg.Callback or function() end
+			local hasDesc = description and description ~= "" or false
+			local columns = math.max(1, math.floor(cfg.Columns or 4))
+			if IsMobile and columns > 2 then columns = 2 end
+
+			local colors = {}
+			if type(cfg.Colors) == "table" then
+				for _, v in ipairs(cfg.Colors) do
+					local c = nil
+					if typeof(v) == "Color3" then
+						c = v
+					elseif type(v) == "string" then
+						c = parseButtonColor(v)
+					elseif type(v) == "table" then
+						if typeof(v.Color) == "Color3" then
+							c = v.Color
+						elseif type(v.Color) == "string" then
+							c = parseButtonColor(v.Color)
+						end
+					end
+					if c then table.insert(colors, c) end
+				end
+			end
+			if #colors == 0 then
+				colors = {
+					Color3.fromRGB(231, 76, 60),
+					Color3.fromRGB(243, 156, 18),
+					Color3.fromRGB(241, 196, 15),
+					Color3.fromRGB(46, 204, 113),
+					Color3.fromRGB(0, 210, 255),
+					Color3.fromRGB(0, 153, 235),
+					Color3.fromRGB(138, 90, 255),
+					Color3.fromRGB(255, 90, 180),
+				}
+			end
+
+			local pad = IsMobile and 6 or 10
+			local gap = IsMobile and 6 or 10
+			local btnH = IsMobile and 44 or 56
+			local headerH = hasDesc and (IsMobile and 30 or 36) or (IsMobile and 18 or 22)
+			local rows = math.max(1, math.ceil(#colors / columns))
+			local gridH = rows * btnH + (rows - 1) * gap
+			local calculatedHeight = pad + headerH + 10 + gridH + pad
+
+			local Card = Instance.new("Frame")
+			Card.Name = title .. "_MultiColorPicker"
+			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BorderSizePixel = 0
+			Card.Size = UDim2.new(1, 0, 0, calculatedHeight)
+
+			local CardCorner = Instance.new("UICorner")
+			CardCorner.CornerRadius = UDim.new(0, 8)
+			CardCorner.Parent = Card
+
+			local CardStroke = Instance.new("UIStroke")
+			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Thickness = 1
+			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			CardStroke.Parent = Card
+
+			local Header = Instance.new("Frame")
+			Header.Name = "Header"
+			Header.BackgroundTransparency = 1
+			Header.Position = UDim2.new(0, pad, 0, pad)
+			Header.Size = UDim2.new(1, -pad * 2, 0, headerH)
+			Header.Parent = Card
+
+			local TitleLabel = Instance.new("TextLabel")
+			TitleLabel.Name = "Title"
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
+			TitleLabel.Font = Enum.Font.GothamBold
+			tr(TitleLabel, title)
+			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			regText(TitleLabel, 12)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.Parent = Header
+
+			if hasDesc then
+				local DescLabel = Instance.new("TextLabel")
+				DescLabel.Name = "Description"
+				DescLabel.BackgroundTransparency = 1
+				DescLabel.Size = UDim2.new(1, 0, 0, 16)
+				DescLabel.Font = Enum.Font.Gotham
+				tr(DescLabel, description)
+				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				regText(DescLabel, 10)
+				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+				DescLabel.Parent = Header
+			end
+
+			local Grid = Instance.new("Frame")
+			Grid.Name = "ColorGrid"
+			Grid.BackgroundTransparency = 1
+			Grid.Position = UDim2.new(0, pad, 0, pad + headerH + 10)
+			Grid.Size = UDim2.new(1, -pad * 2, 0, gridH)
+			Grid.Parent = Card
+
+			local GridLayout = Instance.new("UIGridLayout")
+			local shrink = math.ceil((columns - 1) * gap / columns)
+			GridLayout.CellSize = UDim2.new(1 / columns, -shrink, 0, btnH)
+			GridLayout.CellPadding = UDim.new(0, gap, 0, gap)
+			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			GridLayout.FillDirectionMaxCells = columns
+			GridLayout.Parent = Grid
+
+			local tiles = {}
+			for i, col in ipairs(colors) do
+				local Btn = Instance.new("TextButton")
+				Btn.Name = "Color_" .. i
+				Btn.BackgroundColor3 = col
+				Btn.BorderSizePixel = 0
+				Btn.Text = ""
+				Btn.AutoButtonColor = false
+				Btn.ClipsDescendants = true
+				Btn.LayoutOrder = i
+				Btn.Parent = Grid
+
+				local BtnCorner = Instance.new("UICorner")
+				BtnCorner.CornerRadius = UDim.new(0, 8)
+				BtnCorner.Parent = Btn
+
+				local BtnStroke = Instance.new("UIStroke")
+				BtnStroke.Color = Color3.fromRGB(255, 255, 255)
+				BtnStroke.Transparency = 0.75
+				BtnStroke.Thickness = 1
+				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				BtnStroke.Parent = Btn
+
+				local BtnScale = Instance.new("UIScale")
+				BtnScale.Scale = 1
+				BtnScale.Parent = Btn
+
+				tiles[i] = Btn
+				local tileIndex = i
+				Btn.MouseButton1Click:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					openColorPicker(Btn.BackgroundColor3, function(c)
+						tiles[tileIndex].BackgroundColor3 = c
+						task.spawn(callback, tileIndex, c)
+					end)
+				end)
+				Btn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1.06}):Play()
+				end)
+				Btn.MouseLeave:Connect(function()
+					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1}):Play()
+				end)
+			end
+
+			registerElement(Card, calculatedHeight, cfg.Position)
+
+			local MultiColorController = {}
+			function MultiColorController:Get(index)
+				local b = tiles[index or 1]
+				if b then return b.BackgroundColor3 end
+				return nil
+			end
+			function MultiColorController:GetAll()
+				local out = {}
+				for i, b in ipairs(tiles) do out[i] = b.BackgroundColor3 end
+				return out
+			end
+			function MultiColorController:Set(index, color)
+				if typeof(color) ~= "Color3" then return end
+				local b = tiles[index]
+				if b then b.BackgroundColor3 = color end
+			end
+			return MultiColorController
+		end
+		TabObject.Addmulticolorpicker = TabObject.AddMultiColorPicker
+
 		-- Fault tolerance: one bad element can never kill the whole UI build.
 		-- Any failing Add* call is skipped and reported instead of aborting.
 		do
 			local addNames = {"AddButton", "AddToggle", "AddTick", "AddSlider", "AddTextbox",
-				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton"}
+				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton", "AddMultiColorPicker"}
 			for _, addName in ipairs(addNames) do
 				local orig = TabObject[addName]
 				if type(orig) == "function" then
