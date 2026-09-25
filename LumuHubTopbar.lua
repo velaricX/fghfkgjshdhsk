@@ -5967,56 +5967,33 @@ function Astral:MakeWindow(config)
 			return MultiController
 		end
 
-		-- MultiColorPicker: grid of color wells. Tap one to open the color
-		-- picker panel; the picked color fills the tile. Callback(index, color).
-		-- Usage: tab:AddMultiColorPicker({ Title = "Theme Colors", Columns = 4,
-		--   Colors = { Color3.fromRGB(255,0,0), "green", "blue" },
-		--   Callback = function(i, c) print(i, c) end })
+		-- MultiColorPicker: like MultiButton, but every button carries its own
+		-- mini color picker. Tap the tile = button Callback. Tap the dot = opens
+		-- the color picker; confirming recolors the tile + fires OnColor.
+		-- Usage: tab:AddMultiColorPicker({ Title = "Skins", Columns = 2, Buttons = {
+		--   { Title = "Kill", Icon = "Gun", Color = "red",
+		--     Callback = function(i) print("pressed", i) end,
+		--     OnColor = function(i, c) print("recolored", i, c) end },
+		-- }})
 		function TabObject:AddMultiColorPicker(cfg)
 			cfg = cfg or {}
 			local title = cfg.Title or "Colors"
 			local description = cfg.Description
-			local callback = cfg.Callback or function() end
-			local hasDesc = description and description ~= "" or false
-			local columns = math.max(1, math.floor(cfg.Columns or 4))
+			local items = cfg.Buttons or {}
+			local columns = math.max(1, math.floor(cfg.Columns or 2))
 			if IsMobile and columns > 2 then columns = 2 end
+			local hasDesc = description and description ~= "" or false
 
-			local colors = {}
-			if type(cfg.Colors) == "table" then
-				for _, v in ipairs(cfg.Colors) do
-					local c = nil
-					if typeof(v) == "Color3" then
-						c = v
-					elseif type(v) == "string" then
-						c = parseButtonColor(v)
-					elseif type(v) == "table" then
-						if typeof(v.Color) == "Color3" then
-							c = v.Color
-						elseif type(v.Color) == "string" then
-							c = parseButtonColor(v.Color)
-						end
-					end
-					if c then table.insert(colors, c) end
-				end
-			end
-			if #colors == 0 then
-				colors = {
-					Color3.fromRGB(231, 76, 60),
-					Color3.fromRGB(243, 156, 18),
-					Color3.fromRGB(241, 196, 15),
-					Color3.fromRGB(46, 204, 113),
-					Color3.fromRGB(0, 210, 255),
-					Color3.fromRGB(0, 153, 235),
-					Color3.fromRGB(138, 90, 255),
-					Color3.fromRGB(255, 90, 180),
-				}
+			local iconOnlyMode = #items > 0
+			for _, it in ipairs(items) do
+				if it and it.Title and it.Title ~= "" then iconOnlyMode = false; break end
 			end
 
 			local pad = IsMobile and 6 or 10
 			local gap = IsMobile and 6 or 10
-			local btnH = IsMobile and 44 or 56
+			local btnH = iconOnlyMode and (IsMobile and 48 or 64) or (IsMobile and 40 or 48)
 			local headerH = hasDesc and (IsMobile and 30 or 36) or (IsMobile and 18 or 22)
-			local rows = math.max(1, math.ceil(#colors / columns))
+			local rows = math.max(1, math.ceil(math.max(1, #items) / columns))
 			local gridH = rows * btnH + (rows - 1) * gap
 			local calculatedHeight = pad + headerH + 10 + gridH + pad
 
@@ -6070,7 +6047,7 @@ function Astral:MakeWindow(config)
 			end
 
 			local Grid = Instance.new("Frame")
-			Grid.Name = "ColorGrid"
+			Grid.Name = "ButtonGrid"
 			Grid.BackgroundTransparency = 1
 			Grid.Position = UDim2.new(0, pad, 0, pad + headerH + 10)
 			Grid.Size = UDim2.new(1, -pad * 2, 0, gridH)
@@ -6085,10 +6062,18 @@ function Astral:MakeWindow(config)
 			GridLayout.Parent = Grid
 
 			local tiles = {}
-			for i, col in ipairs(colors) do
+			for i, item in ipairs(items) do
+				item = item or {}
+				local bTitle = item.Title
+				local bIcon = parseIcon(item.Icon)
+				local bCallback = item.Callback or function() end
+				local bOnColor = item.OnColor
+				local bColor = parseButtonColor(item.Color) or Color3.fromRGB(40, 40, 48)
+				local baseName = (bTitle and bTitle ~= "") and bTitle or ("Color " .. i)
+
 				local Btn = Instance.new("TextButton")
-				Btn.Name = "Color_" .. i
-				Btn.BackgroundColor3 = col
+				Btn.Name = baseName .. "_MultiColorBtn"
+				Btn.BackgroundColor3 = bColor
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
@@ -6097,55 +6082,112 @@ function Astral:MakeWindow(config)
 				Btn.Parent = Grid
 
 				local BtnCorner = Instance.new("UICorner")
-				BtnCorner.CornerRadius = UDim.new(0, 8)
+				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
 
-				local BtnStroke = Instance.new("UIStroke")
-				BtnStroke.Color = Color3.fromRGB(255, 255, 255)
-				BtnStroke.Transparency = 0.75
-				BtnStroke.Thickness = 1
-				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-				BtnStroke.Parent = Btn
+				if bIcon then
+					local BIcon = Instance.new("ImageLabel")
+					BIcon.Name = "Icon"
+					BIcon.BackgroundTransparency = 1
+					if iconOnlyMode then
+						BIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+						BIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+					else
+						BIcon.AnchorPoint = Vector2.new(0, 0.5)
+						BIcon.Position = UDim2.new(0, 10, 0.5, 0)
+					end
+					BIcon.Size = UDim2.new(0, IsMobile and 18 or 22, 0, IsMobile and 18 or 22)
+					Astral.ApplyIcon(BIcon, bIcon)
+					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					BIcon.ScaleType = Enum.ScaleType.Fit
+					BIcon.Parent = Btn
+				end
 
-				local BtnScale = Instance.new("UIScale")
-				BtnScale.Scale = 1
-				BtnScale.Parent = Btn
+				if not iconOnlyMode and bTitle and bTitle ~= "" then
+					local BLabel = Instance.new("TextLabel")
+					BLabel.Name = "Label"
+					BLabel.BackgroundTransparency = 1
+					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
+					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 30, 1, 0)
+					BLabel.Font = Enum.Font.GothamBold
+					tr(BLabel, bTitle)
+					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					BLabel.TextSize = IsMobile and 10 or 12
+					BLabel.TextXAlignment = Enum.TextXAlignment.Left
+					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
+					BLabel.Parent = Btn
+				end
 
-				tiles[i] = Btn
+				local Dot = Instance.new("TextButton")
+				Dot.Name = "ColorDot"
+				Dot.AnchorPoint = Vector2.new(1, 0)
+				Dot.Position = UDim2.new(1, -5, 0, 5)
+				Dot.Size = UDim2.new(0, 18, 0, 18)
+				Dot.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+				Dot.BorderSizePixel = 0
+				Dot.Text = ""
+				Dot.AutoButtonColor = false
+				Dot.ZIndex = 2
+				Dot.Parent = Btn
+
+				local DotCorner = Instance.new("UICorner")
+				DotCorner.CornerRadius = UDim.new(1, 0)
+				DotCorner.Parent = Dot
+
+				local DotStroke = Instance.new("UIStroke")
+				DotStroke.Color = Color3.fromRGB(255, 255, 255)
+				DotStroke.Transparency = 0.5
+				DotStroke.Thickness = 1
+				DotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				DotStroke.Parent = Dot
+
+				tiles[i] = {Btn = Btn, Color = bColor, Callback = bCallback, OnColor = bOnColor}
 				local tileIndex = i
 				Btn.MouseButton1Click:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					openColorPicker(Btn.BackgroundColor3, function(c)
-						tiles[tileIndex].BackgroundColor3 = c
-						task.spawn(callback, tileIndex, c)
+					local t = tiles[tileIndex]
+					if t and t.Callback then task.spawn(t.Callback, tileIndex) end
+				end)
+				Dot.MouseButton1Click:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					local t = tiles[tileIndex]
+					if not t then return end
+					openColorPicker(t.Color, function(c)
+						t.Color = c
+						t.Btn.BackgroundColor3 = c
+						if t.OnColor then task.spawn(t.OnColor, tileIndex, c) end
 					end)
 				end)
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1.06}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.18)}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
-					TweenService:Create(BtnScale, TweenInfo.new(0.15), {Scale = 1}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
 				end)
 			end
 
 			registerElement(Card, calculatedHeight, cfg.Position)
 
 			local MultiColorController = {}
-			function MultiColorController:Get(index)
-				local b = tiles[index or 1]
-				if b then return b.BackgroundColor3 end
+			function MultiColorController:GetColor(index)
+				local t = tiles[index or 1]
+				if t then return t.Color end
 				return nil
 			end
-			function MultiColorController:GetAll()
+			function MultiColorController:GetAllColors()
 				local out = {}
-				for i, b in ipairs(tiles) do out[i] = b.BackgroundColor3 end
+				for i, t in ipairs(tiles) do out[i] = t.Color end
 				return out
 			end
-			function MultiColorController:Set(index, color)
+			function MultiColorController:SetColor(index, color)
 				if typeof(color) ~= "Color3" then return end
-				local b = tiles[index]
-				if b then b.BackgroundColor3 = color end
+				local t = tiles[index]
+				if t then t.Color = color; t.Btn.BackgroundColor3 = color end
+			end
+			function MultiColorController:Click(index)
+				local t = tiles[index]
+				if t and t.Callback then task.spawn(t.Callback, index) end
 			end
 			return MultiColorController
 		end
