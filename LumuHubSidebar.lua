@@ -5513,13 +5513,12 @@ function Astral:MakeWindow(config)
 		end
 
 
-		-- MultiColorPicker: like MultiButton, but every button carries its own
-		-- mini color picker. Tap the tile = button Callback. Tap the dot = opens
-		-- the color picker; confirming recolors the tile + fires OnColor.
+		-- MultiColorPicker: MultiButton-style buttons where every tile is a
+		-- mini color picker. Tap a tile to open the picker; confirming recolors
+		-- the tile and fires Callback(index, color).
 		-- Usage: tab:AddMultiColorPicker({ Title = "Skins", Columns = 2, Buttons = {
 		--   { Title = "Kill", Icon = "Gun", Color = "red",
-		--     Callback = function(i) print("pressed", i) end,
-		--     OnColor = function(i, c) print("recolored", i, c) end },
+		--     Callback = function(i, c) print(i, c) end },
 		-- }})
 		function TabObject:AddMultiColorPicker(cfg)
 			cfg = cfg or {}
@@ -5613,7 +5612,6 @@ function Astral:MakeWindow(config)
 				local bTitle = item.Title
 				local bIcon = parseIcon(item.Icon)
 				local bCallback = item.Callback or function() end
-				local bOnColor = item.OnColor
 				local bColor = parseButtonColor(item.Color) or Color3.fromRGB(40, 40, 48)
 				local baseName = (bTitle and bTitle ~= "") and bTitle or ("Color " .. i)
 
@@ -5630,6 +5628,13 @@ function Astral:MakeWindow(config)
 				local BtnCorner = Instance.new("UICorner")
 				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
+
+				local BtnStroke = Instance.new("UIStroke")
+				BtnStroke.Color = Color3.fromRGB(255, 255, 255)
+				BtnStroke.Transparency = 0.75
+				BtnStroke.Thickness = 1
+				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				BtnStroke.Parent = Btn
 
 				if bIcon then
 					local BIcon = Instance.new("ImageLabel")
@@ -5654,7 +5659,7 @@ function Astral:MakeWindow(config)
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
 					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
-					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 30, 1, 0)
+					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 10, 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					tr(BLabel, bTitle)
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5664,44 +5669,16 @@ function Astral:MakeWindow(config)
 					BLabel.Parent = Btn
 				end
 
-				local Dot = Instance.new("TextButton")
-				Dot.Name = "ColorDot"
-				Dot.AnchorPoint = Vector2.new(1, 0)
-				Dot.Position = UDim2.new(1, -5, 0, 5)
-				Dot.Size = UDim2.new(0, 18, 0, 18)
-				Dot.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
-				Dot.BorderSizePixel = 0
-				Dot.Text = ""
-				Dot.AutoButtonColor = false
-				Dot.ZIndex = 2
-				Dot.Parent = Btn
-
-				local DotCorner = Instance.new("UICorner")
-				DotCorner.CornerRadius = UDim.new(1, 0)
-				DotCorner.Parent = Dot
-
-				local DotStroke = Instance.new("UIStroke")
-				DotStroke.Color = Color3.fromRGB(255, 255, 255)
-				DotStroke.Transparency = 0.5
-				DotStroke.Thickness = 1
-				DotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-				DotStroke.Parent = Dot
-
-				tiles[i] = {Btn = Btn, Color = bColor, Callback = bCallback, OnColor = bOnColor}
+				tiles[i] = {Btn = Btn, Color = bColor, Callback = bCallback}
 				local tileIndex = i
 				Btn.MouseButton1Click:Connect(function()
-					if pickerOpen or selectorOpen then return end
-					local t = tiles[tileIndex]
-					if t and t.Callback then task.spawn(t.Callback, tileIndex) end
-				end)
-				Dot.MouseButton1Click:Connect(function()
 					if pickerOpen or selectorOpen then return end
 					local t = tiles[tileIndex]
 					if not t then return end
 					openColorPicker(t.Color, function(c)
 						t.Color = c
 						t.Btn.BackgroundColor3 = c
-						if t.OnColor then task.spawn(t.OnColor, tileIndex, c) end
+						task.spawn(t.Callback, tileIndex, c)
 					end)
 				end)
 				Btn.MouseEnter:Connect(function()
@@ -5733,7 +5710,7 @@ function Astral:MakeWindow(config)
 			end
 			function MultiColorController:Click(index)
 				local t = tiles[index]
-				if t and t.Callback then task.spawn(t.Callback, index) end
+				if t and t.Callback then task.spawn(t.Callback, index, t.Color) end
 			end
 			return MultiColorController
 		end
