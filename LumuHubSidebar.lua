@@ -5868,7 +5868,7 @@ function Astral:MakeWindow(config)
 			local GridLayout = Instance.new("UIGridLayout")
 			local shrink = math.ceil((columns - 1) * gap / columns)
 			GridLayout.CellSize = UDim2.new(1 / columns, -shrink, 0, btnH)
-			GridLayout.CellPadding = UDim.new(0, gap, 0, gap)
+			GridLayout.CellPadding = UDim2.new(0, gap, 0, gap)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.FillDirectionMaxCells = columns
 			GridLayout.Parent = Grid
