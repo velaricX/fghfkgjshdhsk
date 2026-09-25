@@ -5905,13 +5905,15 @@ function Astral:MakeWindow(config)
 
 				local TilePreview = nil
 				if not iconOnlyMode then
-					TilePreview = Instance.new("Frame")
-					TilePreview.Name = "ColorPreview"
-					TilePreview.AnchorPoint = Vector2.new(1, 0.5)
-					TilePreview.Position = UDim2.new(1, -8, 0.5, 0)
-					TilePreview.Size = UDim2.new(0, 26, 0, 26)
+					TilePreview = Instance.new("TextButton")
+					TilePreview.Name = "ColorBox"
+					TilePreview.AnchorPoint = Vector2.new(1, 0)
+					TilePreview.Position = UDim2.new(1, -6, 0, 6)
+					TilePreview.Size = UDim2.new(0, 22, 0, 22)
 					TilePreview.BackgroundColor3 = bColor
 					TilePreview.BorderSizePixel = 0
+					TilePreview.Text = ""
+					TilePreview.AutoButtonColor = false
 					TilePreview.ZIndex = 2
 					TilePreview.Parent = Btn
 
@@ -5926,40 +5928,6 @@ function Astral:MakeWindow(config)
 					PreviewStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 					PreviewStroke.Parent = TilePreview
 				end
-
-				-- rainbow dot: marks the tile as a color picker
-				local PickHint = Instance.new("Frame")
-				PickHint.Name = "PickHint"
-				PickHint.AnchorPoint = Vector2.new(1, 1)
-				PickHint.Position = UDim2.new(1, -6, 1, -6)
-				PickHint.Size = UDim2.new(0, 20, 0, 20)
-				PickHint.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-				PickHint.BorderSizePixel = 0
-				PickHint.ZIndex = 2
-				PickHint.Parent = Btn
-
-				local PickHintCorner = Instance.new("UICorner")
-				PickHintCorner.CornerRadius = UDim.new(1, 0)
-				PickHintCorner.Parent = PickHint
-
-				local PickHintGrad = Instance.new("UIGradient")
-				PickHintGrad.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-					ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
-					ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
-					ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
-					ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 0, 255)),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255)),
-				})
-				PickHintGrad.Rotation = 45
-				PickHintGrad.Parent = PickHint
-
-				local PickHintStroke = Instance.new("UIStroke")
-				PickHintStroke.Color = Color3.fromRGB(255, 255, 255)
-				PickHintStroke.Transparency = 0.4
-				PickHintStroke.Thickness = 1
-				PickHintStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-				PickHintStroke.Parent = PickHint
 
 				if bIcon then
 					local BIcon = Instance.new("ImageLabel")
@@ -6007,6 +5975,19 @@ function Astral:MakeWindow(config)
 						task.spawn(t.Callback, tileIndex, c)
 					end)
 				end)
+				if TilePreview then
+					TilePreview.MouseButton1Click:Connect(function()
+						if pickerOpen or selectorOpen then return end
+						local t = tiles[tileIndex]
+						if not t then return end
+						openColorPicker(t.Color, function(c)
+							t.Color = c
+							t.Btn.BackgroundColor3 = c
+							if t.Preview then t.Preview.BackgroundColor3 = c end
+							task.spawn(t.Callback, tileIndex, c)
+						end)
+					end)
+				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
 					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.18)}):Play()
