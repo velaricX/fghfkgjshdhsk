@@ -2668,8 +2668,8 @@ function Astral:MakeWindow(config)
 					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(st.BStroke, TweenInfo.new(0.18), {
-					Color = on and AccentColor or Color3.fromRGB(70, 70, 80),
-					Transparency = on and 0 or 0.5
+					Color = Color3.fromRGB(70, 70, 80),
+					Transparency = 0.5
 				}):Play()
 				TweenService:Create(st.BText, TweenInfo.new(0.18), {
 					TextColor3 = on and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 160, 168)
@@ -5979,7 +5979,7 @@ function Astral:MakeWindow(config)
 			StBtnCorner.Parent = StBtn
 
 			local StBtnStroke = Instance.new("UIStroke")
-			StBtnStroke.Color = AccentColor
+			StBtnStroke.Color = Color3.fromRGB(70, 70, 80)
 			StBtnStroke.Thickness = 1
 			StBtnStroke.Transparency = 0.5
 			StBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
