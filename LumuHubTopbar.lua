@@ -6071,7 +6071,8 @@ function Astral:MakeWindow(config)
 
 				local Btn = Instance.new("TextButton")
 				Btn.Name = baseName .. "_MultiColorBtn"
-				Btn.BackgroundColor3 = iconOnlyMode and bColor or Color3.fromRGB(26, 26, 30)				Btn.BorderSizePixel = 0
+				Btn.BackgroundColor3 = iconOnlyMode and bColor or Color3.fromRGB(26, 26, 30)
+				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
 				Btn.ClipsDescendants = true
