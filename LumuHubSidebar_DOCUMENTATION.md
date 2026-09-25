@@ -442,6 +442,34 @@ color, so themes recolor it.
 **Icon-only mode:** if *every* button has no `Title`, they render as big square
 icon tiles (44–72px, centered) instead of bars — great for teleport/shortcut pads.
 
+### MultiColorPicker — MultiButton tiles, each a mini color picker
+
+*(testingbeta + NewUiBeta)* Same `Buttons` shape as MultiButton
+(`Title` / `Icon` / `Color` / `Callback`), but every tile carries a color box:
+tapping a tile (or its box) opens the color picker panel, and confirming
+recolors the tile and fires `Callback(index, color)`.
+
+```lua
+local skins = Tab:AddMultiColorPicker({
+  Title = "Skin Colors",
+  Description = "Tap a tile to recolor it.",  -- optional
+  Columns = 2,                                -- tiles per row (default 2)
+  Position = "Left",                          -- optional, like other elements
+  Buttons = {
+    { Title = "Kill", Icon = "Gun", Color = "red",
+      Callback = function(i, c) print("picked", i, c) end },
+    { Title = "Loot", Icon = "Money", Color = "green",
+      Callback = function(i, c) print("picked", i, c) end },
+  },
+})
+skins:GetColor(1)            -- Color3 of tile 1
+skins:SetColor(1, Color3.fromRGB(0, 0, 0))
+skins:GetAllColors()         -- table of Color3
+skins:Click(1)               -- fire tile 1's callback
+-- Colors accept Color3 or names (red, green, blue, cyan, purple, pink,
+-- orange, gold, white). Tiles without Title render as icon-only swatches.
+```
+
 ### Discord Invite Card (260px)
 
 ```lua
@@ -466,6 +494,23 @@ Tab:AddDiscordCard({
 -- invite unless you set ServerName / ServerIconId yourself. If the request
 -- fails (offline), the fallback numbers stay.
 ```
+
+### Sub-Tabs — tabs inside a tab *(NewUiBeta only)*
+
+```lua
+local Farming = Window:MakeTab({ "Farming", "Badge Star" })
+
+local Sea1 = Farming:AddSubTab({ Name = "Sea 1 Farming" })  -- or AddSubTab("Sea 1")
+Sea1:AddToggle({ Title = "Auto Level", Callback = function() end })
+
+local Sea2 = Farming:AddSubTab({ Name = "Sea 2 Farming", Icon = "Trophy1" })
+Sea2:AddButton({ Title = "Start", Callback = function() end })
+```
+
+A horizontal sub-tab strip appears at the top of the tab (floating rounded
+card). Each sub-tab's elements show only while it is active; elements added
+directly to the parent tab stay visible everywhere. The first sub-tab
+auto-selects, and sub-tab names translate like everything else.
 
 ## 4b. Game Status — small draggable overlay
 
