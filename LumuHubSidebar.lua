@@ -198,117 +198,6 @@ Astral:AddTranslations("Deutsch", {
 	["(+%d more)"] = "(+%d weitere)",
 })
 
--- Every language Google Translate supports. AddAutoTranslations() builds a
--- normal selector from this list; picking one machine-translates every
--- registered English string via Google's free endpoint (no API key needed).
-Astral.GoogleLanguages = {
-	{Name = "English", Code = "en"},
-	{Name = "Afrikaans", Code = "af"},
-	{Name = "Albanian", Code = "sq"},
-	{Name = "Amharic", Code = "am"},
-	{Name = "Arabic", Code = "ar"},
-	{Name = "Armenian", Code = "hy"},
-	{Name = "Azerbaijani", Code = "az"},
-	{Name = "Basque", Code = "eu"},
-	{Name = "Belarusian", Code = "be"},
-	{Name = "Bengali", Code = "bn"},
-	{Name = "Bosnian", Code = "bs"},
-	{Name = "Bulgarian", Code = "bg"},
-	{Name = "Catalan", Code = "ca"},
-	{Name = "Cebuano", Code = "ceb"},
-	{Name = "Chichewa", Code = "ny"},
-	{Name = "Chinese (Simplified)", Code = "zh-cn"},
-	{Name = "Chinese (Traditional)", Code = "zh-tw"},
-	{Name = "Corsican", Code = "co"},
-	{Name = "Croatian", Code = "hr"},
-	{Name = "Czech", Code = "cs"},
-	{Name = "Danish", Code = "da"},
-	{Name = "Deutsch", Code = "de"},
-	{Name = "Dutch", Code = "nl"},
-	{Name = "Esperanto", Code = "eo"},
-	{Name = "Estonian", Code = "et"},
-	{Name = "Filipino", Code = "tl"},
-	{Name = "Finnish", Code = "fi"},
-	{Name = "Français", Code = "fr"},
-	{Name = "Frisian", Code = "fy"},
-	{Name = "Galician", Code = "gl"},
-	{Name = "Georgian", Code = "ka"},
-	{Name = "Greek", Code = "el"},
-	{Name = "Gujarati", Code = "gu"},
-	{Name = "Haitian Creole", Code = "ht"},
-	{Name = "Hausa", Code = "ha"},
-	{Name = "Hawaiian", Code = "haw"},
-	{Name = "Hebrew", Code = "he"},
-	{Name = "Hindi", Code = "hi"},
-	{Name = "Hmong", Code = "hmn"},
-	{Name = "Hungarian", Code = "hu"},
-	{Name = "Icelandic", Code = "is"},
-	{Name = "Igbo", Code = "ig"},
-	{Name = "Indonesian", Code = "id"},
-	{Name = "Irish", Code = "ga"},
-	{Name = "Italian", Code = "it"},
-	{Name = "Japanese", Code = "ja"},
-	{Name = "Javanese", Code = "jv"},
-	{Name = "Kannada", Code = "kn"},
-	{Name = "Kazakh", Code = "kk"},
-	{Name = "Khmer", Code = "km"},
-	{Name = "Korean", Code = "ko"},
-	{Name = "Kurdish", Code = "ku"},
-	{Name = "Kyrgyz", Code = "ky"},
-	{Name = "Lao", Code = "lo"},
-	{Name = "Latin", Code = "la"},
-	{Name = "Latvian", Code = "lv"},
-	{Name = "Lithuanian", Code = "lt"},
-	{Name = "Luxembourgish", Code = "lb"},
-	{Name = "Macedonian", Code = "mk"},
-	{Name = "Malagasy", Code = "mg"},
-	{Name = "Malay", Code = "ms"},
-	{Name = "Malayalam", Code = "ml"},
-	{Name = "Maltese", Code = "mt"},
-	{Name = "Maori", Code = "mi"},
-	{Name = "Marathi", Code = "mr"},
-	{Name = "Mongolian", Code = "mn"},
-	{Name = "Myanmar", Code = "my"},
-	{Name = "Nepali", Code = "ne"},
-	{Name = "Norwegian", Code = "no"},
-	{Name = "Odia", Code = "or"},
-	{Name = "Pashto", Code = "ps"},
-	{Name = "Persian", Code = "fa"},
-	{Name = "Polish", Code = "pl"},
-	{Name = "Portuguese", Code = "pt"},
-	{Name = "Punjabi", Code = "pa"},
-	{Name = "Romanian", Code = "ro"},
-	{Name = "Russian", Code = "ru"},
-	{Name = "Samoan", Code = "sm"},
-	{Name = "Scots Gaelic", Code = "gd"},
-	{Name = "Serbian", Code = "sr"},
-	{Name = "Sesotho", Code = "st"},
-	{Name = "Shona", Code = "sn"},
-	{Name = "Sindhi", Code = "sd"},
-	{Name = "Sinhala", Code = "si"},
-	{Name = "Slovak", Code = "sk"},
-	{Name = "Slovenian", Code = "sl"},
-	{Name = "Somali", Code = "so"},
-	{Name = "Español", Code = "es"},
-	{Name = "Sundanese", Code = "su"},
-	{Name = "Swahili", Code = "sw"},
-	{Name = "Swedish", Code = "sv"},
-	{Name = "Tajik", Code = "tg"},
-	{Name = "Tamil", Code = "ta"},
-	{Name = "Telugu", Code = "te"},
-	{Name = "Thai", Code = "th"},
-	{Name = "Turkish", Code = "tr"},
-	{Name = "Ukrainian", Code = "uk"},
-	{Name = "Urdu", Code = "ur"},
-	{Name = "Uyghur", Code = "ug"},
-	{Name = "Uzbek", Code = "uz"},
-	{Name = "Vietnamese", Code = "vi"},
-	{Name = "Welsh", Code = "cy"},
-	{Name = "Xhosa", Code = "xh"},
-	{Name = "Yiddish", Code = "yi"},
-	{Name = "Yoruba", Code = "yo"},
-	{Name = "Zulu", Code = "zu"},
-}
 
 -- Comprehensive Icon Dictionary
 Astral.Icons = {
@@ -3960,111 +3849,6 @@ function Astral:MakeWindow(config)
 
 			return SelectorController
 		end
-		-- =========================================================================
-		-- AUTO TRANSLATIONS (Google-powered language selector)
-		-- A normal selector pre-filled with every Google Translate language.
-		-- Picking one machine-translates every registered UI string via
-		-- Google's free endpoint (no API key, source language auto-detected)
-		-- and applies it live.
-		-- Manual Astral:AddTranslations() packs are separate and untouched;
-		-- auto-fill only adds keys missing from that language (manual wins).
-		-- Usage: tab:AddAutoTranslations({ Title = "Language", Icon = "Badge Gear" })
-		-- =========================================================================
-		function TabObject:AddAutoTranslations(config)
-			config = config or {}
-			local names = {}
-			local codeByName = {}
-			for _, lang in ipairs(Astral.GoogleLanguages or {}) do
-				if type(lang.Name) == "string" and type(lang.Code) == "string" then
-					table.insert(names, lang.Name)
-					codeByName[lang.Name] = lang.Code
-				end
-			end
-			local busy = false
-			local function applyGoogleLanguage(pick)
-				local langName = tostring(pick or "")
-				local code = codeByName[langName]
-				if code == nil or code == "" or busy then return end
-				if code == "en" then
-					Astral:SetLanguage("English")
-					task.spawn(config.Callback or function() end, langName)
-					return
-				end
-				busy = true
-				Window:Notify({ Type = "info", Title = "Translating", Message = "Fetching " .. langName .. "...", Duration = 5 })
-				task.spawn(function()
-					local seen, keys = {}, {}
-					local function addKey(k)
-						if type(k) == "string" and k ~= "" and not seen[k] then
-							seen[k] = true
-							table.insert(keys, k)
-						end
-					end
-					for _, item in ipairs(translatableLabels) do addKey(item.Key) end
-					addKey("Select..."); addKey("None"); addKey("Search...")
-					addKey("Select Option"); addKey("(+%d more)")
-					local dict = {}
-					local CHUNK = 20
-					for ci = 1, #keys, CHUNK do
-						local chunk = {}
-						for i = ci, math.min(ci + CHUNK - 1, #keys) do
-							table.insert(chunk, keys[i])
-						end
-						local url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" .. code .. "&dt=t"
-						for _, k in ipairs(chunk) do
-							local okE, enc = pcall(function() return HttpService:UrlEncode(k) end)
-							url = url .. "&q=" .. ((okE and enc) or k)
-						end
-						local res = webGet(url)
-						if type(res) == "string" and res ~= "" then
-							local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
-							if ok2 and type(js) == "table" then
-								for i, k in ipairs(chunk) do
-									local block = js[i]
-									if type(block) == "table" then
-										local parts = {}
-										for _, seg in ipairs(block) do
-											if type(seg) == "table" and type(seg[1]) == "string" then
-												table.insert(parts, seg[1])
-											end
-										end
-										if #parts > 0 then dict[k] = table.concat(parts) end
-									end
-								end
-							end
-						end
-						task.wait(0.1)
-					end
-					if next(dict) == nil then
-						busy = false
-						Window:Notify({ Type = "bad", Title = "Translate failed", Message = "Google blocked the request. Try again later.", Duration = 6 })
-						return
-					end
-					Astral.Languages[langName] = Astral.Languages[langName] or {}
-					for k, v in pairs(dict) do
-						if Astral.Languages[langName][k] == nil then
-							Astral.Languages[langName][k] = v
-						end
-					end
-					Astral:SetLanguage(langName)
-					busy = false
-					Window:Notify({ Type = "good", Title = "Language", Message = langName .. " applied.", Duration = 4 })
-					task.spawn(config.Callback or function() end, langName)
-				end)
-			end
-			return TabObject:AddSelector({
-				Title = config.Title or "Language",
-				Description = config.Description,
-				Icon = config.Icon,
-				Options = names,
-				Default = config.Default or "English",
-				Search = (config.Search == nil) and true or config.Search,
-				Callback = applyGoogleLanguage,
-				Flag = config.Flag,
-				Position = config.Position,
-			})
-		end
-		TabObject.Addautotranslations = TabObject.AddAutoTranslations
 		TabObject.Addselector = TabObject.AddSelector -- Alias to support lowercase calls
 
 
@@ -5728,11 +5512,238 @@ function Astral:MakeWindow(config)
 			return MultiController
 		end
 
+
+		-- MultiColorPicker: like MultiButton, but every button carries its own
+		-- mini color picker. Tap the tile = button Callback. Tap the dot = opens
+		-- the color picker; confirming recolors the tile + fires OnColor.
+		-- Usage: tab:AddMultiColorPicker({ Title = "Skins", Columns = 2, Buttons = {
+		--   { Title = "Kill", Icon = "Gun", Color = "red",
+		--     Callback = function(i) print("pressed", i) end,
+		--     OnColor = function(i, c) print("recolored", i, c) end },
+		-- }})
+		function TabObject:AddMultiColorPicker(cfg)
+			cfg = cfg or {}
+			local title = cfg.Title or "Colors"
+			local description = cfg.Description
+			local items = cfg.Buttons or {}
+			local columns = math.max(1, math.floor(cfg.Columns or 2))
+			if IsMobile and columns > 2 then columns = 2 end
+			local hasDesc = description and description ~= "" or false
+
+			local iconOnlyMode = #items > 0
+			for _, it in ipairs(items) do
+				if it and it.Title and it.Title ~= "" then iconOnlyMode = false; break end
+			end
+
+			local pad = IsMobile and 6 or 10
+			local gap = IsMobile and 6 or 10
+			local btnH = iconOnlyMode and (IsMobile and 48 or 64) or (IsMobile and 40 or 48)
+			local headerH = hasDesc and (IsMobile and 30 or 36) or (IsMobile and 18 or 22)
+			local rows = math.max(1, math.ceil(math.max(1, #items) / columns))
+			local gridH = rows * btnH + (rows - 1) * gap
+			local calculatedHeight = pad + headerH + 10 + gridH + pad
+
+			local Card = Instance.new("Frame")
+			Card.Name = title .. "_MultiColorPicker"
+			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BorderSizePixel = 0
+			Card.Size = UDim2.new(1, 0, 0, calculatedHeight)
+
+			local CardCorner = Instance.new("UICorner")
+			CardCorner.CornerRadius = UDim.new(0, 8)
+			CardCorner.Parent = Card
+
+			local CardStroke = Instance.new("UIStroke")
+			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Thickness = 1
+			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			CardStroke.Parent = Card
+
+			local Header = Instance.new("Frame")
+			Header.Name = "Header"
+			Header.BackgroundTransparency = 1
+			Header.Position = UDim2.new(0, pad, 0, pad)
+			Header.Size = UDim2.new(1, -pad * 2, 0, headerH)
+			Header.Parent = Card
+
+			local TitleLabel = Instance.new("TextLabel")
+			TitleLabel.Name = "Title"
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
+			TitleLabel.Font = Enum.Font.GothamBold
+			tr(TitleLabel, title)
+			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			regText(TitleLabel, 12)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.Parent = Header
+
+			if hasDesc then
+				local DescLabel = Instance.new("TextLabel")
+				DescLabel.Name = "Description"
+				DescLabel.BackgroundTransparency = 1
+				DescLabel.Size = UDim2.new(1, 0, 0, 16)
+				DescLabel.Font = Enum.Font.Gotham
+				tr(DescLabel, description)
+				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				regText(DescLabel, 10)
+				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
+				DescLabel.Parent = Header
+			end
+
+			local Grid = Instance.new("Frame")
+			Grid.Name = "ButtonGrid"
+			Grid.BackgroundTransparency = 1
+			Grid.Position = UDim2.new(0, pad, 0, pad + headerH + 10)
+			Grid.Size = UDim2.new(1, -pad * 2, 0, gridH)
+			Grid.Parent = Card
+
+			local GridLayout = Instance.new("UIGridLayout")
+			local shrink = math.ceil((columns - 1) * gap / columns)
+			GridLayout.CellSize = UDim2.new(1 / columns, -shrink, 0, btnH)
+			GridLayout.CellPadding = UDim.new(0, gap, 0, gap)
+			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			GridLayout.FillDirectionMaxCells = columns
+			GridLayout.Parent = Grid
+
+			local tiles = {}
+			for i, item in ipairs(items) do
+				item = item or {}
+				local bTitle = item.Title
+				local bIcon = parseIcon(item.Icon)
+				local bCallback = item.Callback or function() end
+				local bOnColor = item.OnColor
+				local bColor = parseButtonColor(item.Color) or Color3.fromRGB(40, 40, 48)
+				local baseName = (bTitle and bTitle ~= "") and bTitle or ("Color " .. i)
+
+				local Btn = Instance.new("TextButton")
+				Btn.Name = baseName .. "_MultiColorBtn"
+				Btn.BackgroundColor3 = bColor
+				Btn.BorderSizePixel = 0
+				Btn.Text = ""
+				Btn.AutoButtonColor = false
+				Btn.ClipsDescendants = true
+				Btn.LayoutOrder = i
+				Btn.Parent = Grid
+
+				local BtnCorner = Instance.new("UICorner")
+				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
+				BtnCorner.Parent = Btn
+
+				if bIcon then
+					local BIcon = Instance.new("ImageLabel")
+					BIcon.Name = "Icon"
+					BIcon.BackgroundTransparency = 1
+					if iconOnlyMode then
+						BIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+						BIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+					else
+						BIcon.AnchorPoint = Vector2.new(0, 0.5)
+						BIcon.Position = UDim2.new(0, 10, 0.5, 0)
+					end
+					BIcon.Size = UDim2.new(0, IsMobile and 18 or 22, 0, IsMobile and 18 or 22)
+					Astral.ApplyIcon(BIcon, bIcon)
+					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					BIcon.ScaleType = Enum.ScaleType.Fit
+					BIcon.Parent = Btn
+				end
+
+				if not iconOnlyMode and bTitle and bTitle ~= "" then
+					local BLabel = Instance.new("TextLabel")
+					BLabel.Name = "Label"
+					BLabel.BackgroundTransparency = 1
+					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
+					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 30, 1, 0)
+					BLabel.Font = Enum.Font.GothamBold
+					tr(BLabel, bTitle)
+					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					BLabel.TextSize = IsMobile and 10 or 12
+					BLabel.TextXAlignment = Enum.TextXAlignment.Left
+					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
+					BLabel.Parent = Btn
+				end
+
+				local Dot = Instance.new("TextButton")
+				Dot.Name = "ColorDot"
+				Dot.AnchorPoint = Vector2.new(1, 0)
+				Dot.Position = UDim2.new(1, -5, 0, 5)
+				Dot.Size = UDim2.new(0, 18, 0, 18)
+				Dot.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+				Dot.BorderSizePixel = 0
+				Dot.Text = ""
+				Dot.AutoButtonColor = false
+				Dot.ZIndex = 2
+				Dot.Parent = Btn
+
+				local DotCorner = Instance.new("UICorner")
+				DotCorner.CornerRadius = UDim.new(1, 0)
+				DotCorner.Parent = Dot
+
+				local DotStroke = Instance.new("UIStroke")
+				DotStroke.Color = Color3.fromRGB(255, 255, 255)
+				DotStroke.Transparency = 0.5
+				DotStroke.Thickness = 1
+				DotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				DotStroke.Parent = Dot
+
+				tiles[i] = {Btn = Btn, Color = bColor, Callback = bCallback, OnColor = bOnColor}
+				local tileIndex = i
+				Btn.MouseButton1Click:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					local t = tiles[tileIndex]
+					if t and t.Callback then task.spawn(t.Callback, tileIndex) end
+				end)
+				Dot.MouseButton1Click:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					local t = tiles[tileIndex]
+					if not t then return end
+					openColorPicker(t.Color, function(c)
+						t.Color = c
+						t.Btn.BackgroundColor3 = c
+						if t.OnColor then task.spawn(t.OnColor, tileIndex, c) end
+					end)
+				end)
+				Btn.MouseEnter:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.18)}):Play()
+				end)
+				Btn.MouseLeave:Connect(function()
+					TweenService:Create(Btn, TweenInfo.new(0.15), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
+				end)
+			end
+
+			registerElement(Card, calculatedHeight, cfg.Position)
+
+			local MultiColorController = {}
+			function MultiColorController:GetColor(index)
+				local t = tiles[index or 1]
+				if t then return t.Color end
+				return nil
+			end
+			function MultiColorController:GetAllColors()
+				local out = {}
+				for i, t in ipairs(tiles) do out[i] = t.Color end
+				return out
+			end
+			function MultiColorController:SetColor(index, color)
+				if typeof(color) ~= "Color3" then return end
+				local t = tiles[index]
+				if t then t.Color = color; t.Btn.BackgroundColor3 = color end
+			end
+			function MultiColorController:Click(index)
+				local t = tiles[index]
+				if t and t.Callback then task.spawn(t.Callback, index) end
+			end
+			return MultiColorController
+		end
+		TabObject.Addmulticolorpicker = TabObject.AddMultiColorPicker
+
 		-- Fault tolerance: one bad element can never kill the whole UI build.
 		-- Any failing Add* call is skipped and reported instead of aborting.
 		do
 			local addNames = {"AddButton", "AddToggle", "AddTick", "AddSlider", "AddTextbox",
-				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton", "AddAutoTranslations"}
+				"AddSelector", "AddColorpicker", "AddLabel", "AddParagraph", "AddKeybind", "AddDiscordCard", "AddMultiButton", "AddMultiColorPicker"}
 			for _, addName in ipairs(addNames) do
 				local orig = TabObject[addName]
 				if type(orig) == "function" then
