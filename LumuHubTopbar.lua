@@ -6165,7 +6165,6 @@ function Astral:MakeWindow(config)
 						if not t then return end
 						openColorPicker(t.Color, function(c)
 							t.Color = c
-							t.Btn.BackgroundColor3 = c
 							if t.Preview then t.Preview.BackgroundColor3 = c end
 							task.spawn(t.Callback, tileIndex, c)
 						end)
