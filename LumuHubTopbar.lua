@@ -2572,20 +2572,18 @@ function Astral:MakeWindow(config)
 		SubTabBar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 		SubTabBar.BackgroundTransparency = 0
 		SubTabBar.BorderSizePixel = 0
-		SubTabBar.Size = UDim2.new(1, 0, 0, SubTabBarHeight)
-		SubTabBar.Position = UDim2.new(0, 0, 0, 0)
+		SubTabBar.Size = UDim2.new(1, -24, 0, SubTabBarHeight)
+		SubTabBar.Position = UDim2.new(0, 12, 0, 6)
 		SubTabBar.ClipsDescendants = true
 		SubTabBar.Visible = false
 		SubTabBar.ZIndex = 5
 		SubTabBar.Parent = TabPage
 
-		local SubTabBarSeparator = Instance.new("Frame")
-		SubTabBarSeparator.BackgroundColor3 = Color3.fromRGB(32, 32, 38)
-		SubTabBarSeparator.BorderSizePixel = 0
-		SubTabBarSeparator.Position = UDim2.new(0, 0, 1, -1)
-		SubTabBarSeparator.Size = UDim2.new(1, 0, 0, 1)
-		SubTabBarSeparator.ZIndex = 6
-		SubTabBarSeparator.Parent = SubTabBar
+		local SubTabBarCorner = Instance.new("UICorner")
+		SubTabBarCorner.CornerRadius = UDim.new(0, 10)
+		SubTabBarCorner.Parent = SubTabBar
+
+		-- (rounded floating card needs no separator line)
 
 		local SubTabScroll = Instance.new("ScrollingFrame")
 		SubTabScroll.Name = "SubTabScroll"
@@ -5938,9 +5936,9 @@ function Astral:MakeWindow(config)
 			-- 首次调用才显示 sub-tab 栏，原 PageScroll 下移让位
 			if not subTabBarShown then
 				subTabBarShown = true
-				SubTabBar.Visible = true
-				PageScroll.Position = UDim2.new(0, 0, 0, SubTabBarHeight)
-				PageScroll.Size = UDim2.new(1, 0, 1, -SubTabBarHeight)
+			SubTabBar.Visible = true
+			PageScroll.Position = UDim2.new(0, 0, 0, SubTabBarHeight + 6)
+			PageScroll.Size = UDim2.new(1, 0, 1, -(SubTabBarHeight + 6))
 			end
 
 			local stIdx = #subTabs + 1
