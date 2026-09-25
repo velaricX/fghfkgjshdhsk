@@ -6090,6 +6090,30 @@ function Astral:MakeWindow(config)
 				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				BtnStroke.Parent = Btn
 
+				local TilePreview = nil
+				if not iconOnlyMode then
+					TilePreview = Instance.new("Frame")
+					TilePreview.Name = "ColorPreview"
+					TilePreview.AnchorPoint = Vector2.new(1, 0.5)
+					TilePreview.Position = UDim2.new(1, -8, 0.5, 0)
+					TilePreview.Size = UDim2.new(0, 26, 0, 26)
+					TilePreview.BackgroundColor3 = bColor
+					TilePreview.BorderSizePixel = 0
+					TilePreview.ZIndex = 2
+					TilePreview.Parent = Btn
+
+					local PreviewCorner = Instance.new("UICorner")
+					PreviewCorner.CornerRadius = UDim.new(0, 6)
+					PreviewCorner.Parent = TilePreview
+
+					local PreviewStroke = Instance.new("UIStroke")
+					PreviewStroke.Color = Color3.fromRGB(255, 255, 255)
+					PreviewStroke.Transparency = 0.5
+					PreviewStroke.Thickness = 1
+					PreviewStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					PreviewStroke.Parent = TilePreview
+				end
+
 				-- rainbow dot: marks the tile as a color picker
 				local PickHint = Instance.new("Frame")
 				PickHint.Name = "PickHint"
@@ -6147,7 +6171,7 @@ function Astral:MakeWindow(config)
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
 					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
-					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 10, 1, 0)
+					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 44, 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					tr(BLabel, bTitle)
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -6157,7 +6181,7 @@ function Astral:MakeWindow(config)
 					BLabel.Parent = Btn
 				end
 
-				tiles[i] = {Btn = Btn, Color = bColor, Callback = bCallback}
+				tiles[i] = {Btn = Btn, Preview = TilePreview, Color = bColor, Callback = bCallback}
 				local tileIndex = i
 				Btn.MouseButton1Click:Connect(function()
 					if pickerOpen or selectorOpen then return end
@@ -6166,6 +6190,7 @@ function Astral:MakeWindow(config)
 					openColorPicker(t.Color, function(c)
 						t.Color = c
 						t.Btn.BackgroundColor3 = c
+						if t.Preview then t.Preview.BackgroundColor3 = c end
 						task.spawn(t.Callback, tileIndex, c)
 					end)
 				end)
@@ -6194,7 +6219,7 @@ function Astral:MakeWindow(config)
 			function MultiColorController:SetColor(index, color)
 				if typeof(color) ~= "Color3" then return end
 				local t = tiles[index]
-				if t then t.Color = color; t.Btn.BackgroundColor3 = color end
+				if t then t.Color = color; t.Btn.BackgroundColor3 = color; if t.Preview then t.Preview.BackgroundColor3 = color end end
 			end
 			function MultiColorController:Click(index)
 				local t = tiles[index]
