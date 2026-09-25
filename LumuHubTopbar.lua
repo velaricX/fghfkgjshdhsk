@@ -5795,7 +5795,7 @@ function Astral:MakeWindow(config)
 
 				local Btn = Instance.new("TextButton")
 				Btn.Name = baseName .. "_MultiColorBtn"
-				Btn.BackgroundColor3 = bColor
+				Btn.BackgroundColor3 = iconOnlyMode and bColor or Color3.fromRGB(26, 26, 30)
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
@@ -5807,13 +5807,19 @@ function Astral:MakeWindow(config)
 				BtnCorner.CornerRadius = UDim.new(0, iconOnlyMode and 10 or 6)
 				BtnCorner.Parent = Btn
 
+				local BtnStroke = Instance.new("UIStroke")
+				BtnStroke.Color = Color3.fromRGB(50, 50, 55)
+				BtnStroke.Thickness = 1
+				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				BtnStroke.Parent = Btn
+
 				local TilePreview = nil
 				if not iconOnlyMode then
 					TilePreview = Instance.new("TextButton")
 					TilePreview.Name = "ColorBox"
-					TilePreview.AnchorPoint = Vector2.new(1, 0)
-					TilePreview.Position = UDim2.new(1, -6, 0, 6)
-					TilePreview.Size = UDim2.new(0, 22, 0, 22)
+					TilePreview.AnchorPoint = Vector2.new(1, 0.5)
+					TilePreview.Position = UDim2.new(1, -10, 0.5, 0)
+					TilePreview.Size = UDim2.new(0, IsMobile and 48 or 56, 0, IsMobile and 22 or 26)
 					TilePreview.BackgroundColor3 = bColor
 					TilePreview.BorderSizePixel = 0
 					TilePreview.Text = ""
@@ -5822,13 +5828,12 @@ function Astral:MakeWindow(config)
 					TilePreview.Parent = Btn
 
 					local PreviewCorner = Instance.new("UICorner")
-					PreviewCorner.CornerRadius = UDim.new(0, 6)
+					PreviewCorner.CornerRadius = UDim.new(0, 8)
 					PreviewCorner.Parent = TilePreview
 
 					local PreviewStroke = Instance.new("UIStroke")
-					PreviewStroke.Color = Color3.fromRGB(255, 255, 255)
-					PreviewStroke.Transparency = 0.5
-					PreviewStroke.Thickness = 1
+					PreviewStroke.Color = Color3.fromRGB(50, 50, 55)
+					PreviewStroke.Thickness = 1.2
 					PreviewStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 					PreviewStroke.Parent = TilePreview
 				end
@@ -5856,12 +5861,12 @@ function Astral:MakeWindow(config)
 					BLabel.Name = "Label"
 					BLabel.BackgroundTransparency = 1
 					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
-					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - 44, 1, 0)
+					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - (IsMobile and 68 or 76), 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					tr(BLabel, bTitle)
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 					BLabel.TextSize = IsMobile and 10 or 12
-					BLabel.TextXAlignment = Enum.TextXAlignment.Center
+					BLabel.TextXAlignment = Enum.TextXAlignment.Left
 					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
 					BLabel.Parent = Btn
 				end
@@ -5894,10 +5899,18 @@ function Astral:MakeWindow(config)
 				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.12)}):Play()
+					if iconOnlyMode then
+						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color:Lerp(Color3.new(1, 1, 1), 0.12)}):Play()
+					else
+						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
+					end
 				end)
 				Btn.MouseLeave:Connect(function()
-					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
+					if iconOnlyMode then
+						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = tiles[tileIndex].Color}):Play()
+					else
+						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
+					end
 				end)
 			end
 
