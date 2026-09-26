@@ -1882,9 +1882,9 @@ function Astral:MakeWindow(config)
 	SearchContainer.ZIndex = 202
 	SearchContainer.Parent = SelectorPanel
 
-	local SearchCorner = Instance.new("UICorner")
-	SearchCorner.CornerRadius = UDim.new(0, 6)
-	SearchCorner.Parent = SearchContainer
+			local SearchCorner = Instance.new("UICorner")
+			SearchCorner.CornerRadius = UDim.new(0, 12)
+			SearchCorner.Parent = SearchContainer
 
 	local SearchStroke = Instance.new("UIStroke")
 	SearchStroke.Color = Color3.fromRGB(55, 55, 65) -- Higher contrast border
@@ -6009,14 +6009,14 @@ function Astral:MakeWindow(config)
 			local CountPill = Instance.new("Frame")
 			CountPill.Name = "Count"
 			CountPill.AnchorPoint = Vector2.new(1, 0)
-			CountPill.Position = UDim2.new(1, -12, 0, 35)
-			CountPill.Size = UDim2.new(0, 60, 0, 22)
+			CountPill.Position = UDim2.new(1, -12, 0, 36)
+			CountPill.Size = UDim2.new(0, 60, 0, 28)
 			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			CountPill.BorderSizePixel = 0
 			CountPill.Parent = Header
 
 			local CountPillCorner = Instance.new("UICorner")
-			CountPillCorner.CornerRadius = UDim.new(0, 6)
+			CountPillCorner.CornerRadius = UDim.new(0, 8)
 			CountPillCorner.Parent = CountPill
 
 			local CountPillLabel = Instance.new("TextLabel")
@@ -6032,7 +6032,7 @@ function Astral:MakeWindow(config)
 			SearchBox.Name = "SearchBox"
 			SearchBox.AnchorPoint = Vector2.new(0, 0)
 			SearchBox.Position = UDim2.new(0, 12, 0, 36)
-			SearchBox.Size = UDim2.new(1, -92, 0, 26)
+			SearchBox.Size = UDim2.new(1, -92, 0, 28)
 			SearchBox.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 			SearchBox.BorderSizePixel = 0
 			SearchBox.Font = Enum.Font.Gotham
@@ -6047,8 +6047,14 @@ function Astral:MakeWindow(config)
 			SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 
 			local SearchBoxCorner = Instance.new("UICorner")
-			SearchBoxCorner.CornerRadius = UDim.new(0, 13)
+			SearchBoxCorner.CornerRadius = UDim.new(0, 14)
 			SearchBoxCorner.Parent = SearchBox
+
+			local SearchBoxStroke = Instance.new("UIStroke")
+			SearchBoxStroke.Color = Color3.fromRGB(55, 55, 65)
+			SearchBoxStroke.Thickness = 1
+			SearchBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			SearchBoxStroke.Parent = SearchBox
 
 			local ViewBtn = Instance.new("TextButton")
 			ViewBtn.Name = "ViewToggle"
