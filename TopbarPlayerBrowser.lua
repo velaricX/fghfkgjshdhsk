@@ -5967,7 +5967,7 @@ function Astral:MakeWindow(config)
 			local LocalPlayer = PlayersSvc.LocalPlayer
 
 			local GRID_H = 320
-			local ROW_H = 170
+			local ROW_H = 280
 			local cardH = (mode == "Row") and ROW_H or GRID_H
 
 			local Card = Instance.new("Frame")
@@ -6047,7 +6047,7 @@ function Astral:MakeWindow(config)
 			SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 
 			local SearchBoxCorner = Instance.new("UICorner")
-			SearchBoxCorner.CornerRadius = UDim.new(0, 6)
+			SearchBoxCorner.CornerRadius = UDim.new(0, 13)
 			SearchBoxCorner.Parent = SearchBox
 
 			local ViewBtn = Instance.new("TextButton")
@@ -6065,18 +6065,40 @@ function Astral:MakeWindow(config)
 			ViewBtnCorner.CornerRadius = UDim.new(0, 6)
 			ViewBtnCorner.Parent = ViewBtn
 
+			local gridGlyph = Instance.new("Frame")
+			gridGlyph.Name = "GridGlyph"
+			gridGlyph.BackgroundTransparency = 1
+			gridGlyph.Size = UDim2.new(1, 0, 1, 0)
+			gridGlyph.Parent = ViewBtn
 			for r = 0, 1 do
 				for c = 0, 1 do
 					local sq = Instance.new("Frame")
 					sq.Size = UDim2.new(0, 6, 0, 6)
-					sq.Position = UDim2.new(0, 5 + c * 8, 0, 5 + r * 8)
+					sq.Position = UDim2.new(0, 6 + c * 8, 0, 6 + r * 8)
 					sq.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 					sq.BorderSizePixel = 0
-					sq.Parent = ViewBtn
+					sq.Parent = gridGlyph
 					local sqc = Instance.new("UICorner")
 					sqc.CornerRadius = UDim.new(0, 2)
 					sqc.Parent = sq
 				end
+			end
+			local rowGlyph = Instance.new("Frame")
+			rowGlyph.Name = "RowGlyph"
+			rowGlyph.BackgroundTransparency = 1
+			rowGlyph.Size = UDim2.new(1, 0, 1, 0)
+			rowGlyph.Visible = false
+			rowGlyph.Parent = ViewBtn
+			for r = 0, 2 do
+				local bar = Instance.new("Frame")
+				bar.Size = UDim2.new(0, 16, 0, 3)
+				bar.Position = UDim2.new(0.5, -8, 0, 5 + r * 7)
+				bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				bar.BorderSizePixel = 0
+				bar.Parent = rowGlyph
+				local barc = Instance.new("UICorner")
+				barc.CornerRadius = UDim.new(0, 1)
+				barc.Parent = bar
 			end
 
 			local GridScroll = Instance.new("ScrollingFrame")
@@ -6112,8 +6134,8 @@ function Astral:MakeWindow(config)
 			RowScroll.Position = UDim2.new(0, 0, 0, 76)
 			RowScroll.Size = UDim2.new(1, 0, 1, -84)
 			RowScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-			RowScroll.AutomaticCanvasSize = Enum.AutomaticSize.X
-			RowScroll.ScrollingDirection = Enum.ScrollingDirection.X
+			RowScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			RowScroll.ScrollingDirection = Enum.ScrollingDirection.Y
 			RowScroll.ScrollBarThickness = 3
 			RowScroll.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
 			RowScroll.ScrollBarImageTransparency = 0.4
@@ -6128,9 +6150,8 @@ function Astral:MakeWindow(config)
 			RowPad.Parent = RowScroll
 
 			local RowLayout = Instance.new("UIListLayout")
-			RowLayout.FillDirection = Enum.FillDirection.Horizontal
+			RowLayout.FillDirection = Enum.FillDirection.Vertical
 			RowLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			RowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 			RowLayout.Padding = UDim.new(0, 8)
 			RowLayout.Parent = RowScroll
 
@@ -6168,12 +6189,21 @@ function Astral:MakeWindow(config)
 				return string.lower(t)
 			end
 
+			local thumbCache = {}
 			local function makeAvatarThumb(imgLabel, player)
+				local uid = nil
+				pcall(function() uid = player.UserId end)
+				if uid and thumbCache[uid] then
+					local cached = thumbCache[uid]
+					pcall(function() imgLabel.Image = cached end)
+					return
+				end
 				task.spawn(function()
 					local ok, img = pcall(function()
 						return PlayersSvc:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
 					end)
 					if ok and type(img) == "string" and img ~= "" then
+						if uid then thumbCache[uid] = img end
 						pcall(function() imgLabel.Image = img end)
 					else
 						task.wait(2)
@@ -6181,6 +6211,7 @@ function Astral:MakeWindow(config)
 							return PlayersSvc:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
 						end)
 						if ok2 and type(img2) == "string" and img2 ~= "" then
+							if uid then thumbCache[uid] = img2 end
 							pcall(function() imgLabel.Image = img2 end)
 						end
 					end
@@ -6311,7 +6342,7 @@ function Astral:MakeWindow(config)
 				end)
 			end
 
-			local function buildRowChip(plr)
+			local function buildRowChip(plr, idx)
 				local uname = ""
 				local dname = ""
 				pcall(function() uname = tostring(plr.Name or "") end)
@@ -6322,9 +6353,10 @@ function Astral:MakeWindow(config)
 				chip.Name = "Player_" .. uname
 				chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 				chip.BorderSizePixel = 0
-				chip.Size = UDim2.new(0, 190, 0, 46)
+				chip.Size = UDim2.new(1, 0, 0, 52)
 				chip.Text = ""
 				chip.AutoButtonColor = false
+				chip.LayoutOrder = idx or 0
 				chip.Parent = RowScroll
 
 				local chipCorner = Instance.new("UICorner")
@@ -6340,8 +6372,8 @@ function Astral:MakeWindow(config)
 
 				local av = Instance.new("ImageLabel")
 				av.AnchorPoint = Vector2.new(0, 0.5)
-				av.Position = UDim2.new(0, 5, 0.5, 0)
-				av.Size = UDim2.new(0, 36, 0, 36)
+				av.Position = UDim2.new(0, 6, 0.5, 0)
+				av.Size = UDim2.new(0, 40, 0, 40)
 				av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 				av.BorderSizePixel = 0
 				av.ScaleType = Enum.ScaleType.Crop
@@ -6354,8 +6386,8 @@ function Astral:MakeWindow(config)
 
 				local dn = Instance.new("TextLabel")
 				dn.BackgroundTransparency = 1
-				dn.Position = UDim2.new(0, 47, 0, 5)
-				dn.Size = UDim2.new(1, -52, 0, 17)
+				dn.Position = UDim2.new(0, 52, 0, 6)
+				dn.Size = UDim2.new(1, -92, 0, 17)
 				dn.Font = Enum.Font.GothamBold
 				dn.Text = dname
 				dn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -6366,8 +6398,8 @@ function Astral:MakeWindow(config)
 
 				local un = Instance.new("TextLabel")
 				un.BackgroundTransparency = 1
-				un.Position = UDim2.new(0, 47, 0, 23)
-				un.Size = UDim2.new(1, -52, 0, 14)
+				un.Position = UDim2.new(0, 52, 0, 24)
+				un.Size = UDim2.new(1, -92, 0, 14)
 				un.Font = Enum.Font.Gotham
 				un.Text = "@" .. uname
 				un.TextColor3 = Color3.fromRGB(150, 150, 160)
@@ -6376,6 +6408,20 @@ function Astral:MakeWindow(config)
 				un.TextTruncate = Enum.TextTruncate.AtEnd
 				un.Parent = chip
 
+				local opt = Instance.new("TextButton")
+				opt.Name = "Options"
+				opt.AnchorPoint = Vector2.new(1, 0.5)
+				opt.Position = UDim2.new(1, -8, 0.5, 0)
+				opt.Size = UDim2.new(0, 28, 0, 28)
+				opt.BackgroundTransparency = 1
+				opt.Font = Enum.Font.GothamBold
+				opt.Text = "..."
+				opt.TextColor3 = Color3.fromRGB(160, 160, 170)
+				mTS(opt, 14)
+				opt.Parent = chip
+				opt.MouseButton1Click:Connect(function()
+					task.spawn(optionsCallback, plr)
+				end)
 				cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = Color3.fromRGB(32, 32, 40)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
@@ -6411,7 +6457,7 @@ function Astral:MakeWindow(config)
 						if mode == "Grid" then
 							buildGridCard(plr, idx)
 						else
-							buildRowChip(plr)
+							buildRowChip(plr, idx)
 						end
 					end
 				end
@@ -6462,12 +6508,36 @@ function Astral:MakeWindow(config)
 			function PlayerBrowserController:SetMode(m)
 				if m ~= "Grid" and m ~= "Row" then return end
 				mode = m
+				gridGlyph.Visible = (m == "Grid")
+				rowGlyph.Visible = (m == "Row")
 				setCardHeight((m == "Row") and ROW_H or GRID_H)
 				populate()
 			end
 			function PlayerBrowserController:GetSelected()
 				return selectedPlayer
 			end
+			local lastIds = ""
+			local function idsNow()
+				local ids = {}
+				pcall(function()
+					for _, p in ipairs(PlayersSvc:GetPlayers()) do
+						table.insert(ids, tostring(p.UserId))
+					end
+				end)
+				table.sort(ids)
+				return table.concat(ids, ",")
+			end
+			lastIds = idsNow()
+			task.spawn(function()
+				while task.wait(5) do
+					if not Card.Parent then return end
+					local cur = idsNow()
+					if cur ~= lastIds then
+						lastIds = cur
+						pcall(populate)
+					end
+				end
+			end)
 			populate()
 			return PlayerBrowserController
 		end
