@@ -5966,10 +5966,9 @@ function Astral:MakeWindow(config)
 			local PlayersSvc = game:GetService("Players")
 			local LocalPlayer = PlayersSvc.LocalPlayer
 
-			local GRID_H = 300
-			local ROW_H = 150
+			local GRID_H = 320
+			local ROW_H = 170
 			local cardH = (mode == "Row") and ROW_H or GRID_H
-			local searchW = IsMobile and 100 or 140
 
 			local Card = Instance.new("Frame")
 			Card.Name = title .. "_PlayerBrowser"
@@ -5991,14 +5990,14 @@ function Astral:MakeWindow(config)
 			local Header = Instance.new("Frame")
 			Header.Name = "Header"
 			Header.BackgroundTransparency = 1
-			Header.Size = UDim2.new(1, 0, 0, 40)
+			Header.Size = UDim2.new(1, 0, 0, 68)
 			Header.Parent = Card
 
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-			TitleLabel.Size = UDim2.new(1, -280, 1, 0)
+			TitleLabel.Position = UDim2.new(0, 12, 0, 4)
+			TitleLabel.Size = UDim2.new(1, -56, 0, 24)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -6009,9 +6008,9 @@ function Astral:MakeWindow(config)
 
 			local CountPill = Instance.new("Frame")
 			CountPill.Name = "Count"
-			CountPill.AnchorPoint = Vector2.new(1, 0.5)
-			CountPill.Position = UDim2.new(1, -196 - searchW, 0.5, 0)
-			CountPill.Size = UDim2.new(0, 64, 0, 22)
+			CountPill.AnchorPoint = Vector2.new(1, 0)
+			CountPill.Position = UDim2.new(1, -12, 0, 35)
+			CountPill.Size = UDim2.new(0, 60, 0, 22)
 			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			CountPill.BorderSizePixel = 0
 			CountPill.Parent = Header
@@ -6031,9 +6030,9 @@ function Astral:MakeWindow(config)
 
 			local SearchBox = Instance.new("TextBox")
 			SearchBox.Name = "SearchBox"
-			SearchBox.AnchorPoint = Vector2.new(1, 0.5)
-			SearchBox.Position = UDim2.new(1, -48, 0.5, 0)
-			SearchBox.Size = UDim2.new(0, searchW, 0, 26)
+			SearchBox.AnchorPoint = Vector2.new(0, 0)
+			SearchBox.Position = UDim2.new(0, 12, 0, 36)
+			SearchBox.Size = UDim2.new(1, -92, 0, 26)
 			SearchBox.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 			SearchBox.BorderSizePixel = 0
 			SearchBox.Font = Enum.Font.Gotham
@@ -6053,9 +6052,9 @@ function Astral:MakeWindow(config)
 
 			local ViewBtn = Instance.new("TextButton")
 			ViewBtn.Name = "ViewToggle"
-			ViewBtn.AnchorPoint = Vector2.new(1, 0.5)
-			ViewBtn.Position = UDim2.new(1, -10, 0.5, 0)
-			ViewBtn.Size = UDim2.new(0, 30, 0, 30)
+			ViewBtn.AnchorPoint = Vector2.new(1, 0)
+			ViewBtn.Position = UDim2.new(1, -10, 0, 5)
+			ViewBtn.Size = UDim2.new(0, 26, 0, 26)
 			ViewBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
 			ViewBtn.BorderSizePixel = 0
 			ViewBtn.Text = ""
@@ -6069,8 +6068,8 @@ function Astral:MakeWindow(config)
 			for r = 0, 1 do
 				for c = 0, 1 do
 					local sq = Instance.new("Frame")
-					sq.Size = UDim2.new(0, 8, 0, 8)
-					sq.Position = UDim2.new(0, 6 + c * 10, 0, 6 + r * 10)
+					sq.Size = UDim2.new(0, 6, 0, 6)
+					sq.Position = UDim2.new(0, 5 + c * 8, 0, 5 + r * 8)
 					sq.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 					sq.BorderSizePixel = 0
 					sq.Parent = ViewBtn
@@ -6084,8 +6083,8 @@ function Astral:MakeWindow(config)
 			GridScroll.Name = "Grid"
 			GridScroll.BackgroundTransparency = 1
 			GridScroll.BorderSizePixel = 0
-			GridScroll.Position = UDim2.new(0, 0, 0, 44)
-			GridScroll.Size = UDim2.new(1, 0, 1, -52)
+			GridScroll.Position = UDim2.new(0, 0, 0, 76)
+			GridScroll.Size = UDim2.new(1, 0, 1, -84)
 			GridScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 			GridScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			GridScroll.ScrollBarThickness = 3
@@ -6101,7 +6100,7 @@ function Astral:MakeWindow(config)
 			GridPad.Parent = GridScroll
 
 			local GridLayout = Instance.new("UIGridLayout")
-			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 3 or 5), -10, 0, 140)
+			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 140)
 			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
@@ -6110,8 +6109,8 @@ function Astral:MakeWindow(config)
 			RowScroll.Name = "Row"
 			RowScroll.BackgroundTransparency = 1
 			RowScroll.BorderSizePixel = 0
-			RowScroll.Position = UDim2.new(0, 0, 0, 44)
-			RowScroll.Size = UDim2.new(1, 0, 1, -52)
+			RowScroll.Position = UDim2.new(0, 0, 0, 76)
+			RowScroll.Size = UDim2.new(1, 0, 1, -84)
 			RowScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 			RowScroll.AutomaticCanvasSize = Enum.AutomaticSize.X
 			RowScroll.ScrollingDirection = Enum.ScrollingDirection.X
