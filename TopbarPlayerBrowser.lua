@@ -6102,7 +6102,7 @@ function Astral:MakeWindow(config)
 
 			local GridLayout = Instance.new("UIGridLayout")
 			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 3 or 5), -10, 0, 128)
-			GridLayout.CellPadding = UDim.new(0, 8)
+			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
 
