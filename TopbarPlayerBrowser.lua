@@ -6101,7 +6101,7 @@ function Astral:MakeWindow(config)
 			GridPad.Parent = GridScroll
 
 			local GridLayout = Instance.new("UIGridLayout")
-			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 3 or 5), -10, 0, 128)
+			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 3 or 5), -10, 0, 140)
 			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
@@ -6253,7 +6253,7 @@ function Astral:MakeWindow(config)
 				local av = Instance.new("ImageLabel")
 				av.Name = "Avatar"
 				av.AnchorPoint = Vector2.new(0.5, 0)
-				av.Position = UDim2.new(0.5, 0, 0, 22)
+				av.Position = UDim2.new(0.5, 0, 0, 24)
 				av.Size = UDim2.new(0, 56, 0, 56)
 				av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 				av.BorderSizePixel = 0
@@ -6267,7 +6267,7 @@ function Astral:MakeWindow(config)
 
 				local dn = Instance.new("TextLabel")
 				dn.BackgroundTransparency = 1
-				dn.Position = UDim2.new(0, 4, 0, 80)
+				dn.Position = UDim2.new(0, 4, 0, 84)
 				dn.Size = UDim2.new(1, -8, 0, 16)
 				dn.Font = Enum.Font.GothamBold
 				dn.Text = dname
@@ -6278,7 +6278,7 @@ function Astral:MakeWindow(config)
 
 				local un = Instance.new("TextLabel")
 				un.BackgroundTransparency = 1
-				un.Position = UDim2.new(0, 4, 0, 96)
+				un.Position = UDim2.new(0, 4, 0, 100)
 				un.Size = UDim2.new(1, -8, 0, 14)
 				un.Font = Enum.Font.Gotham
 				un.Text = "@" .. uname
@@ -6290,7 +6290,7 @@ function Astral:MakeWindow(config)
 				if plr == LocalPlayer then
 					local tag = Instance.new("TextLabel")
 					tag.AnchorPoint = Vector2.new(0.5, 0)
-					tag.Position = UDim2.new(0.5, 0, 0, 110)
+					tag.Position = UDim2.new(0.5, 0, 0, 116)
 					tag.Size = UDim2.new(0, 0, 0, 14)
 					tag.AutomaticSize = Enum.AutomaticSize.X
 					tag.BackgroundColor3 = Color3.fromRGB(48, 48, 58)
