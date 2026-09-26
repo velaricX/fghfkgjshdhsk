@@ -5869,7 +5869,7 @@ function Astral:MakeWindow(config)
 			SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 
 			local SearchBoxCorner = Instance.new("UICorner")
-			SearchBoxCorner.CornerRadius = UDim.new(0, 8)
+			SearchBoxCorner.CornerRadius = UDim.new(0, 4)
 			SearchBoxCorner.Parent = SearchBox
 
 			local SearchBoxStroke = Instance.new("UIStroke")
