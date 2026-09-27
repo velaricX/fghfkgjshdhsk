@@ -7441,7 +7441,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 
 		local Panel = Instance.new("Frame")
 		local gsHeaderH = IsMobile and 36 or 44
-		local gsMaxPanelH = IsMobile and 220 or 300
+		local gsMaxPanelH = tonumber(config.MaxHeight) or (IsMobile and 220 or 300)
 
 		Panel.Name = "GameStatus"
 		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
@@ -7628,6 +7628,18 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 
 		local ICON_GAP = 25
 
+		-- Measure wrapped text and grow the row so nothing is ever cut to "...".
+		local function fitRow(row)
+			local nameW = math.max(20, panelW * 0.58 - 8)
+			local valW = math.max(20, panelW * 0.42 - 8)
+			local ts = game:GetService("TextService")
+			local nY = ts:GetTextSize(row.Name.Text, row.Name.TextSize, Enum.Font.Gotham, Vector2.new(nameW, 10000)).Y
+			local vY = ts:GetTextSize(row.Value.Text, row.Value.TextSize, Enum.Font.GothamBold, Vector2.new(valW, 10000)).Y
+			local lineH = row.Name.TextSize * 1.3
+			local h = math.max(rowH, math.ceil(math.max(nY, vY) / lineH - 0.001) * lineH + 8)
+			row.Frame.Size = UDim2.new(1, 0, 0, h)
+		end
+
 		local function makeRow(name, value, iconAsset, colorOverride)
 			local Row = Instance.new("Frame")
 			Row.Name = "Row"
@@ -7674,7 +7686,8 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			NameLabel.TextSize = IsMobile and 12 or 14
 			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			NameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			NameLabel.TextTruncate = Enum.TextTruncate.None
+			NameLabel.TextWrapped = true
 			NameLabel.ZIndex = 502
 			NameLabel.Parent = Row
 
@@ -7689,7 +7702,8 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			ValueLabel.TextSize = IsMobile and 12 or 14
 			ValueLabel.TextColor3 = colorOverride or AccentColor
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			ValueLabel.TextTruncate = Enum.TextTruncate.None
+			ValueLabel.TextWrapped = true
 			ValueLabel.ZIndex = 502
 			ValueLabel.Parent = Row
 
@@ -7734,6 +7748,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			if opts.Name ~= nil then
 				tr(row.Name, tostring(opts.Name))
 			end
+			fitRow(row)
 		end
 
 		-- Drag the whole panel by its header
