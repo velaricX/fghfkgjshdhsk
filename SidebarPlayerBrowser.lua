@@ -7652,6 +7652,24 @@ function Astral:MakeWindow(config)
 
 		local ICON_GAP = 25
 
+		-- No more "..." truncation: measure wrapped text and grow the row.
+		local TextService = game:GetService("TextService")
+		local function fitRowHeight(row)
+			local padW = math.max(20, panelW - 24)
+			local function linesFor(label, frac, shift)
+				local w = math.max(20, padW * frac - (shift or 0))
+				local ok, bound = pcall(function()
+					return TextService:GetTextSize(label.Text, label.TextSize, label.Font, Vector2.new(w, 10000))
+				end)
+				if not ok or not bound then return 1 end
+				return math.max(1, math.ceil((bound.Y + 1) / (label.TextSize * 1.3)))
+			end
+			local shift = (row.Icon.Visible and ICON_GAP or 0)
+			local need = math.max(linesFor(row.Name, 0.58, shift), linesFor(row.Value, 0.42, 0))
+			local lineH = math.max(row.Name.TextSize, row.Value.TextSize) * 1.3
+			row.Frame.Size = UDim2.new(1, 0, 0, math.max(rowH, math.ceil(need * lineH + 8)))
+		end
+
 		-- Measure wrapped text and grow the row so nothing is ever cut to "...".
 		local function fitRow(row)
 			local nameW = math.max(20, panelW * 0.58 - 8)
@@ -7743,6 +7761,9 @@ function Astral:MakeWindow(config)
 			onAccentChange(function(c)
 				if not row.color then row.Value.TextColor3 = c end
 			end)
+			row.Name:GetPropertyChangedSignal("Text"):Connect(function() fitRowHeight(row) end)
+			row.Value:GetPropertyChangedSignal("Text"):Connect(function() fitRowHeight(row) end)
+			fitRowHeight(row)
 			return row
 		end
 

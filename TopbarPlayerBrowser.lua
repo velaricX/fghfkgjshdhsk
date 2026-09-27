@@ -7719,6 +7719,9 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			onAccentChange(function(c)
 				if not row.color then row.Value.TextColor3 = c end
 			end)
+			row.Name:GetPropertyChangedSignal("Text"):Connect(function() fitRow(row) end)
+			row.Value:GetPropertyChangedSignal("Text"):Connect(function() fitRow(row) end)
+			fitRow(row)
 			return row
 		end
 
