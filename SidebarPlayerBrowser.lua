@@ -5950,7 +5950,7 @@ function Astral:MakeWindow(config)
 			GridPad.Parent = GridScroll
 
 			local GridLayout = Instance.new("UIGridLayout")
-			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 140)
+			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 132)
 			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
@@ -5992,9 +5992,10 @@ function Astral:MakeWindow(config)
 				for uid, refs in pairs(cardRefs) do
 					local on = (selectedPlayer ~= nil and uid == selectedPlayer.UserId)
 					pcall(function()
-						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
-						refs.Stroke.Transparency = on and 0 or 0.6
+						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(58, 58, 70)
+						refs.Stroke.Transparency = on and 0 or 0.55
 						refs.Frame.BackgroundColor3 = on and Color3.fromRGB(30, 36, 60) or refs.Base
+						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(70, 70, 85) end
 					end)
 				end
 			end
@@ -6059,110 +6060,152 @@ function Astral:MakeWindow(config)
 				local dname = ""
 				pcall(function() uname = tostring(plr.Name or "") end)
 				pcall(function() dname = tostring(plr.DisplayName or "") end)
-				if dname == "" then dname = uname end
+			if dname == "" then dname = uname end
+			local isYou = (plr == LocalPlayer)
 
-				local cell = Instance.new("TextButton")
+			local cell = Instance.new("TextButton")
 				cell.Name = "Player_" .. uname
-				cell.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+				cell.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
 				cell.BorderSizePixel = 0
 				cell.Text = ""
 				cell.AutoButtonColor = false
 				cell.LayoutOrder = idx
 				cell.Parent = GridScroll
 
-				local cellCorner = Instance.new("UICorner")
-				cellCorner.CornerRadius = UDim.new(0, 8)
-				cellCorner.Parent = cell
+			local cellCorner = Instance.new("UICorner")
+			cellCorner.CornerRadius = UDim.new(0, 14)
+			cellCorner.Parent = cell
 
-				local cellStroke = Instance.new("UIStroke")
-				cellStroke.Color = Color3.fromRGB(50, 50, 55)
-				cellStroke.Transparency = 0.6
-				cellStroke.Thickness = 1.2
+			local cellGrad = Instance.new("UIGradient")
+			cellGrad.Rotation = 90
+			cellGrad.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(42, 42, 54)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36)),
+			})
+			cellGrad.Parent = cell
+
+			local cellStroke = Instance.new("UIStroke")
+			cellStroke.Color = Color3.fromRGB(58, 58, 70)
+			cellStroke.Transparency = 0.55
+			cellStroke.Thickness = 1.5
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				cellStroke.Parent = cell
 
-				local num = Instance.new("TextLabel")
-				num.BackgroundTransparency = 1
-				num.Position = UDim2.new(0, 8, 0, 4)
-				num.Size = UDim2.new(0, 20, 0, 16)
-				num.Font = Enum.Font.GothamBold
-				num.Text = tostring(idx)
-				num.TextColor3 = Color3.fromRGB(140, 140, 150)
-				mTS(num, 11)
-				num.TextXAlignment = Enum.TextXAlignment.Left
-				num.Parent = cell
+			if isYou then
+				local you = Instance.new("TextLabel")
+				you.Position = UDim2.new(0, 8, 0, 8)
+				you.Size = UDim2.new(0, 0, 0, 18)
+				you.AutomaticSize = Enum.AutomaticSize.X
+				you.BackgroundColor3 = AccentColor
+				you.BorderSizePixel = 0
+				you.Font = Enum.Font.GothamBold
+				you.Text = "  YOU  "
+				you.TextColor3 = Color3.fromRGB(255, 255, 255)
+				mTS(you, 10)
+				you.Parent = cell
+				local youc = Instance.new("UICorner")
+				youc.CornerRadius = UDim.new(1, 0)
+				youc.Parent = you
+				onAccentChange(function(c) pcall(function() you.BackgroundColor3 = c end) end)
+			end
 
-				local opt = Instance.new("TextButton")
-				opt.Name = "Options"
-				opt.AnchorPoint = Vector2.new(1, 0)
-				opt.Position = UDim2.new(1, -6, 0, 2)
-				opt.Size = UDim2.new(0, 28, 0, 20)
-				opt.BackgroundTransparency = 1
-				opt.Font = Enum.Font.GothamBold
-				opt.Text = "..."
-				opt.TextColor3 = Color3.fromRGB(160, 160, 170)
-				mTS(opt, 14)
-				opt.ZIndex = 2
-				opt.Parent = cell
-				opt.MouseButton1Click:Connect(function()
-					task.spawn(optionsCallback, plr)
-				end)
+			local opt = Instance.new("TextButton")
+			opt.Name = "Options"
+			opt.AnchorPoint = Vector2.new(1, 0)
+			opt.Position = UDim2.new(1, -8, 0, 8)
+			opt.Size = UDim2.new(0, 26, 0, 26)
+			opt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			opt.BackgroundTransparency = 0.93
+			opt.BorderSizePixel = 0
+			opt.Font = Enum.Font.GothamBold
+			opt.Text = "..."
+			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
+			mTS(opt, 13)
+			opt.AutoButtonColor = false
+			opt.ZIndex = 2
+			opt.Parent = cell
+			local optc = Instance.new("UICorner")
+			optc.CornerRadius = UDim.new(1, 0)
+			optc.Parent = opt
+			opt.MouseEnter:Connect(function()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.85 }):Play()
+			end)
+			opt.MouseLeave:Connect(function()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.93 }):Play()
+			end)
+			opt.MouseButton1Click:Connect(function()
+				task.spawn(optionsCallback, plr)
+			end)
 
-				local av = Instance.new("ImageLabel")
-				av.Name = "Avatar"
-				av.AnchorPoint = Vector2.new(0.5, 0)
-				av.Position = UDim2.new(0.5, 0, 0, 24)
-				av.Size = UDim2.new(0, 56, 0, 56)
-				av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-				av.BorderSizePixel = 0
-				av.ScaleType = Enum.ScaleType.Crop
-				av.Parent = cell
+			local av = Instance.new("ImageLabel")
+			av.Name = "Avatar"
+			av.AnchorPoint = Vector2.new(0.5, 0)
+			av.Position = UDim2.new(0.5, 0, 0, 20)
+			av.Size = UDim2.new(0, 64, 0, 64)
+			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+			av.BorderSizePixel = 0
+			av.ScaleType = Enum.ScaleType.Crop
+			av.Parent = cell
 
-				local avCorner = Instance.new("UICorner")
-				avCorner.CornerRadius = UDim.new(1, 0)
-				avCorner.Parent = av
-				makeAvatarThumb(av, plr)
+			local avCorner = Instance.new("UICorner")
+			avCorner.CornerRadius = UDim.new(1, 0)
+			avCorner.Parent = av
 
-				local dn = Instance.new("TextLabel")
-				dn.BackgroundTransparency = 1
-				dn.Position = UDim2.new(0, 4, 0, 84)
-				dn.Size = UDim2.new(1, -8, 0, 16)
-				dn.Font = Enum.Font.GothamBold
-				dn.Text = dname
-				dn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				mTS(dn, 12)
-				dn.TextTruncate = Enum.TextTruncate.AtEnd
-				dn.Parent = cell
+			local avRing = Instance.new("UIStroke")
+			avRing.Color = Color3.fromRGB(70, 70, 85)
+			avRing.Thickness = 2
+			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			avRing.Parent = av
 
-				local un = Instance.new("TextLabel")
-				un.BackgroundTransparency = 1
-				un.Position = UDim2.new(0, 4, 0, 100)
-				un.Size = UDim2.new(1, -8, 0, 14)
-				un.Font = Enum.Font.Gotham
-				un.Text = "@" .. uname
-				un.TextColor3 = Color3.fromRGB(150, 150, 160)
-				mTS(un, 11)
-				un.TextTruncate = Enum.TextTruncate.AtEnd
-				un.Parent = cell
+			local dot = Instance.new("Frame")
+			dot.Name = "OnlineDot"
+			dot.AnchorPoint = Vector2.new(1, 1)
+			dot.Position = UDim2.new(1, 0, 1, 0)
+			dot.Size = UDim2.new(0, 14, 0, 14)
+			dot.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+			dot.BorderSizePixel = 0
+			dot.Parent = av
+			local dotc = Instance.new("UICorner")
+			dotc.CornerRadius = UDim.new(1, 0)
+			dotc.Parent = dot
+			local dotStroke = Instance.new("UIStroke")
+			dotStroke.Color = Color3.fromRGB(20, 20, 25)
+			dotStroke.Thickness = 2
+			dotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			dotStroke.Parent = dot
+			makeAvatarThumb(av, plr)
 
-				if plr == LocalPlayer then
-					local tag = Instance.new("TextLabel")
-					tag.AnchorPoint = Vector2.new(0.5, 0)
-					tag.Position = UDim2.new(0.5, 0, 0, 116)
-					tag.Size = UDim2.new(0, 0, 0, 14)
-					tag.AutomaticSize = Enum.AutomaticSize.X
-					tag.BackgroundColor3 = Color3.fromRGB(48, 48, 58)
-					tag.Font = Enum.Font.Gotham
-					tag.Text = "  (LocalPlayer)  "
-					tag.TextColor3 = Color3.fromRGB(170, 170, 180)
-					mTS(tag, 9)
-					tag.Parent = cell
-					local tagc = Instance.new("UICorner")
-					tagc.CornerRadius = UDim.new(0, 4)
-					tagc.Parent = tag
-				end
+			local dn = Instance.new("TextLabel")
+			dn.BackgroundTransparency = 1
+			dn.Position = UDim2.new(0, 6, 0, 88)
+			dn.Size = UDim2.new(1, -12, 0, 18)
+			dn.Font = Enum.Font.GothamBold
+			dn.Text = dname
+			dn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			mTS(dn, 13)
+			dn.TextTruncate = Enum.TextTruncate.AtEnd
+			dn.Parent = cell
 
-				cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = Color3.fromRGB(32, 32, 40)}
+			local un = Instance.new("TextLabel")
+			un.BackgroundTransparency = 1
+			un.Position = UDim2.new(0, 6, 0, 106)
+			un.Size = UDim2.new(1, -12, 0, 15)
+			un.Font = Enum.Font.Gotham
+			un.Text = "@" .. uname
+			un.TextColor3 = Color3.fromRGB(150, 150, 160)
+			mTS(un, 11)
+			un.TextTruncate = Enum.TextTruncate.AtEnd
+			un.Parent = cell
+
+			cell.MouseEnter:Connect(function()
+				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
+			end)
+			cell.MouseLeave:Connect(function()
+				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
+				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
+			end)
+
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Base = Color3.fromRGB(34, 34, 44)}
 				cell.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
@@ -6175,82 +6218,151 @@ function Astral:MakeWindow(config)
 				local dname = ""
 				pcall(function() uname = tostring(plr.Name or "") end)
 				pcall(function() dname = tostring(plr.DisplayName or "") end)
-				if dname == "" then dname = uname end
+			if dname == "" then dname = uname end
+			local isYou = (plr == LocalPlayer)
 
-				local chip = Instance.new("TextButton")
+			local chip = Instance.new("TextButton")
 				chip.Name = "Player_" .. uname
-				chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
-				chip.BorderSizePixel = 0
-				chip.Size = UDim2.new(1, 0, 0, 52)
+			chip.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
+			chip.BorderSizePixel = 0
+			chip.Size = UDim2.new(1, 0, 0, 58)
 				chip.Text = ""
 				chip.AutoButtonColor = false
 				chip.LayoutOrder = idx or 0
 				chip.Parent = RowScroll
 
-				local chipCorner = Instance.new("UICorner")
-				chipCorner.CornerRadius = UDim.new(0, 8)
-				chipCorner.Parent = chip
+			local chipCorner = Instance.new("UICorner")
+			chipCorner.CornerRadius = UDim.new(0, 12)
+			chipCorner.Parent = chip
 
-				local chipStroke = Instance.new("UIStroke")
-				chipStroke.Color = Color3.fromRGB(50, 50, 55)
-				chipStroke.Transparency = 0.6
-				chipStroke.Thickness = 1.2
+			local chipGrad = Instance.new("UIGradient")
+			chipGrad.Rotation = 90
+			chipGrad.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(42, 42, 54)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36)),
+			})
+			chipGrad.Parent = chip
+
+			local chipStroke = Instance.new("UIStroke")
+			chipStroke.Color = Color3.fromRGB(58, 58, 70)
+			chipStroke.Transparency = 0.55
+			chipStroke.Thickness = 1.5
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				chipStroke.Parent = chip
 
-				local av = Instance.new("ImageLabel")
-				av.AnchorPoint = Vector2.new(0, 0.5)
-				av.Position = UDim2.new(0, 6, 0.5, 0)
-				av.Size = UDim2.new(0, 40, 0, 40)
-				av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
-				av.BorderSizePixel = 0
-				av.ScaleType = Enum.ScaleType.Crop
-				av.Parent = chip
+			local av = Instance.new("ImageLabel")
+			av.AnchorPoint = Vector2.new(0, 0.5)
+			av.Position = UDim2.new(0, 7, 0.5, 0)
+			av.Size = UDim2.new(0, 44, 0, 44)
+			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+			av.BorderSizePixel = 0
+			av.ScaleType = Enum.ScaleType.Crop
+			av.Parent = chip
 
-				local avCorner = Instance.new("UICorner")
-				avCorner.CornerRadius = UDim.new(1, 0)
-				avCorner.Parent = av
-				makeAvatarThumb(av, plr)
+			local avCorner = Instance.new("UICorner")
+			avCorner.CornerRadius = UDim.new(1, 0)
+			avCorner.Parent = av
 
-				local dn = Instance.new("TextLabel")
-				dn.BackgroundTransparency = 1
-				dn.Position = UDim2.new(0, 52, 0, 6)
-				dn.Size = UDim2.new(1, -92, 0, 17)
-				dn.Font = Enum.Font.GothamBold
-				dn.Text = dname
-				dn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				mTS(dn, 12)
-				dn.TextXAlignment = Enum.TextXAlignment.Left
-				dn.TextTruncate = Enum.TextTruncate.AtEnd
-				dn.Parent = chip
+			local avRing = Instance.new("UIStroke")
+			avRing.Color = Color3.fromRGB(70, 70, 85)
+			avRing.Thickness = 2
+			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			avRing.Parent = av
 
-				local un = Instance.new("TextLabel")
-				un.BackgroundTransparency = 1
-				un.Position = UDim2.new(0, 52, 0, 24)
-				un.Size = UDim2.new(1, -92, 0, 14)
-				un.Font = Enum.Font.Gotham
-				un.Text = "@" .. uname
-				un.TextColor3 = Color3.fromRGB(150, 150, 160)
-				mTS(un, 10)
-				un.TextXAlignment = Enum.TextXAlignment.Left
-				un.TextTruncate = Enum.TextTruncate.AtEnd
-				un.Parent = chip
+			local dot = Instance.new("Frame")
+			dot.AnchorPoint = Vector2.new(1, 1)
+			dot.Position = UDim2.new(1, 0, 1, 0)
+			dot.Size = UDim2.new(0, 12, 0, 12)
+			dot.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+			dot.BorderSizePixel = 0
+			dot.Parent = av
+			local dotc = Instance.new("UICorner")
+			dotc.CornerRadius = UDim.new(1, 0)
+			dotc.Parent = dot
+			local dotStroke = Instance.new("UIStroke")
+			dotStroke.Color = Color3.fromRGB(20, 20, 25)
+			dotStroke.Thickness = 2
+			dotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			dotStroke.Parent = dot
+			makeAvatarThumb(av, plr)
 
-				local opt = Instance.new("TextButton")
-				opt.Name = "Options"
-				opt.AnchorPoint = Vector2.new(1, 0.5)
-				opt.Position = UDim2.new(1, -8, 0.5, 0)
-				opt.Size = UDim2.new(0, 28, 0, 28)
-				opt.BackgroundTransparency = 1
-				opt.Font = Enum.Font.GothamBold
-				opt.Text = "..."
-				opt.TextColor3 = Color3.fromRGB(160, 160, 170)
-				mTS(opt, 14)
-				opt.Parent = chip
-				opt.MouseButton1Click:Connect(function()
-					task.spawn(optionsCallback, plr)
-				end)
-				cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = Color3.fromRGB(32, 32, 40)}
+			local dn = Instance.new("TextLabel")
+			dn.BackgroundTransparency = 1
+			dn.Position = UDim2.new(0, 60, 0, 8)
+			dn.Size = UDim2.new(1, -150, 0, 19)
+			dn.Font = Enum.Font.GothamBold
+			dn.Text = dname
+			dn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			mTS(dn, 13)
+			dn.TextXAlignment = Enum.TextXAlignment.Left
+			dn.TextTruncate = Enum.TextTruncate.AtEnd
+			dn.Parent = chip
+
+			local un = Instance.new("TextLabel")
+			un.BackgroundTransparency = 1
+			un.Position = UDim2.new(0, 60, 0, 28)
+			un.Size = UDim2.new(1, -150, 0, 15)
+			un.Font = Enum.Font.Gotham
+			un.Text = "@" .. uname
+			un.TextColor3 = Color3.fromRGB(150, 150, 160)
+			mTS(un, 11)
+			un.TextXAlignment = Enum.TextXAlignment.Left
+			un.TextTruncate = Enum.TextTruncate.AtEnd
+			un.Parent = chip
+
+			if isYou then
+				local you = Instance.new("TextLabel")
+				you.AnchorPoint = Vector2.new(1, 0.5)
+				you.Position = UDim2.new(1, -44, 0.5, 0)
+				you.Size = UDim2.new(0, 0, 0, 20)
+				you.AutomaticSize = Enum.AutomaticSize.X
+				you.BackgroundColor3 = AccentColor
+				you.BorderSizePixel = 0
+				you.Font = Enum.Font.GothamBold
+				you.Text = "  YOU  "
+				you.TextColor3 = Color3.fromRGB(255, 255, 255)
+				mTS(you, 10)
+				you.Parent = chip
+				local youc = Instance.new("UICorner")
+				youc.CornerRadius = UDim.new(1, 0)
+				youc.Parent = you
+				onAccentChange(function(c) pcall(function() you.BackgroundColor3 = c end) end)
+			end
+
+			local opt = Instance.new("TextButton")
+			opt.Name = "Options"
+			opt.AnchorPoint = Vector2.new(1, 0.5)
+			opt.Position = UDim2.new(1, -8, 0.5, 0)
+			opt.Size = UDim2.new(0, 28, 0, 28)
+			opt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			opt.BackgroundTransparency = 0.93
+			opt.BorderSizePixel = 0
+			opt.Font = Enum.Font.GothamBold
+			opt.Text = "..."
+			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
+			mTS(opt, 13)
+			opt.AutoButtonColor = false
+			opt.Parent = chip
+			local optc = Instance.new("UICorner")
+			optc.CornerRadius = UDim.new(1, 0)
+			optc.Parent = opt
+			opt.MouseEnter:Connect(function()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.85 }):Play()
+			end)
+			opt.MouseLeave:Connect(function()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.93 }):Play()
+			end)
+			opt.MouseButton1Click:Connect(function()
+				task.spawn(optionsCallback, plr)
+			end)
+			chip.MouseEnter:Connect(function()
+				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
+			end)
+			chip.MouseLeave:Connect(function()
+				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
+				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
+			end)
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Base = Color3.fromRGB(34, 34, 44)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
