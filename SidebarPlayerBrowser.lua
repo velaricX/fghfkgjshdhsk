@@ -5950,7 +5950,7 @@ function Astral:MakeWindow(config)
 			GridPad.Parent = GridScroll
 
 			local GridLayout = Instance.new("UIGridLayout")
-			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 132)
+			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 116)
 			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
@@ -5992,10 +5992,11 @@ function Astral:MakeWindow(config)
 				for uid, refs in pairs(cardRefs) do
 					local on = (selectedPlayer ~= nil and uid == selectedPlayer.UserId)
 					pcall(function()
-						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
-						refs.Stroke.Transparency = on and 0 or 0.55
+						refs.Stroke.Color = AccentColor
+						refs.Stroke.Transparency = on and 0 or 1
 						refs.Frame.BackgroundColor3 = refs.Base
 						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(60, 60, 70) end
+						if refs.Check then refs.Check.Visible = on end
 					end)
 				end
 			end
@@ -6066,6 +6067,7 @@ function Astral:MakeWindow(config)
 			local cell = Instance.new("TextButton")
 				cell.Name = "Player_" .. uname
 				cell.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+				cell.BackgroundTransparency = 1
 				cell.BorderSizePixel = 0
 				cell.Text = ""
 				cell.AutoButtonColor = false
@@ -6078,7 +6080,7 @@ function Astral:MakeWindow(config)
 
 			local cellStroke = Instance.new("UIStroke")
 			cellStroke.Color = Color3.fromRGB(50, 50, 55)
-			cellStroke.Transparency = 0.55
+			cellStroke.Transparency = 1
 			cellStroke.Thickness = 1.5
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				cellStroke.Parent = cell
@@ -6107,7 +6109,7 @@ function Astral:MakeWindow(config)
 			opt.Position = UDim2.new(1, -8, 0, 8)
 			opt.Size = UDim2.new(0, 26, 0, 26)
 			opt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			opt.BackgroundTransparency = 0.93
+			opt.BackgroundTransparency = 1
 			opt.BorderSizePixel = 0
 			opt.Font = Enum.Font.GothamBold
 			opt.Text = "..."
@@ -6120,10 +6122,10 @@ function Astral:MakeWindow(config)
 			optc.CornerRadius = UDim.new(1, 0)
 			optc.Parent = opt
 			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.85 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.9 }):Play()
 			end)
 			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.93 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 1 }):Play()
 			end)
 			opt.MouseButton1Click:Connect(function()
 				task.spawn(optionsCallback, plr)
@@ -6132,8 +6134,8 @@ function Astral:MakeWindow(config)
 			local av = Instance.new("ImageLabel")
 			av.Name = "Avatar"
 			av.AnchorPoint = Vector2.new(0.5, 0)
-			av.Position = UDim2.new(0.5, 0, 0, 20)
-			av.Size = UDim2.new(0, 64, 0, 64)
+			av.Position = UDim2.new(0.5, 0, 0, 12)
+			av.Size = UDim2.new(0, 56, 0, 56)
 			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
@@ -6169,7 +6171,7 @@ function Astral:MakeWindow(config)
 
 			local dn = Instance.new("TextLabel")
 			dn.BackgroundTransparency = 1
-			dn.Position = UDim2.new(0, 6, 0, 88)
+			dn.Position = UDim2.new(0, 6, 0, 72)
 			dn.Size = UDim2.new(1, -12, 0, 18)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
@@ -6180,7 +6182,7 @@ function Astral:MakeWindow(config)
 
 			local un = Instance.new("TextLabel")
 			un.BackgroundTransparency = 1
-			un.Position = UDim2.new(0, 6, 0, 106)
+			un.Position = UDim2.new(0, 6, 0, 90)
 			un.Size = UDim2.new(1, -12, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
@@ -6190,14 +6192,38 @@ function Astral:MakeWindow(config)
 			un.Parent = cell
 
 			cell.MouseEnter:Connect(function()
-				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
+				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
 				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
-				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
+				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Base = Color3.fromRGB(32, 32, 40)}
+			local check = Instance.new("Frame")
+			check.Name = "Check"
+			check.AnchorPoint = Vector2.new(0.5, 0.5)
+			check.Position = UDim2.new(0.5, 19, 0, 59)
+			check.Size = UDim2.new(0, 20, 0, 20)
+			check.BackgroundColor3 = AccentColor
+			check.BorderSizePixel = 0
+			check.Visible = false
+			check.Parent = cell
+			local checkc = Instance.new("UICorner")
+			checkc.CornerRadius = UDim.new(1, 0)
+			checkc.Parent = check
+			local tick = Instance.new("TextLabel")
+			tick.BackgroundTransparency = 1
+			tick.Size = UDim2.new(1, 0, 1, 0)
+			tick.Font = Enum.Font.GothamBold
+			tick.Text = "✓"
+			tick.TextColor3 = Color3.fromRGB(255, 255, 255)
+			mTS(tick, 12)
+			tick.Parent = check
+			onAccentChange(function(c) pcall(function() check.BackgroundColor3 = c end) end)
+
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Check = check, Base = Color3.fromRGB(32, 32, 40)}
 				cell.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
@@ -6216,8 +6242,9 @@ function Astral:MakeWindow(config)
 			local chip = Instance.new("TextButton")
 				chip.Name = "Player_" .. uname
 			chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+			chip.BackgroundTransparency = 1
 			chip.BorderSizePixel = 0
-			chip.Size = UDim2.new(1, 0, 0, 58)
+			chip.Size = UDim2.new(1, 0, 0, 52)
 				chip.Text = ""
 				chip.AutoButtonColor = false
 				chip.LayoutOrder = idx or 0
@@ -6229,7 +6256,7 @@ function Astral:MakeWindow(config)
 
 			local chipStroke = Instance.new("UIStroke")
 			chipStroke.Color = Color3.fromRGB(50, 50, 55)
-			chipStroke.Transparency = 0.55
+			chipStroke.Transparency = 1
 			chipStroke.Thickness = 1.5
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				chipStroke.Parent = chip
@@ -6237,7 +6264,7 @@ function Astral:MakeWindow(config)
 			local av = Instance.new("ImageLabel")
 			av.AnchorPoint = Vector2.new(0, 0.5)
 			av.Position = UDim2.new(0, 7, 0.5, 0)
-			av.Size = UDim2.new(0, 44, 0, 44)
+			av.Size = UDim2.new(0, 36, 0, 36)
 			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
@@ -6256,7 +6283,7 @@ function Astral:MakeWindow(config)
 			local dot = Instance.new("Frame")
 			dot.AnchorPoint = Vector2.new(1, 1)
 			dot.Position = UDim2.new(1, 0, 1, 0)
-			dot.Size = UDim2.new(0, 12, 0, 12)
+			dot.Size = UDim2.new(0, 10, 0, 10)
 			dot.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
 			dot.BorderSizePixel = 0
 			dot.Parent = av
@@ -6272,7 +6299,7 @@ function Astral:MakeWindow(config)
 
 			local dn = Instance.new("TextLabel")
 			dn.BackgroundTransparency = 1
-			dn.Position = UDim2.new(0, 60, 0, 8)
+			dn.Position = UDim2.new(0, 52, 0, 6)
 			dn.Size = UDim2.new(1, -150, 0, 19)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
@@ -6284,7 +6311,7 @@ function Astral:MakeWindow(config)
 
 			local un = Instance.new("TextLabel")
 			un.BackgroundTransparency = 1
-			un.Position = UDim2.new(0, 60, 0, 28)
+			un.Position = UDim2.new(0, 52, 0, 25)
 			un.Size = UDim2.new(1, -150, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
@@ -6316,37 +6343,57 @@ function Astral:MakeWindow(config)
 			local opt = Instance.new("TextButton")
 			opt.Name = "Options"
 			opt.AnchorPoint = Vector2.new(1, 0.5)
-			opt.Position = UDim2.new(1, -8, 0.5, 0)
-			opt.Size = UDim2.new(0, 28, 0, 28)
-			opt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			opt.BackgroundTransparency = 0.93
-			opt.BorderSizePixel = 0
+			opt.Position = UDim2.new(1, -6, 0.5, 0)
+			opt.Size = UDim2.new(0, 24, 0, 28)
+			opt.BackgroundTransparency = 1
 			opt.Font = Enum.Font.GothamBold
 			opt.Text = "..."
-			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
-			mTS(opt, 13)
+			opt.TextColor3 = Color3.fromRGB(130, 130, 140)
+			mTS(opt, 14)
 			opt.AutoButtonColor = false
 			opt.Parent = chip
-			local optc = Instance.new("UICorner")
-			optc.CornerRadius = UDim.new(1, 0)
-			optc.Parent = opt
 			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.85 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(255, 255, 255) }):Play()
 			end)
 			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.93 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(130, 130, 140) }):Play()
 			end)
 			opt.MouseButton1Click:Connect(function()
 				task.spawn(optionsCallback, plr)
 			end)
 			chip.MouseEnter:Connect(function()
-				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
+				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
 				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
-				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
+				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
 			end)
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Base = Color3.fromRGB(32, 32, 40)}
+
+			local check = Instance.new("Frame")
+			check.Name = "Check"
+			check.AnchorPoint = Vector2.new(0.5, 0.5)
+			check.Position = UDim2.new(0, 37, 0, 37)
+			check.Size = UDim2.new(0, 18, 0, 18)
+			check.BackgroundColor3 = AccentColor
+			check.BorderSizePixel = 0
+			check.Visible = false
+			check.Parent = chip
+			local checkc = Instance.new("UICorner")
+			checkc.CornerRadius = UDim.new(1, 0)
+			checkc.Parent = check
+			local tick = Instance.new("TextLabel")
+			tick.BackgroundTransparency = 1
+			tick.Size = UDim2.new(1, 0, 1, 0)
+			tick.Font = Enum.Font.GothamBold
+			tick.Text = "✓"
+			tick.TextColor3 = Color3.fromRGB(255, 255, 255)
+			mTS(tick, 11)
+			tick.Parent = check
+			onAccentChange(function(c) pcall(function() check.BackgroundColor3 = c end) end)
+
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Check = check, Base = Color3.fromRGB(32, 32, 40)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
