@@ -5992,10 +5992,10 @@ function Astral:MakeWindow(config)
 				for uid, refs in pairs(cardRefs) do
 					local on = (selectedPlayer ~= nil and uid == selectedPlayer.UserId)
 					pcall(function()
-						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(58, 58, 70)
+						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
 						refs.Stroke.Transparency = on and 0 or 0.55
-						refs.Frame.BackgroundColor3 = on and Color3.fromRGB(30, 36, 60) or refs.Base
-						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(70, 70, 85) end
+						refs.Frame.BackgroundColor3 = refs.Base
+						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(60, 60, 70) end
 					end)
 				end
 			end
@@ -6065,7 +6065,7 @@ function Astral:MakeWindow(config)
 
 			local cell = Instance.new("TextButton")
 				cell.Name = "Player_" .. uname
-				cell.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
+				cell.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 				cell.BorderSizePixel = 0
 				cell.Text = ""
 				cell.AutoButtonColor = false
@@ -6076,16 +6076,8 @@ function Astral:MakeWindow(config)
 			cellCorner.CornerRadius = UDim.new(0, 14)
 			cellCorner.Parent = cell
 
-			local cellGrad = Instance.new("UIGradient")
-			cellGrad.Rotation = 90
-			cellGrad.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Color3.fromRGB(42, 42, 54)),
-				ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36)),
-			})
-			cellGrad.Parent = cell
-
 			local cellStroke = Instance.new("UIStroke")
-			cellStroke.Color = Color3.fromRGB(58, 58, 70)
+			cellStroke.Color = Color3.fromRGB(50, 50, 55)
 			cellStroke.Transparency = 0.55
 			cellStroke.Thickness = 1.5
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -6152,7 +6144,7 @@ function Astral:MakeWindow(config)
 			avCorner.Parent = av
 
 			local avRing = Instance.new("UIStroke")
-			avRing.Color = Color3.fromRGB(70, 70, 85)
+			avRing.Color = Color3.fromRGB(60, 60, 70)
 			avRing.Thickness = 2
 			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			avRing.Parent = av
@@ -6205,7 +6197,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Base = Color3.fromRGB(34, 34, 44)}
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Base = Color3.fromRGB(32, 32, 40)}
 				cell.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
@@ -6223,7 +6215,7 @@ function Astral:MakeWindow(config)
 
 			local chip = Instance.new("TextButton")
 				chip.Name = "Player_" .. uname
-			chip.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
+			chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 			chip.BorderSizePixel = 0
 			chip.Size = UDim2.new(1, 0, 0, 58)
 				chip.Text = ""
@@ -6235,16 +6227,8 @@ function Astral:MakeWindow(config)
 			chipCorner.CornerRadius = UDim.new(0, 12)
 			chipCorner.Parent = chip
 
-			local chipGrad = Instance.new("UIGradient")
-			chipGrad.Rotation = 90
-			chipGrad.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Color3.fromRGB(42, 42, 54)),
-				ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36)),
-			})
-			chipGrad.Parent = chip
-
 			local chipStroke = Instance.new("UIStroke")
-			chipStroke.Color = Color3.fromRGB(58, 58, 70)
+			chipStroke.Color = Color3.fromRGB(50, 50, 55)
 			chipStroke.Transparency = 0.55
 			chipStroke.Thickness = 1.5
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -6264,7 +6248,7 @@ function Astral:MakeWindow(config)
 			avCorner.Parent = av
 
 			local avRing = Instance.new("UIStroke")
-			avRing.Color = Color3.fromRGB(70, 70, 85)
+			avRing.Color = Color3.fromRGB(60, 60, 70)
 			avRing.Thickness = 2
 			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			avRing.Parent = av
@@ -6362,7 +6346,7 @@ function Astral:MakeWindow(config)
 				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
 				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.55 }):Play()
 			end)
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Base = Color3.fromRGB(34, 34, 44)}
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Base = Color3.fromRGB(32, 32, 40)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
