@@ -3376,7 +3376,7 @@ function Astral:MakeWindow(config)
 			local default = sliderConfig.Default or min
 			local callback = sliderConfig.Callback or function() end
 			local icon = parseIcon(sliderConfig.Icon)
-			local calculatedHeight = IsMobile and 56 or 64
+			local calculatedHeight = IsMobile and 52 or 58
 			local icoSz = IsMobile and 32 or 42
 			local icoOff = IsMobile and -16 or -21
 			local icoInner = IsMobile and 20 or 26
@@ -3452,20 +3452,20 @@ function Astral:MakeWindow(config)
 			ValueInput.Parent = ValueBox
 			local trackLeft = icon and textLeft or 12
 			local trackRightPad = icon and (IsMobile and 58 or 82) or (IsMobile and 28 or 32)
-			local trackTop = IsMobile and 28 or 34
-			local trackH = IsMobile and 14 or 16
-			local thumbW = IsMobile and 16 or 20
-			local thumbH = IsMobile and 16 or 22
+			local trackTop = IsMobile and 26 or 30
+			local trackH = IsMobile and 8 or 10
+			local thumbW = IsMobile and 14 or 16
+			local thumbH = IsMobile and 14 or 16
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
-			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+			SliderTrack.BackgroundColor3 = Color3.fromRGB(33, 33, 38)
 			SliderTrack.Position = UDim2.new(0, trackLeft, 0, trackTop)
 			SliderTrack.Size = UDim2.new(1, -trackLeft - trackRightPad, 0, trackH)
 			SliderTrack.Text = ""
 			SliderTrack.AutoButtonColor = false
 			SliderTrack.Parent = SliderFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(0, 4)
+			TrackCorner.CornerRadius = UDim.new(1, 0)
 			TrackCorner.Parent = SliderTrack
 			local SliderFill = Instance.new("Frame")
 			SliderFill.Name = "SliderFill"
@@ -3473,21 +3473,22 @@ function Astral:MakeWindow(config)
 			SliderFill.Size = UDim2.new((default - min)/math.max(1,max-min),0,1,0)
 			SliderFill.Parent = SliderTrack
 			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(0, 4)
+			FillCorner.CornerRadius = UDim.new(1, 0)
 			FillCorner.Parent = SliderFill
 			local SliderThumb = Instance.new("Frame")
 			SliderThumb.Name = "SliderThumb"
-			SliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			SliderThumb.BackgroundColor3 = AccentColor
 			SliderThumb.AnchorPoint = Vector2.new(0.5,0.5)
 			SliderThumb.Position = UDim2.new((default - min)/math.max(1,max-min),0,0.5,0)
 			SliderThumb.Size = UDim2.fromOffset(thumbW, thumbH)
 			SliderThumb.Parent = SliderTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(0, 3)
+			ThumbCorner.CornerRadius = UDim.new(1, 0)
 			ThumbCorner.Parent = SliderThumb
 			local ThumbStroke = Instance.new("UIStroke")
-			ThumbStroke.Color = Color3.fromRGB(0,0,0)
-			ThumbStroke.Thickness = 1
+			ThumbStroke.Color = Color3.fromRGB(255, 255, 255)
+			ThumbStroke.Transparency = 0.5
+			ThumbStroke.Thickness = 1.5
 			ThumbStroke.Parent = SliderThumb
 			local dragging=false; local cur=default
 			local function upd(p) TweenService:Create(SliderFill,TweenInfo.new(0.08),{Size=UDim2.new(p,0,1,0)}):Play(); TweenService:Create(SliderThumb,TweenInfo.new(0.08),{Position=UDim2.new(p,0,0.5,0)}):Play() end
@@ -3504,6 +3505,7 @@ function Astral:MakeWindow(config)
 			-- Follow theme accent
 			onAccentChange(function(c)
 				SliderFill.BackgroundColor3 = c
+				SliderThumb.BackgroundColor3 = c
 			end)
 			SliderFrame.MouseLeave:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(26,26,30)}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=Color3.fromRGB(50,50,55)}):Play() end)
 			registerElement(SliderFrame, calculatedHeight, sliderConfig.Position)
@@ -5774,7 +5776,7 @@ function Astral:MakeWindow(config)
 		--     Mode = "Grid",                -- "Grid" or "Row" (default Grid)
 		--     Search = true,                -- search box (default true)
 		--     Callback = function(player) print(player.Name) end,        -- card click
-		--     OptionsCallback = function(player) print("options", player.Name) end, -- "..." click
+		--     Multi = true, -- pick several players at once (GetSelected returns a list)
 		--   })
 		--   pb:SetMode("Row"); pb:Refresh(); pb:GetSelected()
 		function TabObject:AddPlayerBrowser(config)
@@ -5984,17 +5986,26 @@ function Astral:MakeWindow(config)
 			RowLayout.Parent = RowScroll
 
 			local selectedPlayer = LocalPlayer
+			local multiSelect = (config.Multi == true)
+			local selectedSet = {}
+			local SEL_BG = Color3.fromRGB(38, 38, 50)
 			local cardRefs = {}
 			local populate
 			local PlayerBrowserController
 
+			local function isOn(uid)
+				if multiSelect then return selectedSet[uid] ~= nil end
+				return selectedPlayer ~= nil and uid == selectedPlayer.UserId
+			end
+
 			local function paintSelected()
 				for uid, refs in pairs(cardRefs) do
-					local on = (selectedPlayer ~= nil and uid == selectedPlayer.UserId)
+					local on = isOn(uid)
 					pcall(function()
 						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
 						refs.Stroke.Transparency = on and 0 or 0.45
-						refs.Frame.BackgroundColor3 = refs.Base
+						refs.Stroke.Thickness = on and 2 or 1.5
+						refs.Frame.BackgroundColor3 = on and SEL_BG or refs.Base
 					end)
 				end
 			end
@@ -6081,32 +6092,7 @@ function Astral:MakeWindow(config)
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				cellStroke.Parent = cell
 
-			local opt = Instance.new("TextButton")
-			opt.Name = "Options"
-			opt.AnchorPoint = Vector2.new(1, 0)
-			opt.Position = UDim2.new(1, -8, 0, 8)
-			opt.Size = UDim2.new(0, 26, 0, 26)
-			opt.BackgroundColor3 = Color3.fromRGB(44, 44, 54)
-			opt.BorderSizePixel = 0
-			opt.Font = Enum.Font.GothamBold
-			opt.Text = "..."
-			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
-			mTS(opt, 13)
-			opt.AutoButtonColor = false
-			opt.ZIndex = 2
-			opt.Parent = cell
-			local optc = Instance.new("UICorner")
-			optc.CornerRadius = UDim.new(1, 0)
-			optc.Parent = opt
-			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(58, 58, 70) }):Play()
-			end)
-			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(44, 44, 54) }):Play()
-			end)
-			opt.MouseButton1Click:Connect(function()
-				task.spawn(optionsCallback, plr)
-			end)
+			-- (per-player options button removed; use row click + Callback)
 
 			local av = Instance.new("ImageLabel")
 			av.Name = "Avatar"
@@ -6149,12 +6135,17 @@ function Astral:MakeWindow(config)
 				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
-				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(30, 30, 37) }):Play()
+				local on = isOn(plr.UserId)
+				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or Color3.fromRGB(30, 30, 37) }):Play()
 			end)
 
 			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = Color3.fromRGB(30, 30, 37)}
 				cell.MouseButton1Click:Connect(function()
-					selectedPlayer = plr
+					if multiSelect then
+						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
+					else
+						selectedPlayer = plr
+					end
 					paintSelected()
 					task.spawn(callback, plr)
 				end)
@@ -6240,41 +6231,22 @@ function Astral:MakeWindow(config)
 			meta.TextTruncate = Enum.TextTruncate.AtEnd
 			meta.Parent = chip
 
-			local opt = Instance.new("TextButton")
-			opt.Name = "Options"
-			opt.AnchorPoint = Vector2.new(1, 0.5)
-			opt.Position = UDim2.new(1, -8, 0.5, 0)
-			opt.Size = UDim2.new(0, 28, 0, 28)
-			opt.BackgroundColor3 = Color3.fromRGB(44, 44, 54)
-			opt.BorderSizePixel = 0
-			opt.Font = Enum.Font.GothamBold
-			opt.Text = "..."
-			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
-			mTS(opt, 13)
-			opt.AutoButtonColor = false
-			opt.Parent = chip
-			local optc = Instance.new("UICorner")
-			optc.CornerRadius = UDim.new(1, 0)
-			optc.Parent = opt
-			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(58, 58, 70) }):Play()
-			end)
-			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(44, 44, 54) }):Play()
-			end)
-			opt.MouseButton1Click:Connect(function()
-				task.spawn(optionsCallback, plr)
-			end)
+			-- (per-player options button removed; use row click + Callback)
 			chip.MouseEnter:Connect(function()
 				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
-				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(30, 30, 37) }):Play()
+				local on = isOn(plr.UserId)
+				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or Color3.fromRGB(30, 30, 37) }):Play()
 			end)
 
 			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = Color3.fromRGB(30, 30, 37)}
 				chip.MouseButton1Click:Connect(function()
-					selectedPlayer = plr
+					if multiSelect then
+						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
+					else
+						selectedPlayer = plr
+					end
 					paintSelected()
 					task.spawn(callback, plr)
 				end)
@@ -6364,7 +6336,17 @@ function Astral:MakeWindow(config)
 				populate()
 			end
 			function PlayerBrowserController:GetSelected()
+				if multiSelect then
+					local list = {}
+					for _, p in pairs(selectedSet) do table.insert(list, p) end
+					return list
+				end
 				return selectedPlayer
+			end
+			function PlayerBrowserController:ClearSelected()
+				selectedPlayer = nil
+				selectedSet = {}
+				paintSelected()
 			end
 			local lastIds = ""
 			local function idsNow()

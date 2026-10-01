@@ -11,15 +11,17 @@ local pb = Tab:AddPlayerBrowser({
     Title = "Players",      -- header title
     Mode = "Grid",          -- "Grid" or "Row"
     Search = true,          -- search box on/off
+    Multi = false,          -- true = tick several players, false = pick 1
     Callback = function(plr) print(plr.DisplayName, "@" .. plr.Name) end,
-    OptionsCallback = function(plr) end, -- "..." button
 })
 pb:SetMode("Row") -- switch Grid <-> Row live
 pb:Refresh()      -- rebuild list (players joined/left)
+pb:GetSelected()  -- single mode: Player or nil | multi mode: {Player, ...}
+pb:ClearSelected() -- untick everything
 ```
 
 - Transparent rows: small pfp + ring, green online dot, Display + @username.
-- Click a player to tick-select it (✓ badge + accent ring). `Callback` fires.
+- Click a player to select it (accent outline + tint). `Callback` fires.
 - Header: live search, Grid/Row toggle, `N / MaxPlayers` count pill.
 - Avatars cached; list auto-refreshes on join/leave if you wire
   `PlayerAdded`/`PlayerRemoving` to `pb:Refresh()`.
