@@ -3376,7 +3376,7 @@ function Astral:MakeWindow(config)
 			local default = sliderConfig.Default or min
 			local callback = sliderConfig.Callback or function() end
 			local icon = parseIcon(sliderConfig.Icon)
-			local calculatedHeight = IsMobile and 52 or 58
+			local calculatedHeight = IsMobile and 56 or 64
 			local icoSz = IsMobile and 32 or 42
 			local icoOff = IsMobile and -16 or -21
 			local icoInner = IsMobile and 20 or 26
@@ -3452,20 +3452,20 @@ function Astral:MakeWindow(config)
 			ValueInput.Parent = ValueBox
 			local trackLeft = icon and textLeft or 12
 			local trackRightPad = icon and (IsMobile and 58 or 82) or (IsMobile and 28 or 32)
-			local trackTop = IsMobile and 26 or 30
-			local trackH = IsMobile and 8 or 10
-			local thumbW = IsMobile and 14 or 16
-			local thumbH = IsMobile and 14 or 16
+			local trackTop = IsMobile and 28 or 34
+			local trackH = IsMobile and 14 or 16
+			local thumbW = IsMobile and 16 or 20
+			local thumbH = IsMobile and 16 or 22
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
-			SliderTrack.BackgroundColor3 = Color3.fromRGB(33, 33, 38)
+			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
 			SliderTrack.Position = UDim2.new(0, trackLeft, 0, trackTop)
 			SliderTrack.Size = UDim2.new(1, -trackLeft - trackRightPad, 0, trackH)
 			SliderTrack.Text = ""
 			SliderTrack.AutoButtonColor = false
 			SliderTrack.Parent = SliderFrame
 			local TrackCorner = Instance.new("UICorner")
-			TrackCorner.CornerRadius = UDim.new(1, 0)
+			TrackCorner.CornerRadius = UDim.new(0, 4)
 			TrackCorner.Parent = SliderTrack
 			local SliderFill = Instance.new("Frame")
 			SliderFill.Name = "SliderFill"
@@ -3473,22 +3473,21 @@ function Astral:MakeWindow(config)
 			SliderFill.Size = UDim2.new((default - min)/math.max(1,max-min),0,1,0)
 			SliderFill.Parent = SliderTrack
 			local FillCorner = Instance.new("UICorner")
-			FillCorner.CornerRadius = UDim.new(1, 0)
+			FillCorner.CornerRadius = UDim.new(0, 4)
 			FillCorner.Parent = SliderFill
 			local SliderThumb = Instance.new("Frame")
 			SliderThumb.Name = "SliderThumb"
-			SliderThumb.BackgroundColor3 = AccentColor
+			SliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SliderThumb.AnchorPoint = Vector2.new(0.5,0.5)
 			SliderThumb.Position = UDim2.new((default - min)/math.max(1,max-min),0,0.5,0)
 			SliderThumb.Size = UDim2.fromOffset(thumbW, thumbH)
 			SliderThumb.Parent = SliderTrack
 			local ThumbCorner = Instance.new("UICorner")
-			ThumbCorner.CornerRadius = UDim.new(1, 0)
+			ThumbCorner.CornerRadius = UDim.new(0, 3)
 			ThumbCorner.Parent = SliderThumb
 			local ThumbStroke = Instance.new("UIStroke")
-			ThumbStroke.Color = Color3.fromRGB(255, 255, 255)
-			ThumbStroke.Transparency = 0.5
-			ThumbStroke.Thickness = 1.5
+			ThumbStroke.Color = Color3.fromRGB(0,0,0)
+			ThumbStroke.Thickness = 1
 			ThumbStroke.Parent = SliderThumb
 			local dragging=false; local cur=default
 			local function upd(p) TweenService:Create(SliderFill,TweenInfo.new(0.08),{Size=UDim2.new(p,0,1,0)}):Play(); TweenService:Create(SliderThumb,TweenInfo.new(0.08),{Position=UDim2.new(p,0,0.5,0)}):Play() end
@@ -3505,7 +3504,6 @@ function Astral:MakeWindow(config)
 			-- Follow theme accent
 			onAccentChange(function(c)
 				SliderFill.BackgroundColor3 = c
-				SliderThumb.BackgroundColor3 = c
 			end)
 			SliderFrame.MouseLeave:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(26,26,30)}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=Color3.fromRGB(50,50,55)}):Play() end)
 			registerElement(SliderFrame, calculatedHeight, sliderConfig.Position)
