@@ -6174,6 +6174,7 @@ function Astral:MakeWindow(config)
 						refs.Stroke.Transparency = on and 0 or 1
 						refs.Frame.BackgroundColor3 = refs.Base
 						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(60, 60, 70) end
+						if refs.Bar then refs.Bar.BackgroundTransparency = on and 0 or 1 end
 						if refs.Check then refs.Check.Visible = on end
 					end)
 				end
@@ -6369,39 +6370,33 @@ function Astral:MakeWindow(config)
 			un.TextTruncate = Enum.TextTruncate.AtEnd
 			un.Parent = cell
 
+			local bar = Instance.new("Frame")
+			bar.Name = "SelectBar"
+			bar.AnchorPoint = Vector2.new(0.5, 0)
+			bar.Position = UDim2.new(0.5, 0, 0, 107)
+			bar.Size = UDim2.new(0, 44, 0, 3)
+			bar.BackgroundColor3 = AccentColor
+			bar.BackgroundTransparency = 1
+			bar.BorderSizePixel = 0
+			bar.Parent = cell
+			local barc = Instance.new("UICorner")
+			barc.CornerRadius = UDim.new(1, 0)
+			barc.Parent = bar
+			onAccentChange(function(c) pcall(function() bar.BackgroundColor3 = c end) end)
+
 			cell.MouseEnter:Connect(function()
 				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
 				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
+				TweenService:Create(bar, TweenInfo.new(0.15), { BackgroundTransparency = 0 }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
 				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
 				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
 				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
+				TweenService:Create(bar, TweenInfo.new(0.2), { BackgroundTransparency = on and 0 or 1 }):Play()
 			end)
 
-			local check = Instance.new("Frame")
-			check.Name = "Check"
-			check.AnchorPoint = Vector2.new(0.5, 0.5)
-			check.Position = UDim2.new(0.5, 19, 0, 59)
-			check.Size = UDim2.new(0, 20, 0, 20)
-			check.BackgroundColor3 = AccentColor
-			check.BorderSizePixel = 0
-			check.Visible = false
-			check.Parent = cell
-			local checkc = Instance.new("UICorner")
-			checkc.CornerRadius = UDim.new(1, 0)
-			checkc.Parent = check
-			local tick = Instance.new("TextLabel")
-			tick.BackgroundTransparency = 1
-			tick.Size = UDim2.new(1, 0, 1, 0)
-			tick.Font = Enum.Font.GothamBold
-			tick.Text = "✓"
-			tick.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(tick, 12)
-			tick.Parent = check
-			onAccentChange(function(c) pcall(function() check.BackgroundColor3 = c end) end)
-
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Check = check, Base = Color3.fromRGB(32, 32, 40)}
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Bar = bar, Base = Color3.fromRGB(32, 32, 40)}
 				cell.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
@@ -6501,13 +6496,6 @@ function Astral:MakeWindow(config)
 
 			local uidTxt = "ID --"
 			pcall(function() uidTxt = "ID " .. tostring(plr.UserId or 0) end)
-			local ageDays = 0
-			pcall(function() ageDays = tonumber(plr.AccountAge) or 0 end)
-			if ageDays >= 365 then
-				uidTxt = uidTxt .. " • " .. math.floor(ageDays / 365) .. "y"
-			elseif ageDays >= 30 then
-				uidTxt = uidTxt .. " • " .. math.floor(ageDays / 30) .. "mo"
-			end
 			local meta = Instance.new("TextLabel")
 			meta.BackgroundTransparency = 1
 			meta.Position = UDim2.new(0, 52, 0, 39)
@@ -6560,39 +6548,33 @@ function Astral:MakeWindow(config)
 			opt.MouseButton1Click:Connect(function()
 				task.spawn(optionsCallback, plr)
 			end)
+			local bar = Instance.new("Frame")
+			bar.Name = "SelectBar"
+			bar.AnchorPoint = Vector2.new(0, 0.5)
+			bar.Position = UDim2.new(0, 0, 0.5, 0)
+			bar.Size = UDim2.new(0, 3, 0, 30)
+			bar.BackgroundColor3 = AccentColor
+			bar.BackgroundTransparency = 1
+			bar.BorderSizePixel = 0
+			bar.Parent = chip
+			local barc = Instance.new("UICorner")
+			barc.CornerRadius = UDim.new(1, 0)
+			barc.Parent = bar
+			onAccentChange(function(c) pcall(function() bar.BackgroundColor3 = c end) end)
+
 			chip.MouseEnter:Connect(function()
 				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
 				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
+				TweenService:Create(bar, TweenInfo.new(0.15), { BackgroundTransparency = 0 }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
 				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
 				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
 				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
+				TweenService:Create(bar, TweenInfo.new(0.2), { BackgroundTransparency = on and 0 or 1 }):Play()
 			end)
 
-			local check = Instance.new("Frame")
-			check.Name = "Check"
-			check.AnchorPoint = Vector2.new(0.5, 0.5)
-			check.Position = UDim2.new(0, 37, 0, 37)
-			check.Size = UDim2.new(0, 18, 0, 18)
-			check.BackgroundColor3 = AccentColor
-			check.BorderSizePixel = 0
-			check.Visible = false
-			check.Parent = chip
-			local checkc = Instance.new("UICorner")
-			checkc.CornerRadius = UDim.new(1, 0)
-			checkc.Parent = check
-			local tick = Instance.new("TextLabel")
-			tick.BackgroundTransparency = 1
-			tick.Size = UDim2.new(1, 0, 1, 0)
-			tick.Font = Enum.Font.GothamBold
-			tick.Text = "✓"
-			tick.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(tick, 11)
-			tick.Parent = check
-			onAccentChange(function(c) pcall(function() check.BackgroundColor3 = c end) end)
-
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Check = check, Base = Color3.fromRGB(32, 32, 40)}
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Bar = bar, Base = Color3.fromRGB(32, 32, 40)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
