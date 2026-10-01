@@ -5832,7 +5832,7 @@ function Astral:MakeWindow(config)
 			CountPill.Name = "Count"
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 36)
-			CountPill.Size = UDim2.new(0, 60, 0, 28)
+			CountPill.Size = UDim2.new(0, 64, 0, 28)
 			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
 			CountPill.BorderSizePixel = 0
 			CountPill.Parent = Header
@@ -5854,7 +5854,7 @@ function Astral:MakeWindow(config)
 			SearchBox.Name = "SearchBox"
 			SearchBox.AnchorPoint = Vector2.new(0, 0)
 			SearchBox.Position = UDim2.new(0, 12, 0, 36)
-			SearchBox.Size = UDim2.new(1, -92, 0, 28)
+			SearchBox.Size = UDim2.new(1, -96, 0, 28)
 			SearchBox.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 			SearchBox.BorderSizePixel = 0
 			SearchBox.Font = Enum.Font.Gotham
@@ -5877,6 +5877,17 @@ function Astral:MakeWindow(config)
 			SearchBoxStroke.Thickness = 1
 			SearchBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SearchBoxStroke.Parent = SearchBox
+
+			local SearchPad = Instance.new("UIPadding")
+			SearchPad.PaddingLeft = UDim.new(0, 10)
+			SearchPad.PaddingRight = UDim.new(0, 8)
+			SearchPad.Parent = SearchBox
+			SearchBox.Focused:Connect(function()
+				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(95, 95, 110) }):Play()
+			end)
+			SearchBox.FocusLost:Connect(function()
+				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(55, 55, 65) }):Play()
+			end)
 
 			local ViewBtn = Instance.new("TextButton")
 			ViewBtn.Name = "ViewToggle"
@@ -5950,7 +5961,7 @@ function Astral:MakeWindow(config)
 			GridPad.Parent = GridScroll
 
 			local GridLayout = Instance.new("UIGridLayout")
-			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 116)
+			GridLayout.CellSize = UDim2.new(1 / (IsMobile and 2 or 3), -10, 0, 106)
 			GridLayout.CellPadding = UDim2.new(0, 8, 0, 8)
 			GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			GridLayout.Parent = GridScroll
@@ -6095,8 +6106,8 @@ function Astral:MakeWindow(config)
 			local av = Instance.new("ImageLabel")
 			av.Name = "Avatar"
 			av.AnchorPoint = Vector2.new(0.5, 0)
-			av.Position = UDim2.new(0.5, 0, 0, 12)
-			av.Size = UDim2.new(0, 56, 0, 56)
+			av.Position = UDim2.new(0.5, 0, 0, 14)
+			av.Size = UDim2.new(0, 48, 0, 48)
 			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
@@ -6109,7 +6120,7 @@ function Astral:MakeWindow(config)
 
 			local dn = Instance.new("TextLabel")
 			dn.BackgroundTransparency = 1
-			dn.Position = UDim2.new(0, 6, 0, 72)
+			dn.Position = UDim2.new(0, 6, 0, 66)
 			dn.Size = UDim2.new(1, -12, 0, 18)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
@@ -6120,7 +6131,7 @@ function Astral:MakeWindow(config)
 
 			local un = Instance.new("TextLabel")
 			un.BackgroundTransparency = 1
-			un.Position = UDim2.new(0, 6, 0, 90)
+			un.Position = UDim2.new(0, 6, 0, 84)
 			un.Size = UDim2.new(1, -12, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
@@ -6180,7 +6191,7 @@ function Astral:MakeWindow(config)
 			local av = Instance.new("ImageLabel")
 			av.AnchorPoint = Vector2.new(0, 0.5)
 			av.Position = UDim2.new(0, 7, 0.5, 0)
-			av.Size = UDim2.new(0, 36, 0, 36)
+			av.Size = UDim2.new(0, 32, 0, 32)
 			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
@@ -6193,7 +6204,7 @@ function Astral:MakeWindow(config)
 
 			local dn = Instance.new("TextLabel")
 			dn.BackgroundTransparency = 1
-			dn.Position = UDim2.new(0, 52, 0, 6)
+			dn.Position = UDim2.new(0, 46, 0, 6)
 			dn.Size = UDim2.new(1, -150, 0, 19)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
@@ -6205,7 +6216,7 @@ function Astral:MakeWindow(config)
 
 			local un = Instance.new("TextLabel")
 			un.BackgroundTransparency = 1
-			un.Position = UDim2.new(0, 52, 0, 25)
+			un.Position = UDim2.new(0, 46, 0, 25)
 			un.Size = UDim2.new(1, -150, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
@@ -6219,7 +6230,7 @@ function Astral:MakeWindow(config)
 			pcall(function() uidTxt = "ID " .. tostring(plr.UserId or 0) end)
 			local meta = Instance.new("TextLabel")
 			meta.BackgroundTransparency = 1
-			meta.Position = UDim2.new(0, 52, 0, 39)
+			meta.Position = UDim2.new(0, 46, 0, 39)
 			meta.Size = UDim2.new(1, -150, 0, 12)
 			meta.Font = Enum.Font.Gotham
 			meta.Text = uidTxt
