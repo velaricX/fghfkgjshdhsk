@@ -6422,7 +6422,7 @@ function Astral:MakeWindow(config)
 			chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
 			chip.BackgroundTransparency = 1
 			chip.BorderSizePixel = 0
-			chip.Size = UDim2.new(1, 0, 0, 52)
+			chip.Size = UDim2.new(1, 0, 0, 62)
 				chip.Text = ""
 				chip.AutoButtonColor = false
 				chip.LayoutOrder = idx or 0
@@ -6498,6 +6498,27 @@ function Astral:MakeWindow(config)
 			un.TextXAlignment = Enum.TextXAlignment.Left
 			un.TextTruncate = Enum.TextTruncate.AtEnd
 			un.Parent = chip
+
+			local uidTxt = "ID --"
+			pcall(function() uidTxt = "ID " .. tostring(plr.UserId or 0) end)
+			local ageDays = 0
+			pcall(function() ageDays = tonumber(plr.AccountAge) or 0 end)
+			if ageDays >= 365 then
+				uidTxt = uidTxt .. " • " .. math.floor(ageDays / 365) .. "y"
+			elseif ageDays >= 30 then
+				uidTxt = uidTxt .. " • " .. math.floor(ageDays / 30) .. "mo"
+			end
+			local meta = Instance.new("TextLabel")
+			meta.BackgroundTransparency = 1
+			meta.Position = UDim2.new(0, 52, 0, 39)
+			meta.Size = UDim2.new(1, -150, 0, 12)
+			meta.Font = Enum.Font.Gotham
+			meta.Text = uidTxt
+			meta.TextColor3 = Color3.fromRGB(120, 120, 130)
+			mTS(meta, 9)
+			meta.TextXAlignment = Enum.TextXAlignment.Left
+			meta.TextTruncate = Enum.TextTruncate.AtEnd
+			meta.Parent = chip
 
 			if isYou then
 				local you = Instance.new("TextLabel")
