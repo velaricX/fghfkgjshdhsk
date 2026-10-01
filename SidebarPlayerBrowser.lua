@@ -5992,12 +5992,9 @@ function Astral:MakeWindow(config)
 				for uid, refs in pairs(cardRefs) do
 					local on = (selectedPlayer ~= nil and uid == selectedPlayer.UserId)
 					pcall(function()
-						refs.Stroke.Color = AccentColor
-						refs.Stroke.Transparency = on and 0 or 1
+						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
+						refs.Stroke.Transparency = on and 0 or 0.45
 						refs.Frame.BackgroundColor3 = refs.Base
-						if refs.Ring then refs.Ring.Color = on and AccentColor or Color3.fromRGB(60, 60, 70) end
-						if refs.Check then refs.Check.Visible = on end
-						if refs.Bar then refs.Bar.BackgroundTransparency = on and 0 or 1 end
 					end)
 				end
 			end
@@ -6063,12 +6060,10 @@ function Astral:MakeWindow(config)
 				pcall(function() uname = tostring(plr.Name or "") end)
 				pcall(function() dname = tostring(plr.DisplayName or "") end)
 			if dname == "" then dname = uname end
-			local isYou = (plr == LocalPlayer)
 
 			local cell = Instance.new("TextButton")
 				cell.Name = "Player_" .. uname
-				cell.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
-				cell.BackgroundTransparency = 1
+				cell.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
 				cell.BorderSizePixel = 0
 				cell.Text = ""
 				cell.AutoButtonColor = false
@@ -6081,36 +6076,17 @@ function Astral:MakeWindow(config)
 
 			local cellStroke = Instance.new("UIStroke")
 			cellStroke.Color = Color3.fromRGB(50, 50, 55)
-			cellStroke.Transparency = 1
+			cellStroke.Transparency = 0.45
 			cellStroke.Thickness = 1.5
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				cellStroke.Parent = cell
-
-			if isYou then
-				local you = Instance.new("TextLabel")
-				you.Position = UDim2.new(0, 8, 0, 8)
-				you.Size = UDim2.new(0, 0, 0, 18)
-				you.AutomaticSize = Enum.AutomaticSize.X
-				you.BackgroundColor3 = AccentColor
-				you.BorderSizePixel = 0
-				you.Font = Enum.Font.GothamBold
-				you.Text = "  YOU  "
-				you.TextColor3 = Color3.fromRGB(255, 255, 255)
-				mTS(you, 10)
-				you.Parent = cell
-				local youc = Instance.new("UICorner")
-				youc.CornerRadius = UDim.new(1, 0)
-				youc.Parent = you
-				onAccentChange(function(c) pcall(function() you.BackgroundColor3 = c end) end)
-			end
 
 			local opt = Instance.new("TextButton")
 			opt.Name = "Options"
 			opt.AnchorPoint = Vector2.new(1, 0)
 			opt.Position = UDim2.new(1, -8, 0, 8)
 			opt.Size = UDim2.new(0, 26, 0, 26)
-			opt.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			opt.BackgroundTransparency = 1
+			opt.BackgroundColor3 = Color3.fromRGB(44, 44, 54)
 			opt.BorderSizePixel = 0
 			opt.Font = Enum.Font.GothamBold
 			opt.Text = "..."
@@ -6123,10 +6099,10 @@ function Astral:MakeWindow(config)
 			optc.CornerRadius = UDim.new(1, 0)
 			optc.Parent = opt
 			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 0.9 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(58, 58, 70) }):Play()
 			end)
 			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundTransparency = 1 }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(44, 44, 54) }):Play()
 			end)
 			opt.MouseButton1Click:Connect(function()
 				task.spawn(optionsCallback, plr)
@@ -6145,29 +6121,6 @@ function Astral:MakeWindow(config)
 			local avCorner = Instance.new("UICorner")
 			avCorner.CornerRadius = UDim.new(1, 0)
 			avCorner.Parent = av
-
-			local avRing = Instance.new("UIStroke")
-			avRing.Color = Color3.fromRGB(60, 60, 70)
-			avRing.Thickness = 2
-			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			avRing.Parent = av
-
-			local dot = Instance.new("Frame")
-			dot.Name = "OnlineDot"
-			dot.AnchorPoint = Vector2.new(1, 1)
-			dot.Position = UDim2.new(1, 0, 1, 0)
-			dot.Size = UDim2.new(0, 14, 0, 14)
-			dot.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
-			dot.BorderSizePixel = 0
-			dot.Parent = av
-			local dotc = Instance.new("UICorner")
-			dotc.CornerRadius = UDim.new(1, 0)
-			dotc.Parent = dot
-			local dotStroke = Instance.new("UIStroke")
-			dotStroke.Color = Color3.fromRGB(20, 20, 25)
-			dotStroke.Thickness = 2
-			dotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			dotStroke.Parent = dot
 			makeAvatarThumb(av, plr)
 
 			local dn = Instance.new("TextLabel")
@@ -6192,33 +6145,14 @@ function Astral:MakeWindow(config)
 			un.TextTruncate = Enum.TextTruncate.AtEnd
 			un.Parent = cell
 
-			local bar = Instance.new("Frame")
-			bar.Name = "SelectBar"
-			bar.AnchorPoint = Vector2.new(0.5, 0)
-			bar.Position = UDim2.new(0.5, 0, 0, 107)
-			bar.Size = UDim2.new(0, 44, 0, 3)
-			bar.BackgroundColor3 = AccentColor
-			bar.BackgroundTransparency = 1
-			bar.BorderSizePixel = 0
-			bar.Parent = cell
-			local barc = Instance.new("UICorner")
-			barc.CornerRadius = UDim.new(1, 0)
-			barc.Parent = bar
-			onAccentChange(function(c) pcall(function() bar.BackgroundColor3 = c end) end)
-
 			cell.MouseEnter:Connect(function()
-				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
-				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
-				TweenService:Create(bar, TweenInfo.new(0.15), { BackgroundTransparency = 0 }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
-				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
-				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
-				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
-				TweenService:Create(bar, TweenInfo.new(0.2), { BackgroundTransparency = on and 0 or 1 }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(30, 30, 37) }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Ring = avRing, Bar = bar, Base = Color3.fromRGB(32, 32, 40)}
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = Color3.fromRGB(30, 30, 37)}
 				cell.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
@@ -6232,12 +6166,10 @@ function Astral:MakeWindow(config)
 				pcall(function() uname = tostring(plr.Name or "") end)
 				pcall(function() dname = tostring(plr.DisplayName or "") end)
 			if dname == "" then dname = uname end
-			local isYou = (plr == LocalPlayer)
 
 			local chip = Instance.new("TextButton")
 				chip.Name = "Player_" .. uname
-			chip.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
-			chip.BackgroundTransparency = 1
+			chip.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
 			chip.BorderSizePixel = 0
 			chip.Size = UDim2.new(1, 0, 0, 62)
 				chip.Text = ""
@@ -6251,7 +6183,7 @@ function Astral:MakeWindow(config)
 
 			local chipStroke = Instance.new("UIStroke")
 			chipStroke.Color = Color3.fromRGB(50, 50, 55)
-			chipStroke.Transparency = 1
+			chipStroke.Transparency = 0.45
 			chipStroke.Thickness = 1.5
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				chipStroke.Parent = chip
@@ -6268,28 +6200,6 @@ function Astral:MakeWindow(config)
 			local avCorner = Instance.new("UICorner")
 			avCorner.CornerRadius = UDim.new(1, 0)
 			avCorner.Parent = av
-
-			local avRing = Instance.new("UIStroke")
-			avRing.Color = Color3.fromRGB(60, 60, 70)
-			avRing.Thickness = 2
-			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			avRing.Parent = av
-
-			local dot = Instance.new("Frame")
-			dot.AnchorPoint = Vector2.new(1, 1)
-			dot.Position = UDim2.new(1, 0, 1, 0)
-			dot.Size = UDim2.new(0, 10, 0, 10)
-			dot.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
-			dot.BorderSizePixel = 0
-			dot.Parent = av
-			local dotc = Instance.new("UICorner")
-			dotc.CornerRadius = UDim.new(1, 0)
-			dotc.Parent = dot
-			local dotStroke = Instance.new("UIStroke")
-			dotStroke.Color = Color3.fromRGB(20, 20, 25)
-			dotStroke.Thickness = 2
-			dotStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			dotStroke.Parent = dot
 			makeAvatarThumb(av, plr)
 
 			local dn = Instance.new("TextLabel")
@@ -6330,73 +6240,39 @@ function Astral:MakeWindow(config)
 			meta.TextTruncate = Enum.TextTruncate.AtEnd
 			meta.Parent = chip
 
-			if isYou then
-				local you = Instance.new("TextLabel")
-				you.AnchorPoint = Vector2.new(1, 0.5)
-				you.Position = UDim2.new(1, -44, 0.5, 0)
-				you.Size = UDim2.new(0, 0, 0, 20)
-				you.AutomaticSize = Enum.AutomaticSize.X
-				you.BackgroundColor3 = AccentColor
-				you.BorderSizePixel = 0
-				you.Font = Enum.Font.GothamBold
-				you.Text = "  YOU  "
-				you.TextColor3 = Color3.fromRGB(255, 255, 255)
-				mTS(you, 10)
-				you.Parent = chip
-				local youc = Instance.new("UICorner")
-				youc.CornerRadius = UDim.new(1, 0)
-				youc.Parent = you
-				onAccentChange(function(c) pcall(function() you.BackgroundColor3 = c end) end)
-			end
-
 			local opt = Instance.new("TextButton")
 			opt.Name = "Options"
 			opt.AnchorPoint = Vector2.new(1, 0.5)
-			opt.Position = UDim2.new(1, -6, 0.5, 0)
-			opt.Size = UDim2.new(0, 24, 0, 28)
-			opt.BackgroundTransparency = 1
+			opt.Position = UDim2.new(1, -8, 0.5, 0)
+			opt.Size = UDim2.new(0, 28, 0, 28)
+			opt.BackgroundColor3 = Color3.fromRGB(44, 44, 54)
+			opt.BorderSizePixel = 0
 			opt.Font = Enum.Font.GothamBold
 			opt.Text = "..."
-			opt.TextColor3 = Color3.fromRGB(130, 130, 140)
-			mTS(opt, 14)
+			opt.TextColor3 = Color3.fromRGB(200, 200, 210)
+			mTS(opt, 13)
 			opt.AutoButtonColor = false
 			opt.Parent = chip
+			local optc = Instance.new("UICorner")
+			optc.CornerRadius = UDim.new(1, 0)
+			optc.Parent = opt
 			opt.MouseEnter:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(255, 255, 255) }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(58, 58, 70) }):Play()
 			end)
 			opt.MouseLeave:Connect(function()
-				TweenService:Create(opt, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(130, 130, 140) }):Play()
+				TweenService:Create(opt, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(44, 44, 54) }):Play()
 			end)
 			opt.MouseButton1Click:Connect(function()
 				task.spawn(optionsCallback, plr)
 			end)
-			local bar = Instance.new("Frame")
-			bar.Name = "SelectBar"
-			bar.AnchorPoint = Vector2.new(0, 0.5)
-			bar.Position = UDim2.new(0, 0, 0.5, 0)
-			bar.Size = UDim2.new(0, 3, 0, 30)
-			bar.BackgroundColor3 = AccentColor
-			bar.BackgroundTransparency = 1
-			bar.BorderSizePixel = 0
-			bar.Parent = chip
-			local barc = Instance.new("UICorner")
-			barc.CornerRadius = UDim.new(1, 0)
-			barc.Parent = bar
-			onAccentChange(function(c) pcall(function() bar.BackgroundColor3 = c end) end)
-
 			chip.MouseEnter:Connect(function()
-				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundTransparency = 0.94 }):Play()
-				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.5 }):Play()
-				TweenService:Create(bar, TweenInfo.new(0.15), { BackgroundTransparency = 0 }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
-				local on = (selectedPlayer ~= nil and selectedPlayer.UserId == plr.UserId)
-				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundTransparency = 1 }):Play()
-				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 1 }):Play()
-				TweenService:Create(bar, TweenInfo.new(0.2), { BackgroundTransparency = on and 0 or 1 }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(30, 30, 37) }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Ring = avRing, Bar = bar, Base = Color3.fromRGB(32, 32, 40)}
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = Color3.fromRGB(30, 30, 37)}
 				chip.MouseButton1Click:Connect(function()
 					selectedPlayer = plr
 					paintSelected()
