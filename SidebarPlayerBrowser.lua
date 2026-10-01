@@ -7530,8 +7530,11 @@ function Astral:MakeWindow(config)
 		Header.Active = true
 		Header.Parent = Panel
 
-		-- NOTE: no UICorner on the header on purpose. The panel clips children
-		-- to its own rounded shape, so header corners are always perfect.
+		-- Header gets its own corners: ClipsDescendants only clips to the
+		-- panel rect, NOT its rounded corners, so square header edges poke out.
+		local HeaderCorner = Instance.new("UICorner")
+		HeaderCorner.CornerRadius = UDim.new(0, gsCornerR)
+		HeaderCorner.Parent = Header
 		local HeaderIcon = Instance.new("ImageLabel")
 		HeaderIcon.Name = "Icon"
 		HeaderIcon.BackgroundTransparency = 1
