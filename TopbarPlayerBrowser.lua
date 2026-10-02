@@ -1833,6 +1833,7 @@ function Astral:MakeWindow(config)
 	local MiniPanel = Instance.new("Frame")
 	MiniPanel.Name = "MiniColorPicker"
 	MiniPanel.Size = UDim2.new(0, 216, 0, 158)
+	MiniPanel.ClipsDescendants = true
 	MiniPanel.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 	MiniPanel.BorderSizePixel = 0
 	MiniPanel.Visible = false
@@ -2056,16 +2057,13 @@ function Astral:MakeWindow(config)
 			if cy + 166 > vh then cy = bp.Y - 166 end
 			if cy < 8 then cy = 8 end
 		end)
-		local fullSize = UDim2.new(0, 216, 0, 158)
-		local fullPos = UDim2.new(0, cx, 0, cy)
-		MiniPanel.Size = UDim2.new(0, 24, 0, 16)
-		MiniPanel.Position = UDim2.new(0, cx + 96, 0, cy + 71)
+		MiniPanel.Size = UDim2.new(0, 216, 0, 8)
+		MiniPanel.Position = UDim2.new(0, cx, 0, cy)
 		MiniCatcher.Visible = true
 		MiniPanel.Visible = true
 		miniOpen = true
-		TweenService:Create(MiniPanel, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Size = fullSize,
-			Position = fullPos,
+		TweenService:Create(MiniPanel, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Size = UDim2.new(0, 216, 0, 158),
 		}):Play()
 	end
 	end -- end mini scope (frees registers)
