@@ -4689,17 +4689,27 @@ function Astral:MakeWindow(config)
 
 			local RowLayout = Instance.new("UIListLayout")
 			RowLayout.FillDirection = Enum.FillDirection.Horizontal
+			RowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 			RowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 			RowLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			RowLayout.Padding = UDim.new(0, 8)
 			RowLayout.Parent = SectionFrame
+
+			local LineL = Instance.new("Frame")
+			LineL.Name = "LineL"
+			LineL.Size = UDim2.new(1, 0, 0, 1)
+			LineL.BackgroundColor3 = Color3.fromRGB(50, 50, 58)
+			LineL.BackgroundTransparency = 0.35
+			LineL.BorderSizePixel = 0
+			LineL.LayoutOrder = 1
+			LineL.Parent = SectionFrame
 
 			local Bar = Instance.new("Frame")
 			Bar.Name = "Bar"
 			Bar.Size = UDim2.new(0, 4, 0, IsMobile and 14 or 16)
 			Bar.BackgroundColor3 = AccentColor
 			Bar.BorderSizePixel = 0
-			Bar.LayoutOrder = 1
+			Bar.LayoutOrder = 2
 			Bar.Parent = SectionFrame
 			local BarCorner = Instance.new("UICorner")
 			BarCorner.CornerRadius = UDim.new(1, 0)
@@ -4711,7 +4721,7 @@ function Astral:MakeWindow(config)
 				Ico.Name = "Icon"
 				Ico.BackgroundTransparency = 1
 				Ico.Size = UDim2.new(0, IsMobile and 14 or 16, 0, IsMobile and 14 or 16)
-				Ico.LayoutOrder = 2
+				Ico.LayoutOrder = 3
 				Astral.ApplyIcon(Ico, icon)
 				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
 				Ico.ScaleType = Enum.ScaleType.Fit
@@ -4725,11 +4735,11 @@ function Astral:MakeWindow(config)
 			TitleLabel.AutomaticSize = Enum.AutomaticSize.X
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(235, 235, 240)
-			mTS(TitleLabel, IsMobile and 12 or 13)
+			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			mTS(TitleLabel, IsMobile and 13 or 14)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-			TitleLabel.LayoutOrder = 3
+			TitleLabel.LayoutOrder = 4
 			TitleLabel.Parent = SectionFrame
 
 			local Line = Instance.new("Frame")
@@ -4738,7 +4748,7 @@ function Astral:MakeWindow(config)
 			Line.BackgroundColor3 = Color3.fromRGB(50, 50, 58)
 			Line.BackgroundTransparency = 0.35
 			Line.BorderSizePixel = 0
-			Line.LayoutOrder = 4
+			Line.LayoutOrder = 5
 			Line.Parent = SectionFrame
 
 			registerElement(SectionFrame, h, sectionConfig.Position)
