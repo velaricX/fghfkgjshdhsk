@@ -6049,11 +6049,22 @@ function Astral:MakeWindow(config)
 
 			local tiles = {}
 			local expandedTile = nil
+			local baseCardH = calculatedHeight
+			local function setMultiCardHeight(h)
+				Card.Size = UDim2.new(1, 0, 0, h)
+				for _, el in ipairs(elements) do
+					if el.Frame == Card then el.Height = h; break end
+				end
+				distributeElements()
+				updateCanvas()
+			end
 			local function collapseTile(t)
 				if not t or not t.Exp then return end
 				if expandedTile == t then expandedTile = nil end
 				t.Btn.ZIndex = 1
+				if t.Stroke then t.Stroke.Color = Color3.fromRGB(50, 50, 55) end
 				TweenService:Create(t.Exp, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, t.ExpW or 0, 0, 0) }):Play()
+				setMultiCardHeight(baseCardH)
 				task.delay(0.2, function()
 					pcall(function()
 						if expandedTile ~= t then t.Exp.Visible = false end
@@ -6078,8 +6089,10 @@ function Astral:MakeWindow(config)
 				t.Exp.Size = UDim2.new(0, gw, 0, 0)
 				t.Exp.Visible = true
 				t.Btn.ZIndex = 10
+				if t.Stroke then t.Stroke.Color = AccentColor end
 				TweenService:Create(t.Exp, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, gw, 0, 134) }):Play()
 				expandedTile = t
+				setMultiCardHeight(baseCardH + 138)
 			end
 			local function buildExpander(tileBtn, initColor, onApply, onClose)
 				local eh, es, ev = Color3.toHSV(initColor)
@@ -6374,7 +6387,7 @@ function Astral:MakeWindow(config)
 				end, function()
 					collapseTile(tiles[tileIndex])
 				end)
-				tiles[i] = {Btn = Btn, Preview = TilePreview, Color = bColor, Callback = bCallback, Exp = Exp}
+				tiles[i] = {Btn = Btn, Preview = TilePreview, Color = bColor, Callback = bCallback, Exp = Exp, Stroke = BtnStroke}
 				Btn.MouseButton1Click:Connect(function()
 					if pickerOpen or selectorOpen then return end
 					local t = tiles[tileIndex]
