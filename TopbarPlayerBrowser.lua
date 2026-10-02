@@ -1,4 +1,4 @@
-﻿-- =====================================================================
+-- =====================================================================
 -- LumuUI TopBar  --  LIBRARY ONLY (running this alone shows NOTHING).
 --
 -- Use it from your hub script:

@@ -1,4 +1,4 @@
-﻿-- Client Script (Place in StarterPlayerScripts or StarterGui)
+-- Client Script (Place in StarterPlayerScripts or StarterGui)
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
