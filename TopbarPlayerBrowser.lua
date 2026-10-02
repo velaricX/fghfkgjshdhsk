@@ -4924,28 +4924,11 @@ function Astral:MakeWindow(config)
 			PillLayout.SortOrder = Enum.SortOrder.LayoutOrder
 			PillLayout.Padding = UDim.new(0, 7)
 			PillLayout.Parent = Pill
-			local Dot = Instance.new("Frame")
-			Dot.Name = "Dot"
-			Dot.Size = UDim2.new(0, 9, 0, 9)
-			Dot.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Dot.BorderSizePixel = 0
-			Dot.LayoutOrder = 1
-			Dot.Parent = Pill
-			local DotCorner = Instance.new("UICorner")
-			DotCorner.CornerRadius = UDim.new(1, 0)
-			DotCorner.Parent = Dot
-			local DotGlow = Instance.new("UIStroke")
-			DotGlow.Color = AccentColor
-			DotGlow.Transparency = 0.3
-			DotGlow.Thickness = 2
-			DotGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			DotGlow.Parent = Dot
 			onAccentChange(function(c) pcall(function()
 				PillGrad.Color = ColorSequence.new({
 					ColorSequenceKeypoint.new(0, c),
 					ColorSequenceKeypoint.new(1, Color3.fromRGB(46, 46, 60)),
 				})
-				DotGlow.Color = c
 			end) end)
 
 			if icon then
