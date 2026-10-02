@@ -4918,6 +4918,9 @@ function Astral:MakeWindow(config)
 			PillPad.PaddingLeft = UDim.new(0, 12)
 			PillPad.PaddingRight = UDim.new(0, 12)
 			PillPad.Parent = Pill
+			local PillMin = Instance.new("UISizeConstraint")
+			PillMin.MinSize = Vector2.new(IsMobile and 120 or 160, 0)
+			PillMin.Parent = Pill
 			local PillLayout = Instance.new("UIListLayout")
 			PillLayout.FillDirection = Enum.FillDirection.Horizontal
 			PillLayout.VerticalAlignment = Enum.VerticalAlignment.Center
