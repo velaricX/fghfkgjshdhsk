@@ -4900,7 +4900,7 @@ function Astral:MakeWindow(config)
 			Pill.LayoutOrder = 2
 			Pill.Parent = SectionFrame
 			local PillCorner = Instance.new("UICorner")
-			PillCorner.CornerRadius = UDim.new(1, 0)
+			PillCorner.CornerRadius = UDim.new(0, 8)
 			PillCorner.Parent = Pill
 			local PillStroke = Instance.new("UIStroke")
 			PillStroke.Color = Color3.fromRGB(80, 80, 95)
