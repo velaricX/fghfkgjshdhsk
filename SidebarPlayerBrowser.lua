@@ -1913,10 +1913,17 @@ function Astral:MakeWindow(config)
 			if cy + 166 > vh then cy = bp.Y - 166 end
 			if cy < 8 then cy = 8 end
 		end)
-		MiniPanel.Position = UDim2.new(0, cx, 0, cy)
+		local fullSize = UDim2.new(0, 216, 0, 158)
+		local fullPos = UDim2.new(0, cx, 0, cy)
+		MiniPanel.Size = UDim2.new(0, 24, 0, 16)
+		MiniPanel.Position = UDim2.new(0, cx + 96, 0, cy + 71)
 		MiniCatcher.Visible = true
 		MiniPanel.Visible = true
 		miniOpen = true
+		TweenService:Create(MiniPanel, TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			Size = fullSize,
+			Position = fullPos,
+		}):Play()
 	end
 	end -- end mini scope (frees registers)
 
