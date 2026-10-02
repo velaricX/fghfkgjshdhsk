@@ -5884,7 +5884,6 @@ function Astral:MakeWindow(config)
 				if not t or not t.Exp then return end
 				if expandedTile == t then expandedTile = nil end
 				t.Btn.ZIndex = 1
-				if t.Stroke then t.Stroke.Color = Color3.fromRGB(50, 50, 55) end
 				TweenService:Create(t.Exp, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, t.ExpW or 0, 0, 0) }):Play()
 				setMultiCardHeight(baseCardH)
 				task.delay(0.2, function()
@@ -5911,7 +5910,6 @@ function Astral:MakeWindow(config)
 				t.Exp.Size = UDim2.new(0, gw, 0, 0)
 				t.Exp.Visible = true
 				t.Btn.ZIndex = 10
-				if t.Stroke then t.Stroke.Color = AccentColor end
 				TweenService:Create(t.Exp, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, gw, 0, 134) }):Play()
 				expandedTile = t
 				setMultiCardHeight(baseCardH + 138)
@@ -6021,7 +6019,7 @@ function Astral:MakeWindow(config)
 				ExpPrevCorner.Parent = ExpPrev
 				local ExpApply = Instance.new("TextButton")
 				ExpApply.Position = UDim2.new(0, 52, 0, 102)
-				ExpApply.Size = UDim2.new(1, -104, 0, 24)
+				ExpApply.Size = UDim2.new(1, -60, 0, 24)
 				ExpApply.BackgroundColor3 = AccentColor
 				ExpApply.Font = Enum.Font.GothamBold
 				ExpApply.Text = "Apply"
@@ -6032,19 +6030,6 @@ function Astral:MakeWindow(config)
 				local ExpApplyCorner = Instance.new("UICorner")
 				ExpApplyCorner.CornerRadius = UDim.new(0, 6)
 				ExpApplyCorner.Parent = ExpApply
-				local ExpX = Instance.new("TextButton")
-				ExpX.Position = UDim2.new(1, -44, 0, 102)
-				ExpX.Size = UDim2.new(0, 36, 0, 24)
-				ExpX.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
-				ExpX.Font = Enum.Font.GothamBold
-				ExpX.Text = "X"
-				ExpX.TextColor3 = Color3.fromRGB(200, 200, 208)
-				ExpX.TextSize = 12
-				ExpX.AutoButtonColor = false
-				ExpX.Parent = Exp
-				local ExpXCorner = Instance.new("UICorner")
-				ExpXCorner.CornerRadius = UDim.new(0, 6)
-				ExpXCorner.Parent = ExpX
 				local function expRefresh()
 					local col = Color3.fromHSV(eh, es, ev)
 					ExpPrev.BackgroundColor3 = col
@@ -6099,9 +6084,6 @@ function Astral:MakeWindow(config)
 				end)
 				ExpApply.MouseButton1Click:Connect(function()
 					onApply(Color3.fromHSV(eh, es, ev))
-				end)
-				ExpX.MouseButton1Click:Connect(function()
-					if onClose then onClose() end
 				end)
 				expRefresh()
 				return Exp
