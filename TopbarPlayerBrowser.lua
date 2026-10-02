@@ -6048,6 +6048,215 @@ function Astral:MakeWindow(config)
 			GridLayout.Parent = Grid
 
 			local tiles = {}
+			local expandedTile = nil
+			local function collapseTile(t)
+				if not t or not t.Exp then return end
+				if expandedTile == t then expandedTile = nil end
+				t.Btn.ZIndex = 1
+				TweenService:Create(t.Exp, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 0, 0) }):Play()
+				task.delay(0.2, function()
+					pcall(function()
+						if expandedTile ~= t then t.Exp.Visible = false end
+					end)
+				end)
+			end
+			local function expandTile(t)
+				if expandedTile and expandedTile ~= t then collapseTile(expandedTile) end
+				t.Exp.Visible = true
+				t.Btn.ZIndex = 10
+				TweenService:Create(t.Exp, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 0, 134) }):Play()
+				expandedTile = t
+			end
+			local function buildExpander(tileBtn, initColor, onApply, onClose)
+				local eh, es, ev = Color3.toHSV(initColor)
+				local Exp = Instance.new("Frame")
+				Exp.Name = "Expander"
+				Exp.BackgroundColor3 = Color3.fromRGB(24, 24, 29)
+				Exp.BorderSizePixel = 0
+				Exp.Position = UDim2.new(0, 0, 1, 4)
+				Exp.Size = UDim2.new(1, 0, 0, 0)
+				Exp.ClipsDescendants = true
+				Exp.Visible = false
+				Exp.ZIndex = 10
+				Exp.Parent = tileBtn
+				local ExpCorner = Instance.new("UICorner")
+				ExpCorner.CornerRadius = UDim.new(0, 8)
+				ExpCorner.Parent = Exp
+				local ExpStroke = Instance.new("UIStroke")
+				ExpStroke.Color = Color3.fromRGB(50, 50, 55)
+				ExpStroke.Thickness = 1
+				ExpStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				ExpStroke.Parent = Exp
+				local ExpCanvas = Instance.new("Frame")
+				ExpCanvas.Position = UDim2.new(0, 8, 0, 8)
+				ExpCanvas.Size = UDim2.new(1, -40, 0, 86)
+				ExpCanvas.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ExpCanvas.BorderSizePixel = 0
+				ExpCanvas.ClipsDescendants = true
+				ExpCanvas.Parent = Exp
+				local ExpCanvasCorner = Instance.new("UICorner")
+				ExpCanvasCorner.CornerRadius = UDim.new(0, 6)
+				ExpCanvasCorner.Parent = ExpCanvas
+				local ExpRainbow = Instance.new("UIGradient")
+				ExpRainbow.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+					ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+					ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+					ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+					ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+					ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
+				})
+				ExpRainbow.Parent = ExpCanvas
+				local ExpShade = Instance.new("Frame")
+				ExpShade.Size = UDim2.fromScale(1, 1)
+				ExpShade.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				ExpShade.BorderSizePixel = 0
+				ExpShade.Parent = ExpCanvas
+				local ExpShadeCorner = Instance.new("UICorner")
+				ExpShadeCorner.CornerRadius = UDim.new(0, 6)
+				ExpShadeCorner.Parent = ExpShade
+				local ExpShadeGrad = Instance.new("UIGradient")
+				ExpShadeGrad.Rotation = 90
+				ExpShadeGrad.Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 1),
+					NumberSequenceKeypoint.new(1, 0),
+				})
+				ExpShadeGrad.Parent = ExpShade
+				local ExpCursor = Instance.new("Frame")
+				ExpCursor.Size = UDim2.new(0, 12, 0, 12)
+				ExpCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+				ExpCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ExpCursor.Parent = ExpCanvas
+				local ExpCursorCorner = Instance.new("UICorner")
+				ExpCursorCorner.CornerRadius = UDim.new(1, 0)
+				ExpCursorCorner.Parent = ExpCursor
+				local ExpCursorStroke = Instance.new("UIStroke")
+				ExpCursorStroke.Color = Color3.fromRGB(0, 0, 0)
+				ExpCursorStroke.Thickness = 1.5
+				ExpCursorStroke.Parent = ExpCursor
+				local ExpBar = Instance.new("Frame")
+				ExpBar.Position = UDim2.new(1, -24, 0, 8)
+				ExpBar.Size = UDim2.new(0, 16, 0, 86)
+				ExpBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ExpBar.BorderSizePixel = 0
+				ExpBar.ClipsDescendants = true
+				ExpBar.Parent = Exp
+				local ExpBarCorner = Instance.new("UICorner")
+				ExpBarCorner.CornerRadius = UDim.new(0, 5)
+				ExpBarCorner.Parent = ExpBar
+				local ExpBarGrad = Instance.new("UIGradient")
+				ExpBarGrad.Rotation = 90
+				ExpBarGrad.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+					ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0, 1, 1)),
+					ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+				})
+				ExpBarGrad.Parent = ExpBar
+				local ExpBarCursor = Instance.new("Frame")
+				ExpBarCursor.Size = UDim2.new(1, 0, 0, 5)
+				ExpBarCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+				ExpBarCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ExpBarCursor.Parent = ExpBar
+				local ExpBarCursorCorner = Instance.new("UICorner")
+				ExpBarCursorCorner.CornerRadius = UDim.new(1, 0)
+				ExpBarCursorCorner.Parent = ExpBarCursor
+				local ExpPrev = Instance.new("Frame")
+				ExpPrev.Position = UDim2.new(0, 8, 0, 102)
+				ExpPrev.Size = UDim2.new(0, 36, 0, 24)
+				ExpPrev.BackgroundColor3 = initColor
+				ExpPrev.BorderSizePixel = 0
+				ExpPrev.Parent = Exp
+				local ExpPrevCorner = Instance.new("UICorner")
+				ExpPrevCorner.CornerRadius = UDim.new(0, 6)
+				ExpPrevCorner.Parent = ExpPrev
+				local ExpApply = Instance.new("TextButton")
+				ExpApply.Position = UDim2.new(0, 52, 0, 102)
+				ExpApply.Size = UDim2.new(1, -104, 0, 24)
+				ExpApply.BackgroundColor3 = AccentColor
+				ExpApply.Font = Enum.Font.GothamBold
+				ExpApply.Text = "Apply"
+				ExpApply.TextColor3 = Color3.fromRGB(255, 255, 255)
+				ExpApply.TextSize = 12
+				ExpApply.AutoButtonColor = false
+				ExpApply.Parent = Exp
+				local ExpApplyCorner = Instance.new("UICorner")
+				ExpApplyCorner.CornerRadius = UDim.new(0, 6)
+				ExpApplyCorner.Parent = ExpApply
+				local ExpX = Instance.new("TextButton")
+				ExpX.Position = UDim2.new(1, -44, 0, 102)
+				ExpX.Size = UDim2.new(0, 36, 0, 24)
+				ExpX.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+				ExpX.Font = Enum.Font.GothamBold
+				ExpX.Text = "X"
+				ExpX.TextColor3 = Color3.fromRGB(200, 200, 208)
+				ExpX.TextSize = 12
+				ExpX.AutoButtonColor = false
+				ExpX.Parent = Exp
+				local ExpXCorner = Instance.new("UICorner")
+				ExpXCorner.CornerRadius = UDim.new(0, 6)
+				ExpXCorner.Parent = ExpX
+				local function expRefresh()
+					local col = Color3.fromHSV(eh, es, ev)
+					ExpPrev.BackgroundColor3 = col
+					ExpCursor.Position = UDim2.new(eh, 0, 1 - ev, 0)
+					local bp = (es < 1) and (es * 0.5) or (1 - ev * 0.5)
+					ExpBarCursor.Position = UDim2.new(0.5, 0, bp, 0)
+					ExpBarGrad.Color = ColorSequence.new({
+						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+						ColorSequenceKeypoint.new(0.5, Color3.fromHSV(eh, 1, 1)),
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+					})
+				end
+				local cDrag, bDrag = false, false
+				ExpCanvas.InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						cDrag = true
+						local rx, ry = getRelativePosition(ExpCanvas, input)
+						eh = rx
+						ev = 1 - ry
+						expRefresh()
+					end
+				end)
+				ExpBar.InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						bDrag = true
+						local _, ry = getRelativePosition(ExpBar, input)
+						local p = math.clamp(ry, 0, 1)
+						if p <= 0.5 then es = p * 2 else es = 1 ev = (1 - p) * 2 end
+						expRefresh()
+					end
+				end)
+				UserInputService.InputChanged:Connect(function(input)
+					if input.UserInputType ~= Enum.UserInputType.MouseMovement and input.UserInputType ~= Enum.UserInputType.Touch then return end
+					if cDrag then
+						local rx, ry = getRelativePosition(ExpCanvas, input)
+						eh = rx
+						ev = 1 - ry
+						expRefresh()
+					end
+					if bDrag then
+						local _, ry = getRelativePosition(ExpBar, input)
+						local p = math.clamp(ry, 0, 1)
+						if p <= 0.5 then es = p * 2 else es = 1 ev = (1 - p) * 2 end
+						expRefresh()
+					end
+				end)
+				UserInputService.InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+						cDrag = false
+						bDrag = false
+					end
+				end)
+				ExpApply.MouseButton1Click:Connect(function()
+					onApply(Color3.fromHSV(eh, es, ev))
+				end)
+				ExpX.MouseButton1Click:Connect(function()
+					if onClose then onClose() end
+				end)
+				expRefresh()
+				return Exp
+			end
 			for i, item in ipairs(items) do
 				item = item or {}
 				local bTitle = item.Title
@@ -6062,7 +6271,7 @@ function Astral:MakeWindow(config)
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
-				Btn.ClipsDescendants = true
+				Btn.ClipsDescendants = false
 				Btn.LayoutOrder = i
 				Btn.Parent = Grid
 
@@ -6134,33 +6343,44 @@ function Astral:MakeWindow(config)
 					BLabel.Parent = Btn
 				end
 
-				tiles[i] = {Btn = Btn, Preview = TilePreview, Color = bColor, Callback = bCallback}
 				local tileIndex = i
+				local Exp = buildExpander(Btn, bColor, function(col)
+					local tt = tiles[tileIndex]
+					if tt then
+						tt.Color = col
+						if tt.Preview then
+							tt.Preview.BackgroundColor3 = col
+						else
+							local ic = tt.Btn:FindFirstChild("Icon")
+							if ic then ic.ImageColor3 = col end
+						end
+						task.spawn(tt.Callback, tileIndex, col)
+					end
+					collapseTile(tiles[tileIndex])
+				end, function()
+					collapseTile(tiles[tileIndex])
+				end)
+				tiles[i] = {Btn = Btn, Preview = TilePreview, Color = bColor, Callback = bCallback, Exp = Exp}
 				Btn.MouseButton1Click:Connect(function()
 					if pickerOpen or selectorOpen then return end
 					local t = tiles[tileIndex]
 					if not t then return end
-					openMiniPicker(t.Color, function(c)
-						t.Color = c
-						if t.Preview then
-							t.Preview.BackgroundColor3 = c
-						else
-							local ic = t.Btn:FindFirstChild("Icon")
-							if ic then ic.ImageColor3 = c end
-						end
-						task.spawn(t.Callback, tileIndex, c)
-					end, Btn)
+					if expandedTile == t then
+						collapseTile(t)
+					else
+						expandTile(t)
+					end
 				end)
 				if TilePreview then
 					TilePreview.MouseButton1Click:Connect(function()
 						if pickerOpen or selectorOpen then return end
 						local t = tiles[tileIndex]
 						if not t then return end
-						openMiniPicker(t.Color, function(c)
-							t.Color = c
-							if t.Preview then t.Preview.BackgroundColor3 = c end
-							task.spawn(t.Callback, tileIndex, c)
-						end, Btn)
+						if expandedTile == t then
+							collapseTile(t)
+						else
+							expandTile(t)
+						end
 					end)
 				end
 				Btn.MouseEnter:Connect(function()
