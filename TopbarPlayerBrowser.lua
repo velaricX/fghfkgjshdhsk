@@ -4852,6 +4852,89 @@ function Astral:MakeWindow(config)
 			return LabelController
 		end
 		-- =========================================================================
+		-- SECTION HEADER (clean divider label: accent bar + title + line)
+		--   local S = Tab:AddSection({ Title = "Farming", Icon = "Home" })
+		--   S:SetTitle("Bosses")
+		-- =========================================================================
+		function TabObject:AddSection(sectionConfig)
+			sectionConfig = sectionConfig or {}
+			local title = sectionConfig.Title or sectionConfig.Name or "Section"
+			local icon = parseIcon(sectionConfig.Icon)
+			local h = IsMobile and 26 or 30
+
+			local SectionFrame = Instance.new("Frame")
+			SectionFrame.Name = title .. "_Section"
+			SectionFrame.BackgroundTransparency = 1
+			SectionFrame.BorderSizePixel = 0
+
+			local RowLayout = Instance.new("UIListLayout")
+			RowLayout.FillDirection = Enum.FillDirection.Horizontal
+			RowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			RowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			RowLayout.Padding = UDim.new(0, 8)
+			RowLayout.Parent = SectionFrame
+
+			local Bar = Instance.new("Frame")
+			Bar.Name = "Bar"
+			Bar.Size = UDim2.new(0, 4, 0, IsMobile and 14 or 16)
+			Bar.BackgroundColor3 = AccentColor
+			Bar.BorderSizePixel = 0
+			Bar.LayoutOrder = 1
+			Bar.Parent = SectionFrame
+			local BarCorner = Instance.new("UICorner")
+			BarCorner.CornerRadius = UDim.new(1, 0)
+			BarCorner.Parent = Bar
+			onAccentChange(function(c) pcall(function() Bar.BackgroundColor3 = c end) end)
+
+			if icon then
+				local Ico = Instance.new("ImageLabel")
+				Ico.Name = "Icon"
+				Ico.BackgroundTransparency = 1
+				Ico.Size = UDim2.new(0, IsMobile and 14 or 16, 0, IsMobile and 14 or 16)
+				Ico.LayoutOrder = 2
+				Astral.ApplyIcon(Ico, icon)
+				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
+				Ico.ScaleType = Enum.ScaleType.Fit
+				Ico.Parent = SectionFrame
+			end
+
+			local TitleLabel = Instance.new("TextLabel")
+			TitleLabel.Name = "Title"
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.Size = UDim2.new(0, 0, 0, IsMobile and 16 or 18)
+			TitleLabel.AutomaticSize = Enum.AutomaticSize.X
+			TitleLabel.Font = Enum.Font.GothamBold
+			tr(TitleLabel, title)
+			TitleLabel.TextColor3 = Color3.fromRGB(235, 235, 240)
+			mTS(TitleLabel, IsMobile and 12 or 13)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.LayoutOrder = 3
+			TitleLabel.Parent = SectionFrame
+
+			local Line = Instance.new("Frame")
+			Line.Name = "Line"
+			Line.Size = UDim2.new(1, 0, 0, 1)
+			Line.BackgroundColor3 = Color3.fromRGB(50, 50, 58)
+			Line.BackgroundTransparency = 0.35
+			Line.BorderSizePixel = 0
+			Line.LayoutOrder = 4
+			Line.Parent = SectionFrame
+
+			registerElement(SectionFrame, h, sectionConfig.Position)
+
+			local SectionController = {}
+			function SectionController:SetTitle(t)
+				TitleLabel.Text = tostring(t)
+			end
+			SectionController.SetText = SectionController.SetTitle
+			function SectionController:SetIcon(iconInput)
+				local ic = SectionFrame:FindFirstChild("Icon")
+				if ic then Astral.ApplyIcon(ic, parseIcon(iconInput)) end
+			end
+			return SectionController
+		end
+		-- =========================================================================
 		-- NEW PARAGRAPH IMPLEMENTATION (PIXEL-PERFECT IMAGE & TEXT CARD)
 		-- =========================================================================
 		function TabObject:AddParagraph(paraConfig)
