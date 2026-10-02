@@ -1242,12 +1242,11 @@ function Astral:MakeWindow(config)
 
 	-- Saturation/Value canvas: hue base + white (sat) + black (val) gradients,
 	-- so every shade is reachable and colors are easy to match
-	local shadeBarW = IsMobile and 16 or 22
 	local Canvas = Instance.new("Frame")
 	Canvas.Name = "Canvas"
-	Canvas.Size = UDim2.new(1, -24 - shadeBarW - 8, 0, canvasHeight)
+	Canvas.Size = UDim2.new(1, -24, 0, canvasHeight)
 	Canvas.Position = UDim2.new(0, 12, 0, padding)
-	Canvas.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Canvas.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 	Canvas.BorderSizePixel = 0
 	Canvas.ClipsDescendants = true
 	Canvas.ZIndex = 202
@@ -1257,20 +1256,26 @@ function Astral:MakeWindow(config)
 	CanvasCorner.CornerRadius = UDim.new(0, 8)
 	CanvasCorner.Parent = Canvas
 
-	-- Rainbow hue axis (X). Black overlay below adds the value axis (Y).
-	local CanvasRainbow = Instance.new("UIGradient")
-	CanvasRainbow.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
-	})
-	CanvasRainbow.Parent = Canvas
+	-- White overlay, transparent on the right = saturation axis
+	local SatOverlay = Instance.new("Frame")
+	SatOverlay.Name = "SatOverlay"
+	SatOverlay.Size = UDim2.fromScale(1, 1)
+	SatOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	SatOverlay.BorderSizePixel = 0
+	SatOverlay.ZIndex = 203
+	SatOverlay.Parent = Canvas
 
-	-- (white sat overlay removed: canvas X is now hue, shade bar sets saturation)
+	local SatOverlayCorner = Instance.new("UICorner")
+	SatOverlayCorner.CornerRadius = UDim.new(0, 8)
+	SatOverlayCorner.Parent = SatOverlay
+
+	local SatGradient = Instance.new("UIGradient")
+	SatGradient.Rotation = 0
+	SatGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
+	SatGradient.Parent = SatOverlay
 
 	-- Black overlay, transparent on top = value axis
 	local ValOverlay = Instance.new("Frame")
@@ -1310,82 +1315,103 @@ function Astral:MakeWindow(config)
 	HandleStroke.Thickness = 1.5
 	HandleStroke.Parent = CanvasHandle
 
-	-- Shade bar (vertical, right of canvas): white top = no saturation,
-	-- hue bottom = full. Drag to set saturation for the current hue.
-	local ShadeBar = Instance.new("Frame")
-	ShadeBar.Name = "ShadeBar"
-	ShadeBar.Size = UDim2.new(0, shadeBarW, 0, canvasHeight)
-	ShadeBar.Position = UDim2.new(1, -12 - shadeBarW, 0, padding)
-	ShadeBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	ShadeBar.BorderSizePixel = 0
-	ShadeBar.ClipsDescendants = true
-	ShadeBar.ZIndex = 202
-	ShadeBar.Parent = ColorPickerPanel
+	-- Hue Slider (FIXED: Subtle curve, not too curved)
+	local HueSlider = Instance.new("Frame")
+	HueSlider.Name = "HueSlider"
+	HueSlider.Size = UDim2.new(1, -24, 0, sliderHeight)
+	HueSlider.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding)
+	HueSlider.ZIndex = 202
+	HueSlider.Parent = ColorPickerPanel
 
-	local ShadeCorner = Instance.new("UICorner")
-	ShadeCorner.CornerRadius = UDim.new(0, 6)
-	ShadeCorner.Parent = ShadeBar
+	local HueCorner = Instance.new("UICorner")
+	HueCorner.CornerRadius = UDim.new(0, 3) -- FIXED: Subtle curve, not too curved
+	HueCorner.Parent = HueSlider
 
-	local BarGradient = Instance.new("UIGradient")
-	BarGradient.Rotation = 90
-	BarGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromHSV(0, 1, 1)),
+	local HueGradient = Instance.new("UIGradient")
+	HueGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
 	})
-	BarGradient.Parent = ShadeBar
+	HueGradient.Parent = HueSlider
 
-	local BarHandle = Instance.new("Frame")
-	BarHandle.Name = "BarHandle"
-	BarHandle.Size = UDim2.new(1, 0, 0, 6)
-	BarHandle.AnchorPoint = Vector2.new(0.5, 0.5)
-	BarHandle.Position = UDim2.new(0.5, 0, 0, 0)
-	BarHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	BarHandle.ZIndex = 203
-	BarHandle.Parent = ShadeBar
+	local HueHandle = Instance.new("Frame")
+	HueHandle.Name = "HueHandle"
+	HueHandle.Size = UDim2.new(0, 12, 1, 6) -- Vertical pill wrapping the slider
+	HueHandle.AnchorPoint = Vector2.new(0.5, 0.5)
+	HueHandle.Position = UDim2.new(0, 0, 0.5, 0)
+	HueHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	HueHandle.ZIndex = 203
+	HueHandle.Parent = HueSlider
 
-	local BarHandleCorner = Instance.new("UICorner")
-	BarHandleCorner.CornerRadius = UDim.new(1, 0)
-	BarHandleCorner.Parent = BarHandle
+	local HueHandleCorner = Instance.new("UICorner")
+	HueHandleCorner.CornerRadius = UDim.new(0, 4)
+	HueHandleCorner.Parent = HueHandle
 
-	local BarHandleStroke = Instance.new("UIStroke")
-	BarHandleStroke.Color = Color3.fromRGB(0, 0, 0)
-	BarHandleStroke.Thickness = 1
-	BarHandleStroke.Parent = BarHandle
+	local HueHandleStroke = Instance.new("UIStroke")
+	HueHandleStroke.Color = Color3.fromRGB(0, 0, 0)
+	HueHandleStroke.Thickness = 1
+	HueHandleStroke.Parent = HueHandle
 
-	-- Current / New swatches float top-right over the canvas
+	-- Current / New Preview Buttons
 	local PreviewContainer = Instance.new("Frame")
 	PreviewContainer.Name = "PreviewContainer"
 	PreviewContainer.BackgroundTransparency = 1
-	PreviewContainer.Size = UDim2.new(0, 52, 0, 22)
-	PreviewContainer.Position = UDim2.new(1, -56, 0, 4)
-	PreviewContainer.ZIndex = 206
-	PreviewContainer.Parent = Canvas
+	PreviewContainer.Size = UDim2.new(1, -24, 0, previewHeight)
+	PreviewContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding)
+	PreviewContainer.ZIndex = 202
+	PreviewContainer.Parent = ColorPickerPanel
 
 	local CurrentPreview = Instance.new("Frame")
 	CurrentPreview.Name = "CurrentPreview"
-	CurrentPreview.Size = UDim2.new(0, 24, 0, 22)
-	CurrentPreview.Position = UDim2.new(0, 0, 0, 0)
+	CurrentPreview.Size = UDim2.new(0.5, -6, 1, 0)
 	CurrentPreview.BackgroundColor3 = Color3.fromRGB(34, 255, 34)
-	CurrentPreview.BorderSizePixel = 0
-	CurrentPreview.ZIndex = 207
+	CurrentPreview.ZIndex = 203
 	CurrentPreview.Parent = PreviewContainer
+	-- LAYOUT AROUND BOX (copied from good UI)
+	local PreviewPadding = Instance.new("UIPadding", PreviewContainer)
+	PreviewPadding.PaddingLeft = UDim.new(0, 0)
+	PreviewPadding.PaddingRight = UDim.new(0, 0)
 
 	local CurrentCorner = Instance.new("UICorner")
-	CurrentCorner.CornerRadius = UDim.new(0, 5)
+	CurrentCorner.CornerRadius = UDim.new(0, 6)
 	CurrentCorner.Parent = CurrentPreview
+
+	local CurrentLabel = Instance.new("TextLabel")
+	CurrentLabel.Size = UDim2.new(1, 0, 1, 0)
+	CurrentLabel.BackgroundTransparency = 1
+	CurrentLabel.Font = Enum.Font.GothamBold
+	CurrentLabel.Text = "CURRENT"
+	CurrentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CurrentLabel.			TextSize = 11
+	CurrentLabel.ZIndex = 204
+	CurrentLabel.Parent = CurrentPreview
 
 	local NewPreview = Instance.new("Frame")
 	NewPreview.Name = "NewPreview"
-	NewPreview.Size = UDim2.new(0, 24, 0, 22)
-	NewPreview.Position = UDim2.new(0, 28, 0, 0)
+	NewPreview.Size = UDim2.new(0.5, -6, 1, 0)
+	NewPreview.Position = UDim2.new(0.5, 6, 0, 0)
 	NewPreview.BackgroundColor3 = Color3.fromRGB(58, 49, 255)
-	NewPreview.BorderSizePixel = 0
-	NewPreview.ZIndex = 207
+	NewPreview.ZIndex = 203
 	NewPreview.Parent = PreviewContainer
 
 	local NewCorner = Instance.new("UICorner")
-	NewCorner.CornerRadius = UDim.new(0, 5)
+	NewCorner.CornerRadius = UDim.new(0, 6)
 	NewCorner.Parent = NewPreview
+
+	local NewLabel = Instance.new("TextLabel")
+	NewLabel.Size = UDim2.new(1, 0, 1, 0)
+	NewLabel.BackgroundTransparency = 1
+	NewLabel.Font = Enum.Font.GothamBold
+	NewLabel.Text = "NEW"
+	NewLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	NewLabel.			TextSize = 11
+	NewLabel.ZIndex = 204
+	NewLabel.Parent = NewPreview
 
 	-- RGB Inputs
 	local RGBContainer = Instance.new("Frame")
@@ -1394,7 +1420,7 @@ function Astral:MakeWindow(config)
 	RGBContainer.BackgroundTransparency = 0
 	RGBContainer.BorderSizePixel = 0
 	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight + 10)
-	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding - 5)
+	RGBContainer.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5)
 	RGBContainer.ZIndex = 202
 	RGBContainer.Parent = ColorPickerPanel
 
@@ -1475,7 +1501,7 @@ function Astral:MakeWindow(config)
 	HexRow.BackgroundTransparency = 0
 	HexRow.BorderSizePixel = 0
 	HexRow.Size = UDim2.new(1, -24, 0, inputHeight + 10)
-	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding - 5 + inputHeight + 10 + 6)
+	HexRow.Position = UDim2.new(0, 12, 0, padding + canvasHeight + padding + sliderHeight + padding + previewHeight + padding - 5 + inputHeight + 10 + 6)
 	HexRow.ZIndex = 202
 	HexRow.Parent = ColorPickerPanel
 
@@ -1607,15 +1633,11 @@ function Astral:MakeWindow(config)
 		local color = Color3.fromHSV(currentHue, currentSat, currentValue)
 		selectedColor = color
 		
-		-- Canvas is a static hue rainbow (X) with black value fade (Y);
-		-- the shade bar sets saturation for the current hue.
-		BarGradient.Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-			ColorSequenceKeypoint.new(1, Color3.fromHSV(currentHue, 1, 1)),
-		})
-
-		CanvasHandle.Position = UDim2.new(currentHue, 0, 1 - currentValue, 0)
-		BarHandle.Position = UDim2.new(0.5, 0, 1 - currentSat, 0)
+		-- Base shows the pure hue; overlays shape saturation (white) and value (black)
+		Canvas.BackgroundColor3 = Color3.fromHSV(currentHue, 1, 1)
+		
+		CanvasHandle.Position = UDim2.new(currentSat, 0, 1 - currentValue, 0)
+		HueHandle.Position = UDim2.new(currentHue, 0, 0.5, 0)
 		NewPreview.BackgroundColor3 = color
 		
 		local r, g, b = math.round(color.R * 255), math.round(color.G * 255), math.round(color.B * 255)
@@ -1625,30 +1647,30 @@ function Astral:MakeWindow(config)
 		HexInput.Text = string.format("#%02X%02X%02X", r, g, b)
 	end
 
-	-- Shade Bar Dragging (vertical saturation)
-	local shadeDragging = false
-	local function updateShadeFromInput(input)
-		local _, relY = getRelativePosition(ShadeBar, input)
-		currentSat = 1 - relY
+	-- Hue Slider Dragging
+	local hueDragging = false
+	local function updateHueFromInput(input)
+		local relX, _ = getRelativePosition(HueSlider, input)
+		currentHue = relX
 		updateColorPickerUI()
 	end
 
-	ShadeBar.InputBegan:Connect(function(input)
+	HueSlider.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			shadeDragging = true
-			updateShadeFromInput(input)
+			hueDragging = true
+			updateHueFromInput(input)
 		end
 	end)
 
 	UserInputService.InputChanged:Connect(function(input)
-		if shadeDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-			updateShadeFromInput(input)
+		if hueDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			updateHueFromInput(input)
 		end
 	end)
 
 	UserInputService.InputEnded:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			shadeDragging = false
+			hueDragging = false
 		end
 	end)
 
@@ -1656,7 +1678,7 @@ function Astral:MakeWindow(config)
 	local canvasDragging = false
 	local function updateCanvasFromInput(input)
 		local relX, relY = getRelativePosition(Canvas, input)
-		currentHue = relX
+		currentSat = relX
 		currentValue = 1 - relY
 		updateColorPickerUI()
 	end
@@ -1724,17 +1746,20 @@ function Astral:MakeWindow(config)
 		local compact = H < 380
 		local pad = compact and 4 or 12
 		local ch = compact and 80 or 190
+		local sh = compact and 10 or 16
+		local ph = compact and 18 or 36
 		local ih = compact and 22 or 32
 		local bh = compact and 26 or 36
-		local barW = compact and 16 or 22
-		Canvas.Size = UDim2.new(1, -24 - barW - 8, 0, ch)
+		Canvas.Size = UDim2.new(1, -24, 0, ch)
 		Canvas.Position = UDim2.new(0, 12, 0, pad)
-		ShadeBar.Size = UDim2.new(0, barW, 0, ch)
-		ShadeBar.Position = UDim2.new(1, -12 - barW, 0, pad)
+		HueSlider.Size = UDim2.new(1, -24, 0, sh)
+		HueSlider.Position = UDim2.new(0, 12, 0, pad + ch + pad)
+		PreviewContainer.Size = UDim2.new(1, -24, 0, ph)
+		PreviewContainer.Position = UDim2.new(0, 12, 0, pad + ch + pad + sh + pad)
 		RGBContainer.Size = UDim2.new(1, -24, 0, ih)
-		RGBContainer.Position = UDim2.new(0, 12, 0, pad + ch + pad)
+		RGBContainer.Position = UDim2.new(0, 12, 0, pad + ch + pad + sh + pad + ph + pad)
 		HexRow.Size = UDim2.new(1, -24, 0, ih)
-		HexRow.Position = UDim2.new(0, 12, 0, pad + ch + pad + ih + pad)
+		HexRow.Position = UDim2.new(0, 12, 0, pad + ch + pad + sh + pad + ph + pad + ih + pad)
 		ApplyButton.Size = UDim2.new(1, -24, 0, bh)
 		ApplyButton.Position = UDim2.new(0, 12, 1, -bh - bh - pad - 8)
 		CancelButton.Size = UDim2.new(1, -24, 0, bh)
