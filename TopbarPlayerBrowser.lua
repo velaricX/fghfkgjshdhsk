@@ -4860,7 +4860,7 @@ function Astral:MakeWindow(config)
 			sectionConfig = sectionConfig or {}
 			local title = sectionConfig.Title or sectionConfig.Name or "Section"
 			local icon = parseIcon(sectionConfig.Icon)
-			local h = IsMobile and 26 or 30
+			local h = IsMobile and 30 or 34
 
 			local SectionFrame = Instance.new("Frame")
 			SectionFrame.Name = title .. "_Section"
@@ -4877,9 +4877,9 @@ function Astral:MakeWindow(config)
 
 			local LineL = Instance.new("Frame")
 			LineL.Name = "LineL"
-			LineL.Size = UDim2.new(1, 0, 0, 1)
-			LineL.BackgroundColor3 = Color3.fromRGB(50, 50, 58)
-			LineL.BackgroundTransparency = 0.35
+			LineL.Size = UDim2.new(1, 0, 0, 2)
+			LineL.BackgroundColor3 = AccentColor
+			LineL.BackgroundTransparency = 0.45
 			LineL.BorderSizePixel = 0
 			LineL.LayoutOrder = 1
 			LineL.Parent = SectionFrame
@@ -4893,9 +4893,9 @@ function Astral:MakeWindow(config)
 
 			local Pill = Instance.new("Frame")
 			Pill.Name = "Pill"
-			Pill.Size = UDim2.new(0, 0, 0, IsMobile and 22 or 24)
+			Pill.Size = UDim2.new(0, 0, 0, IsMobile and 26 or 30)
 			Pill.AutomaticSize = Enum.AutomaticSize.X
-			Pill.BackgroundColor3 = Color3.fromRGB(38, 38, 48)
+			Pill.BackgroundColor3 = Color3.fromRGB(46, 46, 60)
 			Pill.BorderSizePixel = 0
 			Pill.LayoutOrder = 2
 			Pill.Parent = SectionFrame
@@ -4903,8 +4903,8 @@ function Astral:MakeWindow(config)
 			PillCorner.CornerRadius = UDim.new(1, 0)
 			PillCorner.Parent = Pill
 			local PillStroke = Instance.new("UIStroke")
-			PillStroke.Color = Color3.fromRGB(60, 60, 72)
-			PillStroke.Thickness = 1
+			PillStroke.Color = Color3.fromRGB(80, 80, 95)
+			PillStroke.Thickness = 1.5
 			PillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			PillStroke.Parent = Pill
 			local PillPad = Instance.new("UIPadding")
@@ -4919,7 +4919,7 @@ function Astral:MakeWindow(config)
 			PillLayout.Parent = Pill
 			local Dot = Instance.new("Frame")
 			Dot.Name = "Dot"
-			Dot.Size = UDim2.new(0, 7, 0, 7)
+			Dot.Size = UDim2.new(0, 9, 0, 9)
 			Dot.BackgroundColor3 = AccentColor
 			Dot.BorderSizePixel = 0
 			Dot.LayoutOrder = 1
@@ -4927,6 +4927,12 @@ function Astral:MakeWindow(config)
 			local DotCorner = Instance.new("UICorner")
 			DotCorner.CornerRadius = UDim.new(1, 0)
 			DotCorner.Parent = Dot
+			local DotGlow = Instance.new("UIStroke")
+			DotGlow.Color = Color3.fromRGB(255, 255, 255)
+			DotGlow.Transparency = 0.45
+			DotGlow.Thickness = 1.5
+			DotGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			DotGlow.Parent = Dot
 			onAccentChange(function(c) pcall(function() Dot.BackgroundColor3 = c end) end)
 
 			if icon then
@@ -4949,7 +4955,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(TitleLabel, IsMobile and 13 or 14)
+			mTS(TitleLabel, IsMobile and 15 or 16)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TitleLabel.LayoutOrder = 4
@@ -4957,9 +4963,9 @@ function Astral:MakeWindow(config)
 
 			local Line = Instance.new("Frame")
 			Line.Name = "Line"
-			Line.Size = UDim2.new(1, 0, 0, 1)
-			Line.BackgroundColor3 = Color3.fromRGB(50, 50, 58)
-			Line.BackgroundTransparency = 0.35
+			Line.Size = UDim2.new(1, 0, 0, 2)
+			Line.BackgroundColor3 = AccentColor
+			Line.BackgroundTransparency = 0.45
 			Line.BorderSizePixel = 0
 			Line.LayoutOrder = 5
 			Line.Parent = SectionFrame
@@ -4970,6 +4976,10 @@ function Astral:MakeWindow(config)
 				NumberSequenceKeypoint.new(1, 1),
 			})
 			LineRGrad.Parent = Line
+			onAccentChange(function(c) pcall(function()
+				LineL.BackgroundColor3 = c
+				Line.BackgroundColor3 = c
+			end) end)
 
 			registerElement(SectionFrame, h, sectionConfig.Position)
 
