@@ -5875,7 +5875,7 @@ function Astral:MakeWindow(config)
 				if not t or not t.Exp then return end
 				if expandedTile == t then expandedTile = nil end
 				t.Btn.ZIndex = 1
-				TweenService:Create(t.Exp, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 0, 0) }):Play()
+				TweenService:Create(t.Exp, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, t.ExpW or 0, 0, 0) }):Play()
 				task.delay(0.2, function()
 					pcall(function()
 						if expandedTile ~= t then t.Exp.Visible = false end
@@ -5884,9 +5884,23 @@ function Astral:MakeWindow(config)
 			end
 			local function expandTile(t)
 				if expandedTile and expandedTile ~= t then collapseTile(expandedTile) end
+				local order = t.Btn.LayoutOrder or 1
+				local row = math.floor((order - 1) / math.max(1, columns))
+				local gx, gy, gw = 12, 0, 200
+				pcall(function()
+					local gp = Grid.AbsolutePosition
+					local cp = Card.AbsolutePosition
+					gx = gp.X - cp.X
+					gy = (gp.Y - cp.Y) + row * (btnH + gap) + btnH + 4
+					gw = Grid.AbsoluteSize.X
+				end)
+				t.ExpW = gw
+				t.Exp.Parent = Card
+				t.Exp.Position = UDim2.new(0, gx, 0, gy)
+				t.Exp.Size = UDim2.new(0, gw, 0, 0)
 				t.Exp.Visible = true
 				t.Btn.ZIndex = 10
-				TweenService:Create(t.Exp, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 0, 134) }):Play()
+				TweenService:Create(t.Exp, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.new(0, gw, 0, 134) }):Play()
 				expandedTile = t
 			end
 			local function buildExpander(tileBtn, initColor, onApply, onClose)
@@ -5900,7 +5914,7 @@ function Astral:MakeWindow(config)
 				Exp.ClipsDescendants = true
 				Exp.Visible = false
 				Exp.ZIndex = 10
-				Exp.Parent = tileBtn
+				Exp.Parent = Card
 				local ExpCorner = Instance.new("UICorner")
 				ExpCorner.CornerRadius = UDim.new(0, 8)
 				ExpCorner.Parent = Exp
