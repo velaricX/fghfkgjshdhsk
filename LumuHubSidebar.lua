@@ -1240,26 +1240,7 @@ function Astral:MakeWindow(config)
 
 	-- (white sat overlay removed: canvas X is now hue, shade bar sets saturation)
 
-	-- Black overlay, transparent on top = value axis
-	local ValOverlay = Instance.new("Frame")
-	ValOverlay.Name = "ValOverlay"
-	ValOverlay.Size = UDim2.fromScale(1, 1)
-	ValOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	ValOverlay.BorderSizePixel = 0
-	ValOverlay.ZIndex = 204
-	ValOverlay.Parent = Canvas
-
-	local ValOverlayCorner = Instance.new("UICorner")
-	ValOverlayCorner.CornerRadius = UDim.new(0, 8)
-	ValOverlayCorner.Parent = ValOverlay
-
-	local ValGradient = Instance.new("UIGradient")
-	ValGradient.Rotation = 90
-	ValGradient.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 1),
-		NumberSequenceKeypoint.new(1, 0)
-	})
-	ValGradient.Parent = ValOverlay
+	-- (no overlays: canvas is pure rainbow hue like the reference)
 
 	local CanvasHandle = Instance.new("Frame")
 	CanvasHandle.Name = "CanvasHandle"
@@ -1298,7 +1279,8 @@ function Astral:MakeWindow(config)
 	BarGradient.Rotation = 90
 	BarGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromHSV(0, 1, 1)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0, 1, 1)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
 	})
 	BarGradient.Parent = ShadeBar
 
@@ -1575,15 +1557,17 @@ function Astral:MakeWindow(config)
 		local color = Color3.fromHSV(currentHue, currentSat, currentValue)
 		selectedColor = color
 		
-		-- Canvas is a static hue rainbow (X) with black value fade (Y);
-		-- the shade bar sets saturation for the current hue.
+		-- Canvas is a static hue rainbow (X); drag Y also sets value.
+		-- Shade bar: upper half sets saturation, lower half sets value.
 		BarGradient.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-			ColorSequenceKeypoint.new(1, Color3.fromHSV(currentHue, 1, 1)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromHSV(currentHue, 1, 1)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
 		})
 
 		CanvasHandle.Position = UDim2.new(currentHue, 0, 1 - currentValue, 0)
-		BarHandle.Position = UDim2.new(0.5, 0, 1 - currentSat, 0)
+		local bp = (currentSat < 1) and (currentSat * 0.5) or (1 - currentValue * 0.5)
+		BarHandle.Position = UDim2.new(0.5, 0, bp, 0)
 		NewPreview.BackgroundColor3 = color
 		
 		local r, g, b = math.round(color.R * 255), math.round(color.G * 255), math.round(color.B * 255)
@@ -1593,11 +1577,17 @@ function Astral:MakeWindow(config)
 		HexInput.Text = string.format("#%02X%02X%02X", r, g, b)
 	end
 
-	-- Shade Bar Dragging (vertical saturation)
+	-- Shade Bar Dragging (upper half = saturation, lower half = value)
 	local shadeDragging = false
 	local function updateShadeFromInput(input)
 		local _, relY = getRelativePosition(ShadeBar, input)
-		currentSat = 1 - relY
+		local p = math.clamp(relY, 0, 1)
+		if p <= 0.5 then
+			currentSat = p * 2
+		else
+			currentSat = 1
+			currentValue = (1 - p) * 2
+		end
 		updateColorPickerUI()
 	end
 
