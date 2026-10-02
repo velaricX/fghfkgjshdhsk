@@ -1907,11 +1907,13 @@ function Astral:MakeWindow(config)
 		local cx, cy = 200, 200
 		pcall(function()
 			local vw, vh = workspace.CurrentCamera.ViewportSize.X, workspace.CurrentCamera.ViewportSize.Y
+			local insetY = 0
+			pcall(function() insetY = game:GetService("GuiService"):GetGuiInset().Y end)
 			local bp = fromBtn.AbsolutePosition
 			local bs = fromBtn.AbsoluteSize
 			cx = math.clamp(bp.X, 8, vw - 224)
-			cy = bp.Y + bs.Y + 6
-			if cy + 166 > vh then cy = bp.Y - 166 end
+			cy = bp.Y - insetY + bs.Y + 2
+			if cy + 166 > vh - insetY then cy = bp.Y - insetY - 166 end
 			if cy < 8 then cy = 8 end
 		end)
 		MiniPanel.Size = UDim2.new(0, 216, 0, 8)
