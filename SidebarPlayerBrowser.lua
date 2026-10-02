@@ -1593,6 +1593,8 @@ function Astral:MakeWindow(config)
 
 	-- Forward declaration of closeSelector to prevent scope errors
 	local closeSelector
+	local closeMiniPicker
+	local openMiniPicker
 
 	-- Lay out picker rows from the REAL panel height every open,
 	-- so short windows (XS/mobile) can never overlap rows and buttons
@@ -1625,6 +1627,7 @@ function Astral:MakeWindow(config)
 
 	-- Slide Animations (Slides inside MainFrame from the right edge)
 	local function openColorPicker(defaultColor, callback, previewBox)
+		if closeMiniPicker then closeMiniPicker() end
 		if closeSelector then closeSelector() end
 		originalColor = defaultColor
 		selectedColor = defaultColor
@@ -1663,6 +1666,259 @@ function Astral:MakeWindow(config)
 	CancelButton.MouseButton1Click:Connect(function()
 		closeColorPicker()
 	end)
+
+	-- =========================================================================
+	-- MINI COLOR PICKER (compact popup for MultiColorPicker tiles only.
+	-- The single AddColorpicker keeps the big slide-in panel above.)
+	-- Wrapped in do-end so its many locals reuse registers (200 local limit).
+	-- =========================================================================
+	do
+	local miniH, miniS, miniV = 0, 1, 1
+	local miniCallback = nil
+	local miniOpen = false
+
+	local MiniCatcher = Instance.new("TextButton")
+	MiniCatcher.Name = "MiniCatcher"
+	MiniCatcher.Size = UDim2.new(1, 0, 1, 0)
+	MiniCatcher.BackgroundTransparency = 1
+	MiniCatcher.Text = ""
+	MiniCatcher.AutoButtonColor = false
+	MiniCatcher.Visible = false
+	MiniCatcher.ZIndex = 499
+	MiniCatcher.Parent = ScreenGui
+
+	local MiniPanel = Instance.new("Frame")
+	MiniPanel.Name = "MiniColorPicker"
+	MiniPanel.Size = UDim2.new(0, 216, 0, 158)
+	MiniPanel.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+	MiniPanel.BorderSizePixel = 0
+	MiniPanel.Visible = false
+	MiniPanel.ZIndex = 500
+	MiniPanel.Parent = ScreenGui
+
+	local MiniCorner = Instance.new("UICorner")
+	MiniCorner.CornerRadius = UDim.new(0, 10)
+	MiniCorner.Parent = MiniPanel
+
+	local MiniStroke = Instance.new("UIStroke")
+	MiniStroke.Color = Color3.fromRGB(50, 50, 55)
+	MiniStroke.Thickness = 1.2
+	MiniStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	MiniStroke.Parent = MiniPanel
+
+	local MiniCanvas = Instance.new("Frame")
+	MiniCanvas.Name = "Canvas"
+	MiniCanvas.Position = UDim2.new(0, 10, 0, 10)
+	MiniCanvas.Size = UDim2.new(0, 150, 0, 100)
+	MiniCanvas.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniCanvas.BorderSizePixel = 0
+	MiniCanvas.ClipsDescendants = true
+	MiniCanvas.ZIndex = 501
+	MiniCanvas.Parent = MiniPanel
+
+	local MiniCanvasCorner = Instance.new("UICorner")
+	MiniCanvasCorner.CornerRadius = UDim.new(0, 6)
+	MiniCanvasCorner.Parent = MiniCanvas
+
+	local MiniRainbow = Instance.new("UIGradient")
+	MiniRainbow.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
+	})
+	MiniRainbow.Parent = MiniCanvas
+
+	local MiniCursor = Instance.new("Frame")
+	MiniCursor.Size = UDim2.new(0, 12, 0, 12)
+	MiniCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+	MiniCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniCursor.ZIndex = 502
+	MiniCursor.Parent = MiniCanvas
+
+	local MiniCursorCorner = Instance.new("UICorner")
+	MiniCursorCorner.CornerRadius = UDim.new(1, 0)
+	MiniCursorCorner.Parent = MiniCursor
+
+	local MiniCursorStroke = Instance.new("UIStroke")
+	MiniCursorStroke.Color = Color3.fromRGB(0, 0, 0)
+	MiniCursorStroke.Thickness = 1.5
+	MiniCursorStroke.Parent = MiniCursor
+
+	local MiniBar = Instance.new("Frame")
+	MiniBar.Name = "ShadeBar"
+	MiniBar.Position = UDim2.new(0, 168, 0, 10)
+	MiniBar.Size = UDim2.new(0, 16, 0, 100)
+	MiniBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniBar.BorderSizePixel = 0
+	MiniBar.ClipsDescendants = true
+	MiniBar.ZIndex = 501
+	MiniBar.Parent = MiniPanel
+
+	local MiniBarCorner = Instance.new("UICorner")
+	MiniBarCorner.CornerRadius = UDim.new(0, 5)
+	MiniBarCorner.Parent = MiniBar
+
+	local MiniBarGrad = Instance.new("UIGradient")
+	MiniBarGrad.Rotation = 90
+	MiniBarGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0, 1, 1)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+	})
+	MiniBarGrad.Parent = MiniBar
+
+	local MiniBarCursor = Instance.new("Frame")
+	MiniBarCursor.Size = UDim2.new(1, 0, 0, 5)
+	MiniBarCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+	MiniBarCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniBarCursor.ZIndex = 502
+	MiniBarCursor.Parent = MiniBar
+
+	local MiniBarCursorCorner = Instance.new("UICorner")
+	MiniBarCursorCorner.CornerRadius = UDim.new(1, 0)
+	MiniBarCursorCorner.Parent = MiniBarCursor
+
+	local MiniPrev = Instance.new("Frame")
+	MiniPrev.Position = UDim2.new(0, 10, 0, 120)
+	MiniPrev.Size = UDim2.new(0, 40, 0, 28)
+	MiniPrev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniPrev.BorderSizePixel = 0
+	MiniPrev.ZIndex = 501
+	MiniPrev.Parent = MiniPanel
+
+	local MiniPrevCorner = Instance.new("UICorner")
+	MiniPrevCorner.CornerRadius = UDim.new(0, 6)
+	MiniPrevCorner.Parent = MiniPrev
+
+	local MiniApply = Instance.new("TextButton")
+	MiniApply.Position = UDim2.new(0, 58, 0, 120)
+	MiniApply.Size = UDim2.new(0, 96, 0, 28)
+	MiniApply.BackgroundColor3 = AccentColor
+	MiniApply.Font = Enum.Font.GothamBold
+	MiniApply.Text = "Apply"
+	MiniApply.TextColor3 = Color3.fromRGB(255, 255, 255)
+	MiniApply.TextSize = 13
+	MiniApply.AutoButtonColor = false
+	MiniApply.ZIndex = 501
+	MiniApply.Parent = MiniPanel
+
+	local MiniApplyCorner = Instance.new("UICorner")
+	MiniApplyCorner.CornerRadius = UDim.new(0, 6)
+	MiniApplyCorner.Parent = MiniApply
+	onAccentChange(function(c) pcall(function() MiniApply.BackgroundColor3 = c end) end)
+
+	local MiniX = Instance.new("TextButton")
+	MiniX.Position = UDim2.new(0, 162, 0, 120)
+	MiniX.Size = UDim2.new(0, 44, 0, 28)
+	MiniX.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+	MiniX.Font = Enum.Font.GothamBold
+	MiniX.Text = "X"
+	MiniX.TextColor3 = Color3.fromRGB(200, 200, 208)
+	MiniX.TextSize = 13
+	MiniX.AutoButtonColor = false
+	MiniX.ZIndex = 501
+	MiniX.Parent = MiniPanel
+
+	local MiniXCorner = Instance.new("UICorner")
+	MiniXCorner.CornerRadius = UDim.new(0, 6)
+	MiniXCorner.Parent = MiniX
+
+	local function miniRefresh()
+		local col = Color3.fromHSV(miniH, miniS, miniV)
+		MiniPrev.BackgroundColor3 = col
+		MiniCursor.Position = UDim2.new(miniH, 0, 1 - miniV, 0)
+		local bp = (miniS < 1) and (miniS * 0.5) or (1 - miniV * 0.5)
+		MiniBarCursor.Position = UDim2.new(0.5, 0, bp, 0)
+		MiniBarGrad.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromHSV(miniH, 1, 1)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+		})
+	end
+
+	local miniCanvasDrag, miniBarDrag = false, false
+	local function miniCanvasInput(input)
+		local relX, relY = getRelativePosition(MiniCanvas, input)
+		miniH = relX
+		miniV = 1 - relY
+		miniRefresh()
+	end
+	local function miniBarInput(input)
+		local _, relY = getRelativePosition(MiniBar, input)
+		local p = math.clamp(relY, 0, 1)
+		if p <= 0.5 then
+			miniS = p * 2
+		else
+			miniS = 1
+			miniV = (1 - p) * 2
+		end
+		miniRefresh()
+	end
+	MiniCanvas.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			miniCanvasDrag = true
+			miniCanvasInput(input)
+		end
+	end)
+	MiniBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			miniBarDrag = true
+			miniBarInput(input)
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if input.UserInputType ~= Enum.UserInputType.MouseMovement and input.UserInputType ~= Enum.UserInputType.Touch then return end
+		if miniCanvasDrag then miniCanvasInput(input) end
+		if miniBarDrag then miniBarInput(input) end
+	end)
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			miniCanvasDrag = false
+			miniBarDrag = false
+		end
+	end)
+
+	closeMiniPicker = function()
+		if not miniOpen then return end
+		miniOpen = false
+		MiniPanel.Visible = false
+		MiniCatcher.Visible = false
+	end
+	MiniCatcher.MouseButton1Click:Connect(function() closeMiniPicker() end)
+	MiniX.MouseButton1Click:Connect(function() closeMiniPicker() end)
+	MiniApply.MouseButton1Click:Connect(function()
+		if miniCallback then
+			task.spawn(miniCallback, Color3.fromHSV(miniH, miniS, miniV))
+		end
+		closeMiniPicker()
+	end)
+
+	openMiniPicker = function(defaultColor, callback, fromBtn)
+		closeMiniPicker()
+		if closeSelector then closeSelector() end
+		miniH, miniS, miniV = Color3.toHSV(defaultColor)
+		miniCallback = callback
+		miniRefresh()
+		local cx, cy = 200, 200
+		pcall(function()
+			local vw, vh = workspace.CurrentCamera.ViewportSize.X, workspace.CurrentCamera.ViewportSize.Y
+			local bp = fromBtn.AbsolutePosition
+			local bs = fromBtn.AbsoluteSize
+			cx = math.clamp(bp.X, 8, vw - 224)
+			cy = bp.Y + bs.Y + 6
+			if cy + 166 > vh then cy = bp.Y - 166 end
+			if cy < 8 then cy = 8 end
+		end)
+		MiniPanel.Position = UDim2.new(0, cx, 0, cy)
+		MiniCatcher.Visible = true
+		MiniPanel.Visible = true
+		miniOpen = true
+	end
+	end -- end mini scope (frees registers)
 
 	-- =========================================================================
 	-- PIXEL-PERFECT SELECTOR PANEL (SLIDES INSIDE FROM RIGHT SIDE)
@@ -5699,7 +5955,7 @@ function Astral:MakeWindow(config)
 					if pickerOpen or selectorOpen then return end
 					local t = tiles[tileIndex]
 					if not t then return end
-					openColorPicker(t.Color, function(c)
+					openMiniPicker(t.Color, function(c)
 						t.Color = c
 						if t.Preview then
 							t.Preview.BackgroundColor3 = c
@@ -5708,18 +5964,18 @@ function Astral:MakeWindow(config)
 							if ic then ic.ImageColor3 = c end
 						end
 						task.spawn(t.Callback, tileIndex, c)
-					end)
+					end, Btn)
 				end)
 				if TilePreview then
 					TilePreview.MouseButton1Click:Connect(function()
 						if pickerOpen or selectorOpen then return end
 						local t = tiles[tileIndex]
 						if not t then return end
-						openColorPicker(t.Color, function(c)
+						openMiniPicker(t.Color, function(c)
 							t.Color = c
 							if t.Preview then t.Preview.BackgroundColor3 = c end
 							task.spawn(t.Callback, tileIndex, c)
-						end)
+						end, Btn)
 					end)
 				end
 				Btn.MouseEnter:Connect(function()
