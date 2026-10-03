@@ -4684,58 +4684,76 @@ function Astral:MakeWindow(config)
 
 			local SectionFrame = Instance.new("Frame")
 			SectionFrame.Name = title .. "_Section"
-			SectionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
+			SectionFrame.BackgroundTransparency = 1
 			SectionFrame.BorderSizePixel = 0
 
-			local SectionCorner = Instance.new("UICorner")
-			SectionCorner.CornerRadius = UDim.new(0, 10)
-			SectionCorner.Parent = SectionFrame
+			local RowLayout = Instance.new("UIListLayout")
+			RowLayout.FillDirection = Enum.FillDirection.Horizontal
+			RowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			RowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			RowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+			RowLayout.Padding = UDim.new(0, 10)
+			RowLayout.Parent = SectionFrame
 
-			local SectionStroke = Instance.new("UIStroke")
-			SectionStroke.Color = Color3.fromRGB(50, 50, 55)
-			SectionStroke.Thickness = 1.2
-			SectionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			SectionStroke.Parent = SectionFrame
+			local BarL = Instance.new("Frame")
+			BarL.Name = "BarL"
+			BarL.Size = UDim2.new(0, IsMobile and 36 or 48, 0, IsMobile and 8 or 10)
+			BarL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			BarL.BorderSizePixel = 0
+			BarL.LayoutOrder = 1
+			BarL.Parent = SectionFrame
+			local BarLCorner = Instance.new("UICorner")
+			BarLCorner.CornerRadius = UDim.new(1, 0)
+			BarLCorner.Parent = BarL
+			local BarLGrad = Instance.new("UIGradient")
+			BarLGrad.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(59, 130, 246)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247)),
+			})
+			BarLGrad.Parent = BarL
 
-			-- Square open bottom: the header reads as attached to the
-			-- buttons below it instead of a separate floating card.
-			local BottomPatch = Instance.new("Frame")
-			BottomPatch.Name = "BottomPatch"
-			BottomPatch.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
-			BottomPatch.BorderSizePixel = 0
-			BottomPatch.AnchorPoint = Vector2.new(0, 1)
-			BottomPatch.Position = UDim2.new(0, 1, 1, 0)
-			BottomPatch.Size = UDim2.new(1, -2, 0, 12)
-			BottomPatch.Parent = SectionFrame
-
-			local tx = 14
 			if icon then
 				local Ico = Instance.new("ImageLabel")
 				Ico.Name = "Icon"
 				Ico.BackgroundTransparency = 1
-				Ico.AnchorPoint = Vector2.new(0, 0.5)
-				Ico.Position = UDim2.new(0, 14, 0.5, 0)
-				Ico.Size = UDim2.new(0, 18, 0, 18)
+				Ico.Size = UDim2.new(0, 16, 0, 16)
+				Ico.LayoutOrder = 2
 				Astral.ApplyIcon(Ico, icon)
 				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
 				Ico.ScaleType = Enum.ScaleType.Fit
 				Ico.Parent = SectionFrame
-				tx = 40
 			end
 
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
-			TitleLabel.Position = UDim2.new(0, tx, 0.5, 0)
-			TitleLabel.Size = UDim2.new(1, -tx - 12, 1, 0)
+			TitleLabel.Size = UDim2.new(0, 0, 0, IsMobile and 20 or 22)
+			TitleLabel.AutomaticSize = Enum.AutomaticSize.X
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(TitleLabel, IsMobile and 18 or 20)
-			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			mTS(TitleLabel, IsMobile and 15 or 16)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.LayoutOrder = 3
 			TitleLabel.Parent = SectionFrame
+
+			local BarR = Instance.new("Frame")
+			BarR.Name = "BarR"
+			BarR.Size = UDim2.new(0, IsMobile and 36 or 48, 0, IsMobile and 8 or 10)
+			BarR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			BarR.BorderSizePixel = 0
+			BarR.LayoutOrder = 4
+			BarR.Parent = SectionFrame
+			local BarRCorner = Instance.new("UICorner")
+			BarRCorner.CornerRadius = UDim.new(1, 0)
+			BarRCorner.Parent = BarR
+			local BarRGrad = Instance.new("UIGradient")
+			BarRGrad.Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, Color3.fromRGB(168, 85, 247)),
+				ColorSequenceKeypoint.new(1, Color3.fromRGB(59, 130, 246)),
+			})
+			BarRGrad.Parent = BarR
 
 			registerElement(SectionFrame, h, sectionConfig.Position)
 
