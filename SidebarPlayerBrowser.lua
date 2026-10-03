@@ -4697,32 +4697,19 @@ function Astral:MakeWindow(config)
 			SectionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SectionStroke.Parent = SectionFrame
 
-			local Bar = Instance.new("Frame")
-			Bar.Name = "Bar"
-			Bar.AnchorPoint = Vector2.new(0, 0.5)
-			Bar.Position = UDim2.new(0, 12, 0.5, 0)
-			Bar.Size = UDim2.new(0, 4, 0, 22)
-			Bar.BackgroundColor3 = AccentColor
-			Bar.BorderSizePixel = 0
-			Bar.Parent = SectionFrame
-			local BarCorner = Instance.new("UICorner")
-			BarCorner.CornerRadius = UDim.new(1, 0)
-			BarCorner.Parent = Bar
-			onAccentChange(function(c) pcall(function() Bar.BackgroundColor3 = c end) end)
-
-			local tx = 24
+			local tx = 14
 			if icon then
 				local Ico = Instance.new("ImageLabel")
 				Ico.Name = "Icon"
 				Ico.BackgroundTransparency = 1
 				Ico.AnchorPoint = Vector2.new(0, 0.5)
-				Ico.Position = UDim2.new(0, 24, 0.5, 0)
+				Ico.Position = UDim2.new(0, 14, 0.5, 0)
 				Ico.Size = UDim2.new(0, 18, 0, 18)
 				Astral.ApplyIcon(Ico, icon)
 				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
 				Ico.ScaleType = Enum.ScaleType.Fit
 				Ico.Parent = SectionFrame
-				tx = 50
+				tx = 40
 			end
 
 			local TitleLabel = Instance.new("TextLabel")
@@ -4734,7 +4721,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(TitleLabel, IsMobile and 16 or 18)
+			mTS(TitleLabel, IsMobile and 18 or 20)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TitleLabel.Parent = SectionFrame
