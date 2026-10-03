@@ -69,8 +69,8 @@ Full runnable test: `LumuExample_Players.lua` (tester scripts folder).
 
 ```lua
 Window:SetTheme("Midnight") -- Dark, Midnight, Purple, Crimson, Forest,
-                            -- Ocean, Sunset, Rose, Slate, Coffee
-Window:GetTheme() -- current name
+                            -- Ocean, Sunset, Rose, Slate, Coffee, Light
+Window:GetTheme() -- current name (each theme also sets a matching accent)
 Window:SetCustomTheme({
   Background = Color3.fromRGB(10, 10, 14),
   Card = Color3.fromRGB(20, 22, 34),

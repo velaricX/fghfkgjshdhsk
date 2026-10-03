@@ -503,7 +503,20 @@ local THEME_SWAP = {
 	["80,80,90"] = { "55,70,105", "85,60,130", "115,58,60", "52,108,56", "46,106,118", "122,82,44", "128,58,96", "99,114,141", "107,78,52" },
 	["95,95,110"] = { "118,130,163", "150,140,175", "165,145,145", "145,165,145", "140,165,180", "170,155,140", "170,150,165", "150,160,185", "165,150,130" },
 }
-local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2, Crimson = 3, Forest = 4, Ocean = 5, Sunset = 6, Rose = 7, Slate = 8, Coffee = 9, Custom = -1 }
+local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2, Crimson = 3, Forest = 4, Ocean = 5, Sunset = 6, Rose = 7, Slate = 8, Coffee = 9, Light = 10, Custom = -1 }
+local THEME_ACCENT = {
+	Dark = Color3.fromRGB(0, 153, 235),
+	Midnight = Color3.fromRGB(88, 101, 242),
+	Purple = Color3.fromRGB(138, 90, 255),
+	Crimson = Color3.fromRGB(231, 76, 60),
+	Forest = Color3.fromRGB(46, 204, 113),
+	Ocean = Color3.fromRGB(0, 210, 255),
+	Sunset = Color3.fromRGB(243, 156, 18),
+	Rose = Color3.fromRGB(255, 90, 180),
+	Slate = Color3.fromRGB(148, 170, 200),
+	Coffee = Color3.fromRGB(210, 170, 90),
+	Light = Color3.fromRGB(0, 153, 235),
+}
 local CustomThemeValues = nil -- darkKey -> "r,g,b" string, built by SetCustomTheme
 local CurrentThemeName = "Dark"
 
@@ -515,7 +528,23 @@ local function parseThemeRGB(s)
 	return Color3.fromRGB(tonumber(r) or 0, tonumber(g) or 0, tonumber(b) or 0)
 end
 
-local function themeKeyOf(c)
+	local function lightVariantOf(darkKey)
+		local dc = parseThemeRGB(darkKey)
+		local avg = (dc.R + dc.G + dc.B) / 3
+		if avg < 0.25 then
+			local f = 0.9
+			return Color3.new(dc.R + (1 - dc.R) * f, dc.G + (1 - dc.G) * f, dc.B + (1 - dc.B) * f)
+		elseif avg < 0.5 then
+			local f = 0.55
+			return Color3.new(dc.R + (1 - dc.R) * f, dc.G + (1 - dc.G) * f, dc.B + (1 - dc.B) * f)
+		elseif avg > 0.8 then
+			return Color3.new(dc.R * 0.14, dc.G * 0.14, dc.B * 0.14)
+		else
+			return Color3.new(dc.R * 0.5, dc.G * 0.5, dc.B * 0.5)
+		end
+	end
+
+	local function themeKeyOf(c)
 	return math.floor(c.R * 255 + 0.5) .. "," .. math.floor(c.G * 255 + 0.5) .. "," .. math.floor(c.B * 255 + 0.5)
 end
 
@@ -529,6 +558,7 @@ end
 
 	local function valFor(srcKey, idx)
 		if idx == 0 then return parseThemeRGB(srcKey) end
+		if idx == 10 then return lightVariantOf(srcKey) end
 		if idx == -1 then
 			if CustomThemeValues and CustomThemeValues[srcKey] then return parseThemeRGB(CustomThemeValues[srcKey]) end
 			return parseThemeRGB(srcKey)
@@ -548,7 +578,7 @@ end
 	end
 	for srcKey in pairs(THEME_SWAP) do
 		mapVariant(srcKey, 0)
-		for idx = 1, 9 do mapVariant(srcKey, idx) end
+		for idx = 1, 10 do mapVariant(srcKey, idx) end
 		mapVariant(srcKey, -1)
 	end
 	if CustomThemeValues then
@@ -599,7 +629,7 @@ end
 				swapProp(d, "TextColor3", true)
 				swapProp(d, "PlaceholderColor3", true)
 			elseif d:IsA("ImageLabel") or d:IsA("ImageButton") then
-				swapProp(d, "ImageColor3", false)
+				swapProp(d, "ImageColor3", true)
 			elseif d:IsA("ScrollingFrame") then
 				swapProp(d, "ScrollBarImageColor3", false)
 			end
@@ -629,6 +659,7 @@ local function themeColorFor(darkKey, t)
 		return parseThemeRGB(darkKey)
 	end
 	if not idx or idx == 0 then return parseThemeRGB(darkKey) end
+	if idx == 10 then return lightVariantOf(darkKey) end
 	local pair = THEME_SWAP[darkKey]
 	if not pair then return parseThemeRGB(darkKey) end
 	return parseThemeRGB(pair[idx])
@@ -7761,6 +7792,8 @@ function Astral:MakeWindow(config)
 		if result then
 			Window.ThemeName = result
 			CurrentThemeName = result
+			local acc = THEME_ACCENT[result]
+			if acc then Window:SetAccent(acc) end
 			return true
 		end
 		return false
