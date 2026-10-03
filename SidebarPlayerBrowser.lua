@@ -781,15 +781,15 @@ function Astral:MakeWindow(config)
 	local badgeText = config.badge or "PREMIUM"
 	
 	-- Parse Badge Color
-	local badgeColor = Color3.fromRGB(30, 110, 230)
+	local badgeColor = themeColorFor("30,110,230", CurrentThemeName or "Dark")
 	if config.badgecolor then
 		if type(config.badgecolor) == "string" then
 			if config.badgecolor:lower() == "blue" then
-				badgeColor = Color3.fromRGB(30, 110, 230)
+				badgeColor = themeColorFor("30,110,230", CurrentThemeName or "Dark")
 			elseif config.badgecolor:lower() == "red" then
-				badgeColor = Color3.fromRGB(230, 50, 50)
+				badgeColor = themeColorFor("230,50,50", CurrentThemeName or "Dark")
 			elseif config.badgecolor:lower() == "green" then
-				badgeColor = Color3.fromRGB(50, 230, 50)
+				badgeColor = themeColorFor("50,230,50", CurrentThemeName or "Dark")
 			end
 		elseif typeof(config.badgecolor) == "Color3" then
 			badgeColor = config.badgecolor
@@ -847,7 +847,7 @@ function Astral:MakeWindow(config)
 	MainFrame.Name = "MainFrame"
 	MainFrame.Active = true
 	MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+	MainFrame.BackgroundColor3 = themeColorFor("12,12,14", CurrentThemeName or "Dark")
 	MainFrame.BorderSizePixel = 0
 	MainFrame.ClipsDescendants = true -- Fixes corner clipping perfectly
 	
@@ -905,7 +905,7 @@ function Astral:MakeWindow(config)
 	BackgroundImage.BackgroundTransparency = 1
 	BackgroundImage.Image = config.BackgroundImage or ""
 	BackgroundImage.ScaleType = Enum.ScaleType.Crop
-	BackgroundImage.ImageColor3 = Color3.fromRGB(58, 58, 64)
+	BackgroundImage.ImageColor3 = themeColorFor("58,58,64", CurrentThemeName or "Dark")
 	BackgroundImage.ZIndex = 0
 	BackgroundImage.Parent = MainFrame
 	-- no default background: nothing is applied unless you call Window:SetBackground(...) yourself
@@ -943,7 +943,7 @@ function Astral:MakeWindow(config)
 	BgDim.Name = "BackgroundDim"
 	BgDim.Size = UDim2.fromScale(1, 1)
 	BgDim.Position = UDim2.fromScale(0, 0)
-	BgDim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	BgDim.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	BgDim.BackgroundTransparency = tonumber(config.BackgroundDim) or 0.35
 	BgDim.BorderSizePixel = 0
 	BgDim.ZIndex = 1
@@ -954,7 +954,7 @@ function Astral:MakeWindow(config)
 	BgDimCorner.Parent = BgDim
 
 	local UIStroke = Instance.new("UIStroke")
-	UIStroke.Color = Color3.fromRGB(32, 32, 36)
+	UIStroke.Color = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 	UIStroke.Thickness = 1.5
 	UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	UIStroke.Parent = MainFrame
@@ -995,7 +995,7 @@ function Astral:MakeWindow(config)
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.RichText = true
 	TitleLabel.Text = titleText .. ' <font color="#1E6EE6">' .. subTitleText .. '</font>'
-	TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	TitleLabel.TextSize = 18
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
@@ -1028,7 +1028,7 @@ function Astral:MakeWindow(config)
 	PremiumLabel.Size = UDim2.new(1, 0, 1, 0)
 	PremiumLabel.Font = Enum.Font.GothamBold
 	PremiumLabel.Text = tostring(badgeText):upper()
-		PremiumLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		PremiumLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	PremiumLabel.TextSize = 9
 	PremiumLabel.TextXAlignment = Enum.TextXAlignment.Center
 	PremiumLabel.TextYAlignment = Enum.TextYAlignment.Center
@@ -1061,7 +1061,7 @@ function Astral:MakeWindow(config)
 	-- Horizontal Separator Line
 	local HorizontalSeparator = Instance.new("Frame")
 	HorizontalSeparator.Name = "HorizontalSeparator"
-	HorizontalSeparator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+	HorizontalSeparator.BackgroundColor3 = themeColorFor("38,38,44", CurrentThemeName or "Dark")
 	HorizontalSeparator.BorderSizePixel = 0
 	HorizontalSeparator.Position = UDim2.new(0, 0, 0, 50)
 	HorizontalSeparator.Size = UDim2.new(1, 0, 0, 1)
@@ -1075,7 +1075,7 @@ function Astral:MakeWindow(config)
 	-- Sidebar Frame
 	local Sidebar = Instance.new("Frame")
 	Sidebar.Name = "Sidebar"
-	Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 16)
+	Sidebar.BackgroundColor3 = themeColorFor("14,14,16", CurrentThemeName or "Dark")
 	Sidebar.BackgroundTransparency = 0.12 -- lets background image show through
 	Sidebar.BorderSizePixel = 0
 	Sidebar.Position = UDim2.new(0, 0, 0, 51)
@@ -1143,7 +1143,7 @@ function Astral:MakeWindow(config)
 	-- Vertical Separator Line
 	local Separator = Instance.new("Frame")
 	Separator.Name = "Separator"
-	Separator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+	Separator.BackgroundColor3 = themeColorFor("38,38,44", CurrentThemeName or "Dark")
 	Separator.BorderSizePixel = 0
 	Separator.Position = UDim2.new(0, SidebarWidth, 0, 51)
 	Separator.Size = UDim2.new(0, 1, 1, -51)
@@ -1153,7 +1153,7 @@ function Astral:MakeWindow(config)
 	-- Content Container
 	local ContentContainer = Instance.new("Frame")
 	ContentContainer.Name = "ContentContainer"
-	ContentContainer.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
+	ContentContainer.BackgroundColor3 = themeColorFor("16,16,18", CurrentThemeName or "Dark")
 	ContentContainer.BackgroundTransparency = 0.25 -- lets background image show through
 	ContentContainer.BorderSizePixel = 0
 	ContentContainer.ClipsDescendants = true
@@ -1188,7 +1188,7 @@ function Astral:MakeWindow(config)
 
 	local ColorPickerPanel = Instance.new("Frame")
 	ColorPickerPanel.Name = "ColorPickerPanel"
-	ColorPickerPanel.BackgroundColor3 = Color3.fromRGB(26, 26, 30) -- lightened
+	ColorPickerPanel.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark") -- lightened
 	ColorPickerPanel.BorderSizePixel = 0
 	ColorPickerPanel.Size = UDim2.new(0, cpWidth, 1, -51)
 	ColorPickerPanel.Position = UDim2.new(1, 0, 0, 51) -- Hidden off-screen to the right (inside MainFrame)
@@ -1209,7 +1209,7 @@ function Astral:MakeWindow(config)
 	local PanelSeparator = Instance.new("Frame")
 	PanelSeparator.Name = "PanelSeparator"
 	-- layout clean for side panels
-	PanelSeparator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+	PanelSeparator.BackgroundColor3 = themeColorFor("38,38,44", CurrentThemeName or "Dark")
 	PanelSeparator.BorderSizePixel = 0
 	PanelSeparator.Position = UDim2.new(0, 0, 0, 0)
 	PanelSeparator.Size = UDim2.new(0, 1, 1, 0)
@@ -1222,7 +1222,7 @@ function Astral:MakeWindow(config)
 	Canvas.Name = "Canvas"
 	Canvas.Size = UDim2.new(1, -24, 0, canvasHeight)
 	Canvas.Position = UDim2.new(0, 12, 0, padding)
-	Canvas.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	Canvas.BackgroundColor3 = themeColorFor("255,0,0", CurrentThemeName or "Dark")
 	Canvas.BorderSizePixel = 0
 	Canvas.ClipsDescendants = true
 	Canvas.ZIndex = 202
@@ -1257,7 +1257,7 @@ function Astral:MakeWindow(config)
 	local ValOverlay = Instance.new("Frame")
 	ValOverlay.Name = "ValOverlay"
 	ValOverlay.Size = UDim2.fromScale(1, 1)
-	ValOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	ValOverlay.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	ValOverlay.BorderSizePixel = 0
 	ValOverlay.ZIndex = 204
 	ValOverlay.Parent = Canvas
@@ -1287,7 +1287,7 @@ function Astral:MakeWindow(config)
 	HandleCorner.Parent = CanvasHandle
 
 	local HandleStroke = Instance.new("UIStroke")
-	HandleStroke.Color = Color3.fromRGB(0, 0, 0)
+	HandleStroke.Color = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	HandleStroke.Thickness = 1.5
 	HandleStroke.Parent = CanvasHandle
 
@@ -1305,13 +1305,13 @@ function Astral:MakeWindow(config)
 
 	local HueGradient = Instance.new("UIGradient")
 	HueGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+		ColorSequenceKeypoint.new(0, themeColorFor("255,0,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.17, themeColorFor("255,255,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.33, themeColorFor("0,255,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.5, themeColorFor("0,255,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.67, themeColorFor("0,0,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.83, themeColorFor("255,0,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(1, themeColorFor("255,0,0", CurrentThemeName or "Dark"))
 	})
 	HueGradient.Parent = HueSlider
 
@@ -1329,7 +1329,7 @@ function Astral:MakeWindow(config)
 	HueHandleCorner.Parent = HueHandle
 
 	local HueHandleStroke = Instance.new("UIStroke")
-	HueHandleStroke.Color = Color3.fromRGB(0, 0, 0)
+	HueHandleStroke.Color = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	HueHandleStroke.Thickness = 1
 	HueHandleStroke.Parent = HueHandle
 
@@ -1345,7 +1345,7 @@ function Astral:MakeWindow(config)
 	local CurrentPreview = Instance.new("Frame")
 	CurrentPreview.Name = "CurrentPreview"
 	CurrentPreview.Size = UDim2.new(0.5, -6, 1, 0)
-	CurrentPreview.BackgroundColor3 = Color3.fromRGB(34, 255, 34)
+	CurrentPreview.BackgroundColor3 = themeColorFor("34,255,34", CurrentThemeName or "Dark")
 	CurrentPreview.ZIndex = 203
 	CurrentPreview.Parent = PreviewContainer
 	-- LAYOUT AROUND BOX (copied from good UI)
@@ -1362,7 +1362,7 @@ function Astral:MakeWindow(config)
 	CurrentLabel.BackgroundTransparency = 1
 	CurrentLabel.Font = Enum.Font.GothamBold
 	CurrentLabel.Text = "CURRENT"
-	CurrentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CurrentLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	CurrentLabel.			TextSize = 11
 	CurrentLabel.ZIndex = 204
 	CurrentLabel.Parent = CurrentPreview
@@ -1371,7 +1371,7 @@ function Astral:MakeWindow(config)
 	NewPreview.Name = "NewPreview"
 	NewPreview.Size = UDim2.new(0.5, -6, 1, 0)
 	NewPreview.Position = UDim2.new(0.5, 6, 0, 0)
-	NewPreview.BackgroundColor3 = Color3.fromRGB(58, 49, 255)
+	NewPreview.BackgroundColor3 = themeColorFor("58,49,255", CurrentThemeName or "Dark")
 	NewPreview.ZIndex = 203
 	NewPreview.Parent = PreviewContainer
 
@@ -1384,7 +1384,7 @@ function Astral:MakeWindow(config)
 	NewLabel.BackgroundTransparency = 1
 	NewLabel.Font = Enum.Font.GothamBold
 	NewLabel.Text = "NEW"
-	NewLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	NewLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	NewLabel.			TextSize = 11
 	NewLabel.ZIndex = 204
 	NewLabel.Parent = NewPreview
@@ -1392,7 +1392,7 @@ function Astral:MakeWindow(config)
 	-- RGB Inputs
 	local RGBContainer = Instance.new("Frame")
 	RGBContainer.Name = "RGBContainer"
-	RGBContainer.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	RGBContainer.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
 	RGBContainer.BackgroundTransparency = 0
 	RGBContainer.BorderSizePixel = 0
 	RGBContainer.Size = UDim2.new(1, -24, 0, inputHeight + 10)
@@ -1405,7 +1405,7 @@ function Astral:MakeWindow(config)
 	RGBCorner.Parent = RGBContainer
 
 	local RGBStroke = Instance.new("UIStroke")
-	RGBStroke.Color = Color3.fromRGB(52, 52, 60)
+	RGBStroke.Color = themeColorFor("52,52,60", CurrentThemeName or "Dark")
 	RGBStroke.Thickness = 1
 	RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	RGBStroke.Parent = RGBContainer
@@ -1430,13 +1430,13 @@ function Astral:MakeWindow(config)
 		local Box = Instance.new("TextBox")
 		Box.Name = name
 		Box.Size = UDim2.new(0.333, -6, 1, 0)
-		Box.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
+		Box.BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 		Box.BorderSizePixel = 0
 		Box.Font = Enum.Font.GothamBold
 		Box.Text = "255"
 		Box.PlaceholderText = placeholder
-		Box.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
-		Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Box.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+		Box.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		Box.			TextSize = 12
 		Box.ClearTextOnFocus = false
 		Box.ClipsDescendants = true
@@ -1451,7 +1451,7 @@ function Astral:MakeWindow(config)
 		Corner.Parent = Box
 
 		local Stroke = Instance.new("UIStroke")
-		Stroke.Color = Color3.fromRGB(35, 35, 40)
+		Stroke.Color = themeColorFor("35,35,40", CurrentThemeName or "Dark")
 		Stroke.Thickness = 1
 		Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		Stroke.Parent = Box
@@ -1460,7 +1460,7 @@ function Astral:MakeWindow(config)
 			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 		end)
 		Box.FocusLost:Connect(function()
-			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(35, 35, 40)}):Play()
+			TweenService:Create(Stroke, TweenInfo.new(0.15), {Color = themeColorFor("35,35,40", CurrentThemeName or "Dark")}):Play()
 		end)
 
 		return Box
@@ -1473,7 +1473,7 @@ function Astral:MakeWindow(config)
 	-- Hex row: caption + input aligned on one clean line
 	local HexRow = Instance.new("Frame")
 	HexRow.Name = "HexRow"
-	HexRow.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
+	HexRow.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
 	HexRow.BackgroundTransparency = 0
 	HexRow.BorderSizePixel = 0
 	HexRow.Size = UDim2.new(1, -24, 0, inputHeight + 10)
@@ -1486,7 +1486,7 @@ function Astral:MakeWindow(config)
 	HexCardCorner.Parent = HexRow
 
 	local HexCardStroke = Instance.new("UIStroke")
-	HexCardStroke.Color = Color3.fromRGB(52, 52, 60)
+	HexCardStroke.Color = themeColorFor("52,52,60", CurrentThemeName or "Dark")
 	HexCardStroke.Thickness = 1
 	HexCardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	HexCardStroke.Parent = HexRow
@@ -1511,7 +1511,7 @@ function Astral:MakeWindow(config)
 	HexCaption.Size = UDim2.new(0, 36, 1, 0)
 	HexCaption.Font = Enum.Font.GothamBold
 	HexCaption.Text = "HEX"
-	HexCaption.TextColor3 = Color3.fromRGB(160, 160, 165)
+	HexCaption.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 	HexCaption.			TextSize = 10
 	HexCaption.TextXAlignment = Enum.TextXAlignment.Left
 	HexCaption.LayoutOrder = 1
@@ -1522,13 +1522,13 @@ function Astral:MakeWindow(config)
 	local HexInput = Instance.new("TextBox")
 	HexInput.Name = "HexInput"
 	HexInput.Size = UDim2.new(1, -44, 1, 0)
-	HexInput.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
+	HexInput.BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 	HexInput.BorderSizePixel = 0
 	HexInput.Font = Enum.Font.GothamBold
 	HexInput.Text = "#FFFFFF"
 	HexInput.PlaceholderText = "#843447"
-	HexInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
-	HexInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+	HexInput.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+	HexInput.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	HexInput.			TextSize = 12
 	HexInput.ClearTextOnFocus = false
 	HexInput.ClipsDescendants = true
@@ -1547,7 +1547,7 @@ function Astral:MakeWindow(config)
 	HexCorner.Parent = HexInput
 
 	local HexStroke = Instance.new("UIStroke")
-	HexStroke.Color = Color3.fromRGB(35, 35, 40)
+	HexStroke.Color = themeColorFor("35,35,40", CurrentThemeName or "Dark")
 	HexStroke.Thickness = 1
 	HexStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	HexStroke.Parent = HexInput
@@ -1556,7 +1556,7 @@ function Astral:MakeWindow(config)
 		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = AccentColor}):Play()
 	end)
 	HexInput.FocusLost:Connect(function()
-		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(35, 35, 40)}):Play()
+		TweenService:Create(HexStroke, TweenInfo.new(0.15), {Color = themeColorFor("35,35,40", CurrentThemeName or "Dark")}):Play()
 	end)
 
 	-- Apply & Cancel Buttons
@@ -1567,7 +1567,7 @@ function Astral:MakeWindow(config)
 	ApplyButton.BackgroundColor3 = AccentColor
 	ApplyButton.Font = Enum.Font.GothamBold
 	ApplyButton.Text = "Apply"
-			ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ApplyButton.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	ApplyButton.			TextSize = 14
 	ApplyButton.ZIndex = 203
 	ApplyButton.Parent = ColorPickerPanel
@@ -1585,10 +1585,10 @@ function Astral:MakeWindow(config)
 	CancelButton.Name = "CancelButton"
 	CancelButton.Size = UDim2.new(1, -24, 0, buttonHeight)
 	CancelButton.Position = UDim2.new(0, 12, 1, -buttonHeight - 8)
-		CancelButton.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+		CancelButton.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 	CancelButton.Font = Enum.Font.GothamBold
 	CancelButton.Text = "Cancel"
-	CancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CancelButton.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	CancelButton.			TextSize = 14
 	CancelButton.ZIndex = 203
 	CancelButton.Parent = ColorPickerPanel -- FIXED: Corrected parent from CancelButton to ColorPickerPanel to prevent crash
@@ -1599,8 +1599,8 @@ function Astral:MakeWindow(config)
 
 	-- Color Picker State & Math Logic
 	local currentHue, currentSat, currentValue = 0, 1, 1
-	local originalColor = Color3.fromRGB(255, 255, 255)
-	local selectedColor = Color3.fromRGB(255, 255, 255)
+	local originalColor = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+	local selectedColor = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	local activeCallback = nil
 	local activePreviewBox = nil
 	local pickerOpen = false
@@ -1810,7 +1810,7 @@ function Astral:MakeWindow(config)
 	MiniPanel.Name = "MiniColorPicker"
 	MiniPanel.Size = UDim2.new(0, 216, 0, 158)
 	MiniPanel.ClipsDescendants = true
-	MiniPanel.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+	MiniPanel.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 	MiniPanel.BorderSizePixel = 0
 	MiniPanel.Visible = false
 	MiniPanel.ZIndex = 500
@@ -1821,7 +1821,7 @@ function Astral:MakeWindow(config)
 	MiniCorner.Parent = MiniPanel
 
 	local MiniStroke = Instance.new("UIStroke")
-	MiniStroke.Color = Color3.fromRGB(50, 50, 55)
+	MiniStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 	MiniStroke.Thickness = 1.2
 	MiniStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	MiniStroke.Parent = MiniPanel
@@ -1842,13 +1842,13 @@ function Astral:MakeWindow(config)
 
 	local MiniRainbow = Instance.new("UIGradient")
 	MiniRainbow.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0, themeColorFor("255,0,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.17, themeColorFor("255,255,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.33, themeColorFor("0,255,0", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.5, themeColorFor("0,255,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.67, themeColorFor("0,0,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(0.83, themeColorFor("255,0,255", CurrentThemeName or "Dark")),
+		ColorSequenceKeypoint.new(1, themeColorFor("255,0,0", CurrentThemeName or "Dark")),
 	})
 	MiniRainbow.Parent = MiniCanvas
 
@@ -1864,7 +1864,7 @@ function Astral:MakeWindow(config)
 	MiniCursorCorner.Parent = MiniCursor
 
 	local MiniCursorStroke = Instance.new("UIStroke")
-	MiniCursorStroke.Color = Color3.fromRGB(0, 0, 0)
+	MiniCursorStroke.Color = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	MiniCursorStroke.Thickness = 1.5
 	MiniCursorStroke.Parent = MiniCursor
 
@@ -1885,9 +1885,9 @@ function Astral:MakeWindow(config)
 	local MiniBarGrad = Instance.new("UIGradient")
 	MiniBarGrad.Rotation = 90
 	MiniBarGrad.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, themeColorFor("255,255,255", CurrentThemeName or "Dark")),
 		ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0, 1, 1)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(1, themeColorFor("0,0,0", CurrentThemeName or "Dark")),
 	})
 	MiniBarGrad.Parent = MiniBar
 
@@ -1905,7 +1905,7 @@ function Astral:MakeWindow(config)
 	local MiniPrev = Instance.new("Frame")
 	MiniPrev.Position = UDim2.new(0, 10, 0, 120)
 	MiniPrev.Size = UDim2.new(0, 40, 0, 28)
-	MiniPrev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MiniPrev.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	MiniPrev.BorderSizePixel = 0
 	MiniPrev.ZIndex = 501
 	MiniPrev.Parent = MiniPanel
@@ -1920,7 +1920,7 @@ function Astral:MakeWindow(config)
 	MiniApply.BackgroundColor3 = AccentColor
 	MiniApply.Font = Enum.Font.GothamBold
 	MiniApply.Text = "Apply"
-	MiniApply.TextColor3 = Color3.fromRGB(255, 255, 255)
+	MiniApply.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	MiniApply.TextSize = 13
 	MiniApply.AutoButtonColor = false
 	MiniApply.ZIndex = 501
@@ -1934,10 +1934,10 @@ function Astral:MakeWindow(config)
 	local MiniX = Instance.new("TextButton")
 	MiniX.Position = UDim2.new(0, 162, 0, 120)
 	MiniX.Size = UDim2.new(0, 44, 0, 28)
-	MiniX.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+	MiniX.BackgroundColor3 = themeColorFor("40,40,48", CurrentThemeName or "Dark")
 	MiniX.Font = Enum.Font.GothamBold
 	MiniX.Text = "X"
-	MiniX.TextColor3 = Color3.fromRGB(200, 200, 208)
+	MiniX.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
 	MiniX.TextSize = 13
 	MiniX.AutoButtonColor = false
 	MiniX.ZIndex = 501
@@ -1954,9 +1954,9 @@ function Astral:MakeWindow(config)
 		local bp = (miniS < 1) and (miniS * 0.5) or (1 - miniV * 0.5)
 		MiniBarCursor.Position = UDim2.new(0.5, 0, bp, 0)
 		MiniBarGrad.Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0, themeColorFor("255,255,255", CurrentThemeName or "Dark")),
 			ColorSequenceKeypoint.new(0.5, Color3.fromHSV(miniH, 1, 1)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+			ColorSequenceKeypoint.new(1, themeColorFor("0,0,0", CurrentThemeName or "Dark")),
 		})
 	end
 
@@ -2051,7 +2051,7 @@ function Astral:MakeWindow(config)
 	-- =========================================================================
 	local SelectorPanel = Instance.new("Frame")
 	SelectorPanel.Name = "SelectorPanel"
-	SelectorPanel.BackgroundColor3 = Color3.fromRGB(26, 26, 30) -- FIXED: lightened from 14,14,16 for clean visibility
+	SelectorPanel.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark") -- FIXED: lightened from 14,14,16 for clean visibility
 	SelectorPanel.BorderSizePixel = 0
 	SelectorPanel.Size = UDim2.new(0, cpWidth, 1, -51)
 	SelectorPanel.Position = UDim2.new(1, 0, 0, 51) -- Hidden off-screen to the right
@@ -2061,7 +2061,7 @@ function Astral:MakeWindow(config)
 
 	-- FIXED: Clean, matching border stroke for the Selector Panel (No mismatched colors)
 	local SelectorPanelStroke = Instance.new("UIStroke")
-	SelectorPanelStroke.Color = Color3.fromRGB(32, 32, 36) -- Matches MainFrame border exactly
+	SelectorPanelStroke.Color = themeColorFor("32,32,36", CurrentThemeName or "Dark") -- Matches MainFrame border exactly
 	SelectorPanelStroke.Thickness = 1.5
 	local SelectorPadding = Instance.new("UIPadding", SelectorPanel)
 	SelectorPadding.PaddingTop = UDim.new(0, 4)
@@ -2093,7 +2093,7 @@ function Astral:MakeWindow(config)
 
 	local SelectorPanelSeparator = Instance.new("Frame")
 	SelectorPanelSeparator.Name = "SelectorPanelSeparator"
-	SelectorPanelSeparator.BackgroundColor3 = Color3.fromRGB(38, 38, 44)
+	SelectorPanelSeparator.BackgroundColor3 = themeColorFor("38,38,44", CurrentThemeName or "Dark")
 	SelectorPanelSeparator.BorderSizePixel = 0
 	SelectorPanelSeparator.Position = UDim2.new(0, 0, 0, 0)
 	SelectorPanelSeparator.Size = UDim2.new(0, 1, 1, 0)
@@ -2107,7 +2107,7 @@ function Astral:MakeWindow(config)
 	SelectorPanelTitle.BackgroundTransparency = 1
 	SelectorPanelTitle.Font = Enum.Font.GothamBold
 	SelectorPanelTitle.Text = "Select Option"
-	SelectorPanelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	SelectorPanelTitle.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	mTS(SelectorPanelTitle, 14)
 	SelectorPanelTitle.ZIndex = 202
 	SelectorPanelTitle.Parent = SelectorPanel
@@ -2115,7 +2115,7 @@ function Astral:MakeWindow(config)
 	-- Search Container (Modernized & High-Contrast)
 	local SearchContainer = Instance.new("Frame")
 	SearchContainer.Name = "SearchContainer"
-	SearchContainer.BackgroundColor3 = Color3.fromRGB(28, 28, 34) -- Higher contrast
+	SearchContainer.BackgroundColor3 = themeColorFor("28,28,34", CurrentThemeName or "Dark") -- Higher contrast
 	SearchContainer.Size = UDim2.new(1, -24, 0, 32)
 	SearchContainer.Position = UDim2.new(0, 12, 0, 38) -- FIXED: Improved spacing relative to title
 	SearchContainer.ZIndex = 202
@@ -2126,7 +2126,7 @@ function Astral:MakeWindow(config)
 			SearchCorner.Parent = SearchContainer
 
 	local SearchStroke = Instance.new("UIStroke")
-	SearchStroke.Color = Color3.fromRGB(55, 55, 65) -- Higher contrast border
+	SearchStroke.Color = themeColorFor("55,55,65", CurrentThemeName or "Dark") -- Higher contrast border
 	SearchStroke.Thickness = 1
 	SearchStroke.Parent = SearchContainer
 
@@ -2135,7 +2135,7 @@ function Astral:MakeWindow(config)
 	SearchIcon.Position = UDim2.new(0, 8, 0.5, -8)
 	SearchIcon.BackgroundTransparency = 1
 	SearchIcon.Image = Astral.Icons.search
-	SearchIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
+	SearchIcon.ImageColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 	SearchIcon.ZIndex = 203
 	SearchIcon.Parent = SearchContainer
 
@@ -2145,9 +2145,9 @@ function Astral:MakeWindow(config)
 	SearchInput.BackgroundTransparency = 1
 	SearchInput.Font = Enum.Font.Gotham
 	tr(SearchInput, "Search...", "PlaceholderText")
-	SearchInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
+	SearchInput.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
 	SearchInput.Text = ""
-	SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+	SearchInput.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	mTS(SearchInput, 12)
 	SearchInput.TextXAlignment = Enum.TextXAlignment.Left
 	SearchInput.ZIndex = 203
@@ -2160,7 +2160,7 @@ function Astral:MakeWindow(config)
 	ClearSearchBtn.Position = UDim2.new(1, -24, 0.5, -7)
 	ClearSearchBtn.BackgroundTransparency = 1
 	ClearSearchBtn.Image = Astral.Icons.Close
-	ClearSearchBtn.ImageColor3 = Color3.fromRGB(140, 140, 145)
+	ClearSearchBtn.ImageColor3 = themeColorFor("140,140,145", CurrentThemeName or "Dark")
 	ClearSearchBtn.Visible = false
 	ClearSearchBtn.ZIndex = 204
 	ClearSearchBtn.Parent = SearchContainer
@@ -2179,7 +2179,7 @@ function Astral:MakeWindow(config)
 	OptionsScroll.BackgroundTransparency = 1
 	OptionsScroll.BorderSizePixel = 0
 	OptionsScroll.ScrollBarThickness = 2
-	OptionsScroll.ScrollBarImageColor3 = Color3.fromRGB(70, 70, 75)
+	OptionsScroll.ScrollBarImageColor3 = themeColorFor("70,70,75", CurrentThemeName or "Dark")
 	OptionsScroll.ZIndex = 202
 	OptionsScroll.Parent = SelectorPanel
 
@@ -2257,7 +2257,7 @@ function Astral:MakeWindow(config)
 				local OptionBtn = Instance.new("TextButton")
 				OptionBtn.Name = optionStr .. "_Option"
 				OptionBtn.Size = UDim2.new(1, 0, 0, 38)
-				OptionBtn.BackgroundColor3 = isSelected and Color3.new(AccentColor.R * 0.25, AccentColor.G * 0.25, AccentColor.B * 0.25) or Color3.fromRGB(18, 18, 22)
+				OptionBtn.BackgroundColor3 = isSelected and Color3.new(AccentColor.R * 0.25, AccentColor.G * 0.25, AccentColor.B * 0.25) or themeColorFor("18,18,22", CurrentThemeName or "Dark")
 				OptionBtn.BorderSizePixel = 0
 				OptionBtn.Text = ""
 				OptionBtn.AutoButtonColor = false
@@ -2269,7 +2269,7 @@ function Astral:MakeWindow(config)
 				OptionCorner.Parent = OptionBtn
 
 				local OptionStroke = Instance.new("UIStroke")
-				OptionStroke.Color = isSelected and AccentColor or Color3.fromRGB(50, 50, 55)
+				OptionStroke.Color = isSelected and AccentColor or themeColorFor("50,50,55", CurrentThemeName or "Dark")
 				OptionStroke.Thickness = 1
 				OptionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				OptionStroke.Parent = OptionBtn
@@ -2288,7 +2288,7 @@ function Astral:MakeWindow(config)
 				local Indicator = Instance.new("Frame")
 				Indicator.Name = "Indicator"
 				Indicator.Size = UDim2.fromOffset(16, 16)
-				Indicator.BackgroundColor3 = isSelected and AccentColor or Color3.fromRGB(36, 36, 40)
+				Indicator.BackgroundColor3 = isSelected and AccentColor or themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				Indicator.BorderSizePixel = 0
 				Indicator.LayoutOrder = 1
 				Indicator.ZIndex = 204
@@ -2298,7 +2298,7 @@ function Astral:MakeWindow(config)
 				IndicatorCorner.Parent = Indicator
 				local IndicatorStroke = Instance.new("UIStroke")
 				IndicatorStroke.Thickness = 1
-				IndicatorStroke.Color = isSelected and AccentColor or Color3.fromRGB(50, 50, 55)
+				IndicatorStroke.Color = isSelected and AccentColor or themeColorFor("50,50,55", CurrentThemeName or "Dark")
 				IndicatorStroke.Parent = Indicator
 				if isSelected then
 					local Check = Instance.new("ImageLabel")
@@ -2307,7 +2307,7 @@ function Astral:MakeWindow(config)
 					Check.Position = UDim2.fromScale(0.5, 0.5)
 					Check.BackgroundTransparency = 1
 					Astral.ApplyIcon(Check, Astral.Icons.Checkmark)
-					Check.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					Check.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					Check.ZIndex = 204
 					Check.Parent = Indicator
 				end
@@ -2318,7 +2318,7 @@ function Astral:MakeWindow(config)
 				OptionLabel.BackgroundTransparency = 1
 				OptionLabel.Font = Enum.Font.GothamBold
 				OptionLabel.Text = optionStr
-				OptionLabel.TextColor3 = isSelected and AccentColor or Color3.fromRGB(232, 232, 237)
+				OptionLabel.TextColor3 = isSelected and AccentColor or themeColorFor("232,232,237", CurrentThemeName or "Dark")
 				mTS(OptionLabel, 12)
 				OptionLabel.TextXAlignment = Enum.TextXAlignment.Left
 				OptionLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -2458,33 +2458,33 @@ function Astral:MakeWindow(config)
 					Transparency = 0
 				}):Play()
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					TextColor3 = Color3.fromRGB(255, 255, 255)
+					TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				}):Play()
 				if tab.IconLabel then
-					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")}):Play()
 				end
 				if tab.FallbackLabel then
-					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")}):Play()
 				end
 			else
 				tab.Gradient.Enabled = false
 
 				TweenService:Create(tab.Button, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					BackgroundColor3 = Color3.fromRGB(26, 26, 30),
+					BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark"),
 					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(tab.Stroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					Color = Color3.fromRGB(42, 42, 46),
+					Color = themeColorFor("42,42,46", CurrentThemeName or "Dark"),
 					Transparency = 0
 				}):Play()
 				TweenService:Create(tab.ButtonText, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-					TextColor3 = Color3.fromRGB(180, 180, 185)
+					TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 				}):Play()
 				if tab.IconLabel then
-					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+					TweenService:Create(tab.IconLabel, TweenInfo.new(0.2), {ImageColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")}):Play()
 				end
 				if tab.FallbackLabel then
-					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(180, 180, 185)}):Play()
+					TweenService:Create(tab.FallbackLabel, TweenInfo.new(0.2), {TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")}):Play()
 				end
 			end
 		end
@@ -2541,7 +2541,7 @@ function Astral:MakeWindow(config)
 		CategoryHeader.Size = UDim2.new(1, 0, 0, 20)
 		CategoryHeader.Font = Enum.Font.GothamBold
 		CategoryHeader.Text = string.upper(name)
-		CategoryHeader.TextColor3 = Color3.fromRGB(160, 160, 165)
+		CategoryHeader.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 		CategoryHeader.TextSize = 10
 		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Left
 		CategoryHeader.TextYAlignment = Enum.TextYAlignment.Center
@@ -2570,7 +2570,7 @@ function Astral:MakeWindow(config)
 		-- Create Tab Button
 		local TabButton = Instance.new("TextButton")
 		TabButton.Name = tabName .. "_TabButton"
-		TabButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+		TabButton.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 		TabButton.BackgroundTransparency = 0
 		TabButton.BorderSizePixel = 0
 		TabButton.Size = UDim2.new(1, 0, 0, IsMobile and 30 or 36)
@@ -2592,7 +2592,7 @@ function Astral:MakeWindow(config)
 		local TabStroke = Instance.new("UIStroke")
 		TabStroke.Name = "TabStroke"
 		TabStroke.Thickness = 1
-		TabStroke.Color = Color3.fromRGB(42, 42, 46)
+		TabStroke.Color = themeColorFor("42,42,46", CurrentThemeName or "Dark")
 		TabStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		TabStroke.ZIndex = 10
 		TabStroke.Parent = TabButton
@@ -2619,7 +2619,7 @@ function Astral:MakeWindow(config)
 			IconLabel.Position = UDim2.new(0, 6, 0.5, 0)
 			IconLabel.Size = UDim2.new(0, IsMobile and 18 or 26, 0, IsMobile and 18 or 26)
 			Astral.ApplyIcon(IconLabel, tabIcon)
-			IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			IconLabel.ScaleType = Enum.ScaleType.Fit
 			IconLabel.ZIndex = 11
 			IconLabel.Parent = TabButton
@@ -2632,7 +2632,7 @@ function Astral:MakeWindow(config)
 			FallbackLabel.Size = UDim2.new(0, IsMobile and 16 or 22, 0, IsMobile and 16 or 22)
 			FallbackLabel.Font = Enum.Font.GothamBold
 			FallbackLabel.Text = string.sub(tabName, 1, 1)
-			FallbackLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
+			FallbackLabel.TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 			FallbackLabel.TextSize = IsMobile and 11 or 14
 			FallbackLabel.TextTransparency = isCollapsed and 0 or 1
 			FallbackLabel.ZIndex = 11
@@ -2648,7 +2648,7 @@ function Astral:MakeWindow(config)
 		ButtonText.Size = UDim2.new(1, hasIcon and (IsMobile and -38 or -48) or -16, 1, 0)
 		ButtonText.Font = Enum.Font.GothamBold
 		tr(ButtonText, tabName)
-		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
+		ButtonText.TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 		mTS(ButtonText, 12)
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
 		ButtonText.TextYAlignment = Enum.TextYAlignment.Center
@@ -2671,7 +2671,7 @@ function Astral:MakeWindow(config)
 		local SubTabBtnHeight = IsMobile and 30 or 36
 		local SubTabBar = Instance.new("Frame")
 		SubTabBar.Name = "SubTabBar"
-		SubTabBar.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
+		SubTabBar.BackgroundColor3 = themeColorFor("24,24,30", CurrentThemeName or "Dark")
 		SubTabBar.BackgroundTransparency = 0
 		SubTabBar.BorderSizePixel = 0
 		SubTabBar.Size = UDim2.new(1, -24, 0, SubTabBarHeight)
@@ -2686,7 +2686,7 @@ function Astral:MakeWindow(config)
 		SubTabBarCorner.Parent = SubTabBar
 
 		local SubTabBarStroke = Instance.new("UIStroke")
-		SubTabBarStroke.Color = Color3.fromRGB(60, 60, 70)
+		SubTabBarStroke.Color = themeColorFor("60,60,70", CurrentThemeName or "Dark")
 		SubTabBarStroke.Thickness = 1
 		SubTabBarStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		SubTabBarStroke.Parent = SubTabBar
@@ -2735,7 +2735,7 @@ function Astral:MakeWindow(config)
 		PageScroll.Position = UDim2.new(0, 0, 0, 0)
 		PageScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 		PageScroll.ScrollBarThickness = 3
-		PageScroll.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 55)
+		PageScroll.ScrollBarImageColor3 = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 		PageScroll.Parent = TabPage
 
 		local PagePadding = Instance.new("UIPadding")
@@ -2875,15 +2875,15 @@ function Astral:MakeWindow(config)
 			for _, st in ipairs(subTabs) do
 				local on = (st.Index == idx)
 				TweenService:Create(st.Button, TweenInfo.new(0.18), {
-					BackgroundColor3 = on and AccentColor or Color3.fromRGB(32, 32, 40),
+					BackgroundColor3 = on and AccentColor or themeColorFor("32,32,40", CurrentThemeName or "Dark"),
 					BackgroundTransparency = 0
 				}):Play()
 				TweenService:Create(st.BStroke, TweenInfo.new(0.18), {
-					Color = Color3.fromRGB(70, 70, 80),
+					Color = themeColorFor("70,70,80", CurrentThemeName or "Dark"),
 					Transparency = 0.5
 				}):Play()
 				TweenService:Create(st.BText, TweenInfo.new(0.18), {
-					TextColor3 = on and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(160, 160, 168)
+					TextColor3 = on and themeColorFor("255,255,255", CurrentThemeName or "Dark") or themeColorFor("160,160,168", CurrentThemeName or "Dark")
 				}):Play()
 			end
 			applySubTabFilter()
@@ -2928,13 +2928,13 @@ function Astral:MakeWindow(config)
 			if pickerOpen or selectorOpen then return end -- FIXED: Disable hover effects when panels are open
 			if currentTab ~= tabData then
 				TweenService:Create(TabButton, TweenInfo.new(0.15), {
-					BackgroundColor3 = Color3.fromRGB(32, 32, 34)
+					BackgroundColor3 = themeColorFor("32,32,34", CurrentThemeName or "Dark")
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(52, 52, 56)
+					Color = themeColorFor("52,52,56", CurrentThemeName or "Dark")
 				}):Play()
 				TweenService:Create(ButtonText, TweenInfo.new(0.15), {
-					TextColor3 = Color3.fromRGB(255, 255, 255)
+					TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				}):Play()
 			end
 		end)
@@ -2946,10 +2946,10 @@ function Astral:MakeWindow(config)
 					BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 				}):Play()
 				TweenService:Create(TabStroke, TweenInfo.new(0.15), {
-					Color = Color3.fromRGB(42, 42, 46)
+					Color = themeColorFor("42,42,46", CurrentThemeName or "Dark")
 				}):Play()
 				TweenService:Create(ButtonText, TweenInfo.new(0.15), {
-					TextColor3 = Color3.fromRGB(180, 180, 185)
+					TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 				}):Play()
 			end
 		end)
@@ -3008,7 +3008,7 @@ function Astral:MakeWindow(config)
 
 			local ButtonFrame = Instance.new("TextButton")
 			ButtonFrame.Name = title .. "_Button"
-			ButtonFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 39)
+			ButtonFrame.BackgroundColor3 = themeColorFor("33,33,39", CurrentThemeName or "Dark")
 			ButtonFrame.BorderSizePixel = 0
 			ButtonFrame.Size = UDim2.new(1, 0, 0, calculatedHeight)
 			ButtonFrame.Text = ""
@@ -3021,7 +3021,7 @@ function Astral:MakeWindow(config)
 
 			local ButtonStroke = Instance.new("UIStroke")
 			ButtonStroke.Thickness = 1
-			ButtonStroke.Color = Color3.fromRGB(50, 50, 55)
+			ButtonStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ButtonStroke.Parent = ButtonFrame
 
@@ -3032,7 +3032,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
 				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
@@ -3042,7 +3042,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 				local IconStroke = Instance.new("UIStroke")
 				IconStroke.Thickness = 1.5
-				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconStroke.Transparency = 0.3
 				IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconStroke.Parent = IconContainer
@@ -3053,7 +3053,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -3075,7 +3075,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextWrapped = false
@@ -3088,7 +3088,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextWrapped = true
@@ -3103,7 +3103,7 @@ function Astral:MakeWindow(config)
 			ActionArrow.Position = UDim2.new(1, -34, 0.5, -10)
 			ActionArrow.Size = UDim2.new(0, 20, 0, 20)
 			ActionArrow.Image = Astral.Icons.right_arrow
-			ActionArrow.ImageColor3 = Color3.fromRGB(160, 160, 165)
+			ActionArrow.ImageColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 			ActionArrow.ScaleType = Enum.ScaleType.Fit
 			ActionArrow.Parent = ButtonFrame
 
@@ -3111,7 +3111,7 @@ function Astral:MakeWindow(config)
 			local locked = buttonConfig.Locked or false
 			local LockOverlay = Instance.new("Frame")
 			LockOverlay.Name = "LockOverlay"
-			LockOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			LockOverlay.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 			LockOverlay.BackgroundTransparency = 0.55
 			LockOverlay.BorderSizePixel = 0
 			LockOverlay.Size = UDim2.new(1, 0, 1, 0)
@@ -3131,7 +3131,7 @@ function Astral:MakeWindow(config)
 			LockIcon.Position = UDim2.new(1, -24, 0.5, 0)
 			LockIcon.Size = UDim2.new(0, 20, 0, 20)
 			LockIcon.Image = "rbxassetid://15117261700"
-			LockIcon.ImageColor3 = Color3.fromRGB(180, 180, 185)
+			LockIcon.ImageColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 			LockIcon.ScaleType = Enum.ScaleType.Fit
 			LockIcon.Visible = locked
 			LockIcon.ZIndex = 13
@@ -3165,13 +3165,13 @@ function Astral:MakeWindow(config)
 				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
-				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")}):Play()
 			end)
 			ButtonFrame.MouseLeave:Connect(function()
 				if locked then return end
 				TweenService:Create(ButtonFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
-				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = Color3.fromRGB(160, 160, 165)}):Play()
+				TweenService:Create(ActionArrow, TweenInfo.new(0.15), {ImageColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")}):Play()
 			end)
 
 			registerElement(ButtonFrame, calculatedHeight, buttonConfig.Position)
@@ -3206,7 +3206,7 @@ function Astral:MakeWindow(config)
 			local TargetColumn = GetTargetColumn()
 			local ToggleFrame = Instance.new("TextButton")
 			ToggleFrame.Name = title .. "_Toggle"
-			ToggleFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			ToggleFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			ToggleFrame.BorderSizePixel = 0
 			ToggleFrame.Text = ""
 			ToggleFrame.AutoButtonColor = false
@@ -3216,13 +3216,13 @@ function Astral:MakeWindow(config)
 			ToggleCorner.Parent = ToggleFrame
 			local ToggleStroke = Instance.new("UIStroke")
 			ToggleStroke.Thickness = 1
-			ToggleStroke.Color = Color3.fromRGB(50, 50, 55)
+			ToggleStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ToggleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ToggleStroke.Parent = ToggleFrame
 			if icon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, IsMobile and 8 or 10, 0.5, IsMobile and -13 or -21)
 				IconContainer.Size = UDim2.new(0, IsMobile and 26 or 42, 0, IsMobile and 26 or 42)
@@ -3232,7 +3232,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 				local IconStroke = Instance.new("UIStroke")
 				IconStroke.Thickness = 1.5
-				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconStroke.Transparency = 0.3
 				IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconStroke.Parent = IconContainer
@@ -3243,7 +3243,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 16 or 26, 0, IsMobile and 16 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -3264,7 +3264,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, IsMobile and 28 or 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextWrapped = IsMobile
@@ -3277,7 +3277,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 24)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextWrapped = true
@@ -3286,7 +3286,7 @@ function Astral:MakeWindow(config)
 
 			local SwitchTrack = Instance.new("Frame")
 			SwitchTrack.Name = "SwitchTrack"
-			SwitchTrack.BackgroundColor3 = default and AccentColor or Color3.fromRGB(45, 45, 50)
+			SwitchTrack.BackgroundColor3 = default and AccentColor or themeColorFor("45,45,50", CurrentThemeName or "Dark")
 			SwitchTrack.BorderSizePixel = 0
 			SwitchTrack.Position = UDim2.new(1, -switchTrackWidth - 10, 0.5, -switchTrackHeight / 2)
 			SwitchTrack.Size = UDim2.new(0, switchTrackWidth, 0, switchTrackHeight)
@@ -3296,13 +3296,13 @@ function Astral:MakeWindow(config)
 			TrackCorner.Parent = SwitchTrack
 
 			local TrackStroke = Instance.new("UIStroke")
-			TrackStroke.Color = Color3.fromRGB(62, 62, 72)
+			TrackStroke.Color = themeColorFor("62,62,72", CurrentThemeName or "Dark")
 			TrackStroke.Thickness = 1.2
 			TrackStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			TrackStroke.Parent = SwitchTrack
 			local SwitchThumb = Instance.new("Frame")
 			SwitchThumb.Name = "SwitchThumb"
-			SwitchThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			SwitchThumb.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			SwitchThumb.BorderSizePixel = 0
 			SwitchThumb.Position = default and switchThumbOnPosition or switchThumbOffPosition
 			SwitchThumb.Size = UDim2.new(0, switchThumbSize, 0, switchThumbSize)
@@ -3313,7 +3313,7 @@ function Astral:MakeWindow(config)
 			local enabled = default
 			local function toggle(state)
 				if state == nil then enabled = not enabled else enabled = state end
-				local targetTrackColor = enabled and AccentColor or Color3.fromRGB(45, 45, 50)
+				local targetTrackColor = enabled and AccentColor or themeColorFor("45,45,50", CurrentThemeName or "Dark")
 				local targetThumbPos = enabled and switchThumbOnPosition or switchThumbOffPosition
 				TweenService:Create(SwitchTrack, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetTrackColor}):Play()
 				TweenService:Create(SwitchThumb, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetThumbPos}):Play()
@@ -3363,7 +3363,7 @@ function Astral:MakeWindow(config)
 
 			local TickFrame = Instance.new("TextButton")
 			TickFrame.Name = title .. "_Tick"
-			TickFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			TickFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			TickFrame.BorderSizePixel = 0
 			TickFrame.Text = ""
 			TickFrame.AutoButtonColor = false
@@ -3373,7 +3373,7 @@ function Astral:MakeWindow(config)
 			TickCorner.Parent = TickFrame
 
 			local TickStroke = Instance.new("UIStroke")
-			TickStroke.Color = Color3.fromRGB(50, 50, 55)
+			TickStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			TickStroke.Thickness = 1.2
 			TickStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			TickStroke.Parent = TickFrame
@@ -3383,7 +3383,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
 				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
@@ -3394,7 +3394,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconContainerStroke = Instance.new("UIStroke")
-				IconContainerStroke.Color = Color3.fromRGB(70, 70, 75) -- FIXED: Light gray outline instead of black
+				IconContainerStroke.Color = themeColorFor("70,70,75", CurrentThemeName or "Dark") -- FIXED: Light gray outline instead of black
 				IconContainerStroke.Thickness = 1.5
 				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconContainerStroke.Parent = IconContainer
@@ -3406,7 +3406,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -3432,7 +3432,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -3447,7 +3447,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -3458,7 +3458,7 @@ function Astral:MakeWindow(config)
 			-- Checkbox Container (Enlarged & Moved Left to avoid border)
 			local Checkbox = Instance.new("Frame")
 			Checkbox.Name = "Checkbox"
-			Checkbox.BackgroundColor3 = default and AccentColor or Color3.fromRGB(22, 22, 26) -- Fills with accent Color
+			Checkbox.BackgroundColor3 = default and AccentColor or themeColorFor("22,22,26", CurrentThemeName or "Dark") -- Fills with accent Color
 			Checkbox.BorderSizePixel = 0
 			Checkbox.Position = UDim2.new(1, -52, 0.5, -22) -- FIXED: Centered perfectly in 60px height
 			Checkbox.Size = UDim2.new(0, 44, 0, 44) -- FIXED: Sized perfectly for 60px height
@@ -3472,7 +3472,7 @@ function Astral:MakeWindow(config)
 			local CheckboxStroke = Instance.new("UIStroke")
 			CheckboxStroke.Name = "CheckboxStroke"
 			CheckboxStroke.Thickness = 1.5
-			CheckboxStroke.Color = default and AccentColor or Color3.fromRGB(55, 55, 60) -- Accent stroke when active
+			CheckboxStroke.Color = default and AccentColor or themeColorFor("55,55,60", CurrentThemeName or "Dark") -- Accent stroke when active
 			CheckboxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			CheckboxStroke.Parent = Checkbox
 
@@ -3484,7 +3484,7 @@ function Astral:MakeWindow(config)
 			Checkmark.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Checkmark.Size = UDim2.new(0, 30, 0, 30) -- FIXED: Sized perfectly inside checkbox
 			Checkmark.Image = Astral.Icons.Checkmark -- Uses requested ID 12690727184
-			Checkmark.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			Checkmark.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			Checkmark.ImageTransparency = default and 0 or 1
 			Checkmark.ScaleType = Enum.ScaleType.Fit
 			Checkmark.ZIndex = 12
@@ -3503,8 +3503,8 @@ function Astral:MakeWindow(config)
 					enabled = state
 				end
 
-				local targetBoxColor = enabled and AccentColor or Color3.fromRGB(22, 22, 26) -- Fills with accent Color
-				local targetStrokeColor = enabled and AccentColor or Color3.fromRGB(45, 45, 52) -- Accent stroke when active
+				local targetBoxColor = enabled and AccentColor or themeColorFor("22,22,26", CurrentThemeName or "Dark") -- Fills with accent Color
+				local targetStrokeColor = enabled and AccentColor or themeColorFor("45,45,52", CurrentThemeName or "Dark") -- Accent stroke when active
 				local targetCheckScale = enabled and 1 or 0
 				local targetCheckTransparency = enabled and 0 or 1
 
@@ -3582,7 +3582,7 @@ function Astral:MakeWindow(config)
 			pickerConfig = pickerConfig or {}
 			local title = pickerConfig.Title or "Colorpicker"
 			local description = pickerConfig.Description or "Customize the UI theme"
-			local default = pickerConfig.Default or Color3.fromRGB(0, 125, 255)
+			local default = pickerConfig.Default or themeColorFor("0,125,255", CurrentThemeName or "Dark")
 			local callback = pickerConfig.Callback or function() end
 			local icon = parseIcon(pickerConfig.Icon)
 
@@ -3591,7 +3591,7 @@ function Astral:MakeWindow(config)
 
 			local PickerFrame = Instance.new("TextButton")
 			PickerFrame.Name = title .. "_Colorpicker"
-			PickerFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			PickerFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			PickerFrame.BorderSizePixel = 0
 			PickerFrame.Text = ""
 			PickerFrame.AutoButtonColor = false
@@ -3601,7 +3601,7 @@ function Astral:MakeWindow(config)
 			PickerCorner.Parent = PickerFrame
 
 			local PickerStroke = Instance.new("UIStroke")
-			PickerStroke.Color = Color3.fromRGB(50, 50, 55)
+			PickerStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			PickerStroke.Thickness = 1.2
 			PickerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			PickerStroke.Parent = PickerFrame
@@ -3611,7 +3611,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
 				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
@@ -3622,7 +3622,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconContainerStroke = Instance.new("UIStroke")
-				IconContainerStroke.Color = Color3.fromRGB(70, 70, 75) -- FIXED: Light gray outline instead of black
+				IconContainerStroke.Color = themeColorFor("70,70,75", CurrentThemeName or "Dark") -- FIXED: Light gray outline instead of black
 				IconContainerStroke.Thickness = 1.5
 				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconContainerStroke.Parent = IconContainer
@@ -3634,7 +3634,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -3660,7 +3660,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 14)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -3674,7 +3674,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -3695,7 +3695,7 @@ function Astral:MakeWindow(config)
 			PreviewCorner.Parent = ColorPreview
 
 			local PreviewStroke = Instance.new("UIStroke")
-			PreviewStroke.Color = Color3.fromRGB(50, 50, 55)
+			PreviewStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			PreviewStroke.Thickness = 1.2
 			PreviewStroke.Parent = ColorPreview
 
@@ -3766,20 +3766,20 @@ function Astral:MakeWindow(config)
 			local titleTop = IsMobile and 6 or 10
 			local SliderFrame = Instance.new("Frame")
 			SliderFrame.Name = title .. "_Slider"
-			SliderFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			SliderFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			SliderFrame.BorderSizePixel = 0
 			SliderFrame.ClipsDescendants = true
 			local SliderCorner = Instance.new("UICorner")
 			SliderCorner.CornerRadius = UDim.new(0, 8)
 			SliderCorner.Parent = SliderFrame
 			local SliderStroke = Instance.new("UIStroke")
-			SliderStroke.Color = Color3.fromRGB(50, 50, 55)
+			SliderStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			SliderStroke.Thickness = 1
 			SliderStroke.Parent = SliderFrame
 			if icon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.Position = UDim2.new(0, 10, 0.5, icoOff)
 				IconContainer.Size = UDim2.new(0, icoSz, 0, icoSz)
 				IconContainer.Parent = SliderFrame
@@ -3788,7 +3788,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 				local IconStroke = Instance.new("UIStroke")
 				IconStroke.Thickness = 1.5
-				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconStroke.Transparency = 0.3
 				IconStroke.Parent = IconContainer
 				local IconLabel = Instance.new("ImageLabel")
@@ -3807,13 +3807,13 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = icon and UDim2.new(1, -(textLeft + 72), 0, 16) or UDim2.new(1, -80, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.Parent = SliderFrame
 			local ValueBox = Instance.new("Frame")
 			ValueBox.Name = "ValueBox"
-			ValueBox.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
+			ValueBox.BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 			ValueBox.Position = UDim2.new(1, IsMobile and -52 or -64, 0, titleTop)
 			ValueBox.Size = UDim2.new(0, IsMobile and 40 or 48, 0, IsMobile and 18 or 20)
 			ValueBox.Parent = SliderFrame
@@ -3821,7 +3821,7 @@ function Astral:MakeWindow(config)
 			ValueCorner.CornerRadius = UDim.new(0, 4)
 			ValueCorner.Parent = ValueBox
 			local ValueStroke = Instance.new("UIStroke")
-			ValueStroke.Color = Color3.fromRGB(50, 50, 55)
+			ValueStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ValueStroke.Parent = ValueBox
 			local ValueInput = Instance.new("TextBox")
 			ValueInput.Name = "ValueInput"
@@ -3829,7 +3829,7 @@ function Astral:MakeWindow(config)
 			ValueInput.Size = UDim2.new(1, 0, 1, 0)
 			ValueInput.Font = Enum.Font.GothamBold
 			ValueInput.Text = tostring(default)
-			ValueInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ValueInput.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			ValueInput.TextSize = IsMobile and 9 or 10
 			ValueInput.Parent = ValueBox
 			local trackLeft = icon and textLeft or 12
@@ -3840,7 +3840,7 @@ function Astral:MakeWindow(config)
 			local thumbH = IsMobile and 16 or 22
 			local SliderTrack = Instance.new("TextButton")
 			SliderTrack.Name = "SliderTrack"
-			SliderTrack.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+			SliderTrack.BackgroundColor3 = themeColorFor("45,45,50", CurrentThemeName or "Dark")
 			SliderTrack.Position = UDim2.new(0, trackLeft, 0, trackTop)
 			SliderTrack.Size = UDim2.new(1, -trackLeft - trackRightPad, 0, trackH)
 			SliderTrack.Text = ""
@@ -3859,7 +3859,7 @@ function Astral:MakeWindow(config)
 			FillCorner.Parent = SliderFill
 			local SliderThumb = Instance.new("Frame")
 			SliderThumb.Name = "SliderThumb"
-			SliderThumb.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			SliderThumb.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			SliderThumb.AnchorPoint = Vector2.new(0.5,0.5)
 			SliderThumb.Position = UDim2.new((default - min)/math.max(1,max-min),0,0.5,0)
 			SliderThumb.Size = UDim2.fromOffset(thumbW, thumbH)
@@ -3868,7 +3868,7 @@ function Astral:MakeWindow(config)
 			ThumbCorner.CornerRadius = UDim.new(0, 3)
 			ThumbCorner.Parent = SliderThumb
 			local ThumbStroke = Instance.new("UIStroke")
-			ThumbStroke.Color = Color3.fromRGB(0,0,0)
+			ThumbStroke.Color = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 			ThumbStroke.Thickness = 1
 			ThumbStroke.Parent = SliderThumb
 			local dragging=false; local cur=default
@@ -3881,13 +3881,13 @@ function Astral:MakeWindow(config)
 			UserInputService.InputChanged:Connect(function(i) if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then setFromInput(i) end end)
 			UserInputService.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end end)
 			ValueInput.FocusLost:Connect(function() local n=tonumber(ValueInput.Text); if n then n=math.clamp(math.round(n/increase)*increase,min,max); cur=n; upd((cur-min)/math.max(1,max-min)); task.spawn(callback,cur) end; ValueInput.Text=tostring(cur) end)
-			SliderFrame.MouseEnter:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(36,36,40)}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=Color3.fromRGB(70,70,75)}):Play() end)
+			SliderFrame.MouseEnter:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=themeColorFor("36,36,40", CurrentThemeName or "Dark")}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=themeColorFor("70,70,75", CurrentThemeName or "Dark")}):Play() end)
 
 			-- Follow theme accent
 			onAccentChange(function(c)
 				SliderFill.BackgroundColor3 = c
 			end)
-			SliderFrame.MouseLeave:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(26,26,30)}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=Color3.fromRGB(50,50,55)}):Play() end)
+			SliderFrame.MouseLeave:Connect(function() TweenService:Create(SliderFrame,TweenInfo.new(0.15),{BackgroundColor3=themeColorFor("26,26,30", CurrentThemeName or "Dark")}):Play(); TweenService:Create(SliderStroke,TweenInfo.new(0.15),{Color=themeColorFor("50,50,55", CurrentThemeName or "Dark")}):Play() end)
 			registerElement(SliderFrame, calculatedHeight, sliderConfig.Position)
 			local C={}; function C:Set(v) v=math.clamp(v,min,max); cur=v; ValueInput.Text=tostring(v); upd((v-min)/math.max(1,max-min)); task.spawn(callback,v) end; function C:Get() return cur end; if sliderConfig.Flag and sliderConfig.Flag ~= "" then table.insert(configFlags, {Flag = sliderConfig.Flag, Kind = "slider", Get = function() return cur end, Set = function(v) C:Set(v) end}) end; return C
 		end
@@ -3932,7 +3932,7 @@ function Astral:MakeWindow(config)
 
 			local SelectorFrame = Instance.new("Frame")
 			SelectorFrame.Name = title .. "_Selector"
-			SelectorFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			SelectorFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			SelectorFrame.BorderSizePixel = 0
 			SelectorFrame.Size = UDim2.new(1, 0, 0, calculatedHeight)
 
@@ -3941,7 +3941,7 @@ function Astral:MakeWindow(config)
 			SelectorCorner.Parent = SelectorFrame
 
 			local SelectorStroke = Instance.new("UIStroke")
-			SelectorStroke.Color = Color3.fromRGB(50, 50, 55)
+			SelectorStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			SelectorStroke.Thickness = 1
 			SelectorStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SelectorStroke.Parent = SelectorFrame
@@ -3949,7 +3949,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
 				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
@@ -3960,7 +3960,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconContainerStroke = Instance.new("UIStroke")
-				IconContainerStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconContainerStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconContainerStroke.Transparency = 0.3
 				IconContainerStroke.Thickness = 1.5
 				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -3973,7 +3973,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 20 or 26, 0, IsMobile and 20 or 26)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -3997,7 +3997,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4010,7 +4010,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4020,7 +4020,7 @@ function Astral:MakeWindow(config)
 			-- Value box: bright selected text + count badge + arrow, clear at a glance
 			local ValueBox = Instance.new("TextButton")
 			ValueBox.Name = "ValueBox"
-			ValueBox.BackgroundColor3 = Color3.fromRGB(18, 18, 20)
+			ValueBox.BackgroundColor3 = themeColorFor("18,18,20", CurrentThemeName or "Dark")
 			ValueBox.BorderSizePixel = 0
 			ValueBox.Position = icon and UDim2.new(0, 62, 0, valueY) or UDim2.new(0, 12, 0, valueY)
 			ValueBox.Size = icon and UDim2.new(1, -72, 0, valueH) or UDim2.new(1, -24, 0, valueH)
@@ -4033,7 +4033,7 @@ function Astral:MakeWindow(config)
 			ValueCorner.Parent = ValueBox
 
 			local ValueStroke = Instance.new("UIStroke")
-			ValueStroke.Color = Color3.fromRGB(50, 50, 55)
+			ValueStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ValueStroke.Thickness = 1
 			ValueStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ValueStroke.Parent = ValueBox
@@ -4044,7 +4044,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Size = UDim2.new(1, -76, 1, 0)
 			ValueLabel.Position = UDim2.new(0, 10, 0, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
-			ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			ValueLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(ValueLabel, 11)
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Left
 			ValueLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4071,7 +4071,7 @@ function Astral:MakeWindow(config)
 			BadgeLabel.Size = UDim2.new(1, 0, 1, 0)
 			BadgeLabel.Font = Enum.Font.GothamBold
 			BadgeLabel.Text = ""
-			BadgeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			BadgeLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(BadgeLabel, 12)
 			BadgeLabel.TextXAlignment = Enum.TextXAlignment.Center
 			BadgeLabel.ZIndex = 13
@@ -4090,13 +4090,13 @@ function Astral:MakeWindow(config)
 				local list = selectedList()
 				if #list == 0 then
 					ValueLabel.Text = translateText("Select...")
-					ValueLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+					ValueLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				elseif #list > 2 then
 					ValueLabel.Text = string.format("%s, %s " .. translateText("(+%d more)"), list[1], list[2], #list - 2)
-					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					ValueLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				else
 					ValueLabel.Text = table.concat(list, ", ")
-					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					ValueLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				end
 				if multi then
 					CountBadge.Visible = #list > 0
@@ -4115,7 +4115,7 @@ function Astral:MakeWindow(config)
 			DropIcon.Position = UDim2.new(1, -16, 0.5, 0)
 			DropIcon.Size = UDim2.new(0, 12, 0, 12)
 			DropIcon.Image = Astral.Icons.down_arrow
-			DropIcon.ImageColor3 = Color3.fromRGB(160, 160, 165)
+			DropIcon.ImageColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 			DropIcon.Parent = ValueBox
 
 			local function currentText()
@@ -4275,7 +4275,7 @@ function Astral:MakeWindow(config)
 
 			local TextboxFrame = Instance.new("Frame")
 			TextboxFrame.Name = title .. "_Textbox"
-			TextboxFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			TextboxFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			TextboxFrame.BorderSizePixel = 0
 			TextboxFrame.Size = UDim2.new(1, 0, 0, calculatedHeight)
 
@@ -4285,7 +4285,7 @@ function Astral:MakeWindow(config)
 
 			local TextboxStroke = Instance.new("UIStroke")
 			TextboxStroke.Thickness = 1
-			TextboxStroke.Color = Color3.fromRGB(50, 50, 55)
+			TextboxStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			TextboxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			TextboxStroke.Parent = TextboxFrame
 
@@ -4293,7 +4293,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 12, 0, pad)
 				IconContainer.Size = UDim2.new(0, boxSize, 0, boxSize)
@@ -4305,7 +4305,7 @@ function Astral:MakeWindow(config)
 
 				local IconStroke = Instance.new("UIStroke")
 				IconStroke.Thickness = 1.5
-				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconStroke.Transparency = 0.3
 				IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconStroke.Parent = IconContainer
@@ -4317,7 +4317,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, boxSize - 18, 0, boxSize - 18)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -4342,7 +4342,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4355,7 +4355,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4365,15 +4365,15 @@ function Astral:MakeWindow(config)
 			-- Big input box under them, full width
 			local InputBox = Instance.new("TextBox")
 			InputBox.Name = "InputBox"
-			InputBox.BackgroundColor3 = Color3.fromRGB(32, 32, 36)
+			InputBox.BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 			InputBox.BorderSizePixel = 0
 			InputBox.Position = UDim2.new(0, 12, 0, inputY)
 			InputBox.Size = UDim2.new(1, -24, 0, inputH)
 			InputBox.Font = Enum.Font.Gotham
 			InputBox.PlaceholderText = placeholder
-			InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
+			InputBox.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
 			InputBox.Text = default
-			InputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+			InputBox.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(InputBox, 12)
 			InputBox.TextXAlignment = Enum.TextXAlignment.Left
 			InputBox.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4387,7 +4387,7 @@ function Astral:MakeWindow(config)
 
 			local InputStroke = Instance.new("UIStroke")
 			InputStroke.Thickness = 1.5
-			InputStroke.Color = Color3.fromRGB(100, 100, 105)
+			InputStroke.Color = themeColorFor("100,100,105", CurrentThemeName or "Dark")
 			InputStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			InputStroke.Parent = InputBox
 
@@ -4397,13 +4397,13 @@ function Astral:MakeWindow(config)
 			InputPadding.Parent = InputBox
 
 			InputBox.Focused:Connect(function()
-				TweenService:Create(InputBox, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(38, 38, 44)}):Play()
-				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(100, 100, 105)}):Play()
+				TweenService:Create(InputBox, TweenInfo.new(0.15), {BackgroundColor3 = themeColorFor("38,38,44", CurrentThemeName or "Dark")}):Play()
+				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = themeColorFor("100,100,105", CurrentThemeName or "Dark")}):Play()
 			end)
 
 			InputBox.FocusLost:Connect(function()
-				TweenService:Create(InputBox, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 32, 36)}):Play()
-				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(100, 100, 105)}):Play()
+				TweenService:Create(InputBox, TweenInfo.new(0.15), {BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")}):Play()
+				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = themeColorFor("100,100,105", CurrentThemeName or "Dark")}):Play()
 				-- Only fire when the text actually changed (clicking in/out does nothing)
 				if InputBox.Text ~= lastText then
 					lastText = InputBox.Text
@@ -4415,14 +4415,14 @@ function Astral:MakeWindow(config)
 				if pickerOpen or selectorOpen then return end
 				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
-				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 130, 135)}):Play()
+				TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = themeColorFor("130,130,135", CurrentThemeName or "Dark")}):Play()
 			end)
 
 			TextboxFrame.MouseLeave:Connect(function()
 				TweenService:Create(TextboxFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
 				TweenService:Create(TextboxStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 				if not InputBox:IsFocused() then
-					TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(100, 100, 105)}):Play()
+					TweenService:Create(InputStroke, TweenInfo.new(0.15), {Color = themeColorFor("100,100,105", CurrentThemeName or "Dark")}):Play()
 				end
 			end)
 
@@ -4494,7 +4494,7 @@ function Astral:MakeWindow(config)
 
 			local LabelFrame = Instance.new("Frame")
 			LabelFrame.Name = title .. "_Label"
-			LabelFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			LabelFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			LabelFrame.BorderSizePixel = 0
 
 			local LabelCorner = Instance.new("UICorner")
@@ -4502,7 +4502,7 @@ function Astral:MakeWindow(config)
 			LabelCorner.Parent = LabelFrame
 
 			local LabelStroke = Instance.new("UIStroke")
-			LabelStroke.Color = Color3.fromRGB(50, 50, 55)
+			LabelStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			LabelStroke.Thickness = 1.2
 			LabelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			LabelStroke.Parent = LabelFrame
@@ -4512,7 +4512,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 8, 0.5, IsMobile and -17 or -22)
 				IconContainer.Size = UDim2.new(0, IsMobile and 34 or 44, 0, IsMobile and 34 or 44)
@@ -4523,7 +4523,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconContainerStroke = Instance.new("UIStroke")
-				IconContainerStroke.Color = Color3.fromRGB(70, 70, 75)
+				IconContainerStroke.Color = themeColorFor("70,70,75", CurrentThemeName or "Dark")
 				IconContainerStroke.Thickness = 1.5
 				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				IconContainerStroke.Parent = IconContainer
@@ -4535,7 +4535,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -4545,7 +4545,7 @@ function Astral:MakeWindow(config)
 			-- Right-hand STATUS BADGE (hidden until SetStatus is called)
 			local StatusBadge = Instance.new("Frame")
 			StatusBadge.Name = "StatusBadge"
-			StatusBadge.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+			StatusBadge.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 			StatusBadge.BorderSizePixel = 0
 			StatusBadge.AnchorPoint = Vector2.new(1, 0.5)
 			StatusBadge.Position = UDim2.new(1, -12, 0.5, 0)
@@ -4559,7 +4559,7 @@ function Astral:MakeWindow(config)
 			StatusCorner.Parent = StatusBadge
 
 			local StatusStroke = Instance.new("UIStroke")
-			StatusStroke.Color = Color3.fromRGB(70, 70, 75)
+			StatusStroke.Color = themeColorFor("70,70,75", CurrentThemeName or "Dark")
 			StatusStroke.Thickness = 1.2
 			StatusStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			StatusStroke.Parent = StatusBadge
@@ -4582,7 +4582,7 @@ function Astral:MakeWindow(config)
 			StatusIcon.Size = UDim2.new(0, 18, 0, 18)
 			StatusIcon.LayoutOrder = 1
 			StatusIcon.ScaleType = Enum.ScaleType.Fit
-			StatusIcon.ImageColor3 = Color3.fromRGB(46, 204, 113)
+			StatusIcon.ImageColor3 = themeColorFor("46,204,113", CurrentThemeName or "Dark")
 			StatusIcon.Parent = StatusBadge
 
 			local StatusText = Instance.new("TextLabel")
@@ -4593,7 +4593,7 @@ function Astral:MakeWindow(config)
 			StatusText.LayoutOrder = 2
 			StatusText.Font = Enum.Font.GothamBold
 			StatusText.Text = ""
-			StatusText.TextColor3 = Color3.fromRGB(46, 204, 113)
+			StatusText.TextColor3 = themeColorFor("46,204,113", CurrentThemeName or "Dark")
 			regText(StatusText, 13)
 			StatusText.TextXAlignment = Enum.TextXAlignment.Left
 			StatusText.Parent = StatusBadge
@@ -4619,7 +4619,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, titleSize + 5)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4635,7 +4635,7 @@ function Astral:MakeWindow(config)
 					DescLabel.BackgroundTransparency = 1
 					DescLabel.Size = UDim2.new(1, 0, 0, descSize + 4)
 					DescLabel.Font = Enum.Font.Gotham
-					DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+					DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 					regText(DescLabel, descSize)
 					DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 					DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4673,9 +4673,9 @@ function Astral:MakeWindow(config)
 			local LabelController = {}
 
 			local STATUS_DEFS = {
-				good    = { Icon = "Checkmark", Color = Color3.fromRGB(46, 204, 113),  Text = "SPAWNED" },
-				bad     = { Icon = "Close",     Color = Color3.fromRGB(231, 76, 60),   Text = "NOT SPAWNED" },
-				waiting = { Icon = "timer",     Color = Color3.fromRGB(255, 196, 40),  Text = "WAITING" },
+				good    = { Icon = "Checkmark", Color = themeColorFor("46,204,113", CurrentThemeName or "Dark"),  Text = "SPAWNED" },
+				bad     = { Icon = "Close",     Color = themeColorFor("231,76,60", CurrentThemeName or "Dark"),   Text = "NOT SPAWNED" },
+				waiting = { Icon = "timer",     Color = themeColorFor("255,196,40", CurrentThemeName or "Dark"),  Text = "WAITING" },
 			}
 			local function tint(c, f)
 				return Color3.fromRGB(math.floor(c.R * 255 * f), math.floor(c.G * 255 * f), math.floor(c.B * 255 * f))
@@ -4817,7 +4817,7 @@ function Astral:MakeWindow(config)
 			local BarL = Instance.new("Frame")
 			BarL.Name = "BarL"
 			BarL.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
-			BarL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			BarL.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BarL.BorderSizePixel = 0
 			BarL.LayoutOrder = 1
 			BarL.Parent = SectionFrame
@@ -4826,8 +4826,8 @@ function Astral:MakeWindow(config)
 			BarLCorner.Parent = BarL
 			local BarLGrad = Instance.new("UIGradient")
 			BarLGrad.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Color3.fromRGB(59, 130, 246)),
-				ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 85, 247)),
+				ColorSequenceKeypoint.new(0, themeColorFor("59,130,246", CurrentThemeName or "Dark")),
+				ColorSequenceKeypoint.new(1, themeColorFor("168,85,247", CurrentThemeName or "Dark")),
 			})
 			BarLGrad.Parent = BarL
 
@@ -4835,7 +4835,7 @@ function Astral:MakeWindow(config)
 				local IcoBox = Instance.new("Frame")
 				IcoBox.Name = "IconBox"
 				IcoBox.Size = UDim2.new(0, 26, 0, 26)
-				IcoBox.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+				IcoBox.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
 				IcoBox.BorderSizePixel = 0
 				IcoBox.LayoutOrder = 2
 				IcoBox.Parent = SectionFrame
@@ -4854,7 +4854,7 @@ function Astral:MakeWindow(config)
 				Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
 				Ico.Size = UDim2.new(0, 15, 0, 15)
 				Astral.ApplyIcon(Ico, icon)
-				Ico.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				Ico.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				Ico.ScaleType = Enum.ScaleType.Fit
 				Ico.Parent = IcoBox
 				onAccentChange(function(c) pcall(function() IcoBoxStroke.Color = c end) end)
@@ -4867,7 +4867,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.AutomaticSize = Enum.AutomaticSize.X
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(TitleLabel, IsMobile and 19 or 22)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -4877,7 +4877,7 @@ function Astral:MakeWindow(config)
 			local BarR = Instance.new("Frame")
 			BarR.Name = "BarR"
 			BarR.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
-			BarR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			BarR.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BarR.BorderSizePixel = 0
 			BarR.LayoutOrder = 4
 			BarR.Parent = SectionFrame
@@ -4886,8 +4886,8 @@ function Astral:MakeWindow(config)
 			BarRCorner.Parent = BarR
 			local BarRGrad = Instance.new("UIGradient")
 			BarRGrad.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Color3.fromRGB(168, 85, 247)),
-				ColorSequenceKeypoint.new(1, Color3.fromRGB(59, 130, 246)),
+				ColorSequenceKeypoint.new(0, themeColorFor("168,85,247", CurrentThemeName or "Dark")),
+				ColorSequenceKeypoint.new(1, themeColorFor("59,130,246", CurrentThemeName or "Dark")),
 			})
 			BarRGrad.Parent = BarR
 			local function paintSectionBars(c)
@@ -4936,7 +4936,7 @@ function Astral:MakeWindow(config)
 
 			local ParaFrame = Instance.new("Frame")
 			ParaFrame.Name = title .. "_Paragraph"
-			ParaFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30) -- FIXED: match other buttons (was 14,14,16 too dark)
+			ParaFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark") -- FIXED: match other buttons (was 14,14,16 too dark)
 			ParaFrame.BorderSizePixel = 0
 
 			local ParaCorner = Instance.new("UICorner")
@@ -4944,7 +4944,7 @@ function Astral:MakeWindow(config)
 			ParaCorner.Parent = ParaFrame
 
 			local ParaStroke = Instance.new("UIStroke")
-			ParaStroke.Color = Color3.fromRGB(32, 32, 36)
+			ParaStroke.Color = themeColorFor("32,32,36", CurrentThemeName or "Dark")
 			ParaStroke.Thickness = 1.2
 			ParaStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ParaStroke.Parent = ParaFrame
@@ -5021,7 +5021,7 @@ function Astral:MakeWindow(config)
 				IconLabel.LayoutOrder = 1
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.Parent = TitleRow
 			end
 
@@ -5032,7 +5032,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, (icon and -34 or 0), 1, 0)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 16)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5047,7 +5047,7 @@ function Astral:MakeWindow(config)
 			DescLabel.AutomaticSize = Enum.AutomaticSize.Y
 			DescLabel.Font = Enum.Font.Gotham
 			tr(DescLabel, description)
-			DescLabel.TextColor3 = Color3.fromRGB(175, 175, 182)
+			DescLabel.TextColor3 = themeColorFor("175,175,182", CurrentThemeName or "Dark")
 			regText(DescLabel, 13)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
@@ -5466,7 +5466,7 @@ function Astral:MakeWindow(config)
 
 			local KeybindFrame = Instance.new("Frame")
 			KeybindFrame.Name = title .. "_Keybind"
-			KeybindFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			KeybindFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			KeybindFrame.BorderSizePixel = 0
 
 			local KeybindCorner = Instance.new("UICorner")
@@ -5474,7 +5474,7 @@ function Astral:MakeWindow(config)
 			KeybindCorner.Parent = KeybindFrame
 
 			local KeybindStroke = Instance.new("UIStroke")
-			KeybindStroke.Color = Color3.fromRGB(50, 50, 55)
+			KeybindStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			KeybindStroke.Thickness = 1
 			KeybindStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			KeybindStroke.Parent = KeybindFrame
@@ -5484,7 +5484,7 @@ function Astral:MakeWindow(config)
 			if icon then
 				IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, 10, 0.5, IsMobile and -16 or -21)
 				IconContainer.Size = UDim2.new(0, IsMobile and 32 or 42, 0, IsMobile and 32 or 42)
@@ -5495,7 +5495,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconContainerStroke = Instance.new("UIStroke")
-				IconContainerStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconContainerStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconContainerStroke.Transparency = 0.3
 				IconContainerStroke.Thickness = 1.5
 				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -5508,7 +5508,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
 				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -5533,7 +5533,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5544,7 +5544,7 @@ function Astral:MakeWindow(config)
 
 			local KeybindButton = Instance.new("TextButton")
 			KeybindButton.Name = "KeybindButton"
-			KeybindButton.BackgroundColor3 = Color3.fromRGB(42, 42, 50)
+			KeybindButton.BackgroundColor3 = themeColorFor("42,42,50", CurrentThemeName or "Dark")
 			KeybindButton.BorderSizePixel = 0
 			KeybindButton.AnchorPoint = Vector2.new(1, 0.5)
 			KeybindButton.Position = UDim2.new(1, -12, 0.5, 0)
@@ -5552,7 +5552,7 @@ function Astral:MakeWindow(config)
 			KeybindButton.AutomaticSize = Enum.AutomaticSize.X
 			KeybindButton.Font = Enum.Font.GothamBold
 			KeybindButton.Text = default.Name
-			KeybindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+			KeybindButton.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(KeybindButton, 13)
 			KeybindButton.AutoButtonColor = false
 			KeybindButton.Parent = KeybindFrame
@@ -5563,7 +5563,7 @@ function Astral:MakeWindow(config)
 
 			-- Clear outline so the key box is easy to see on the dark card
 			local ButtonStroke = Instance.new("UIStroke")
-			ButtonStroke.Color = Color3.fromRGB(70, 70, 80)
+			ButtonStroke.Color = themeColorFor("70,70,80", CurrentThemeName or "Dark")
 			ButtonStroke.Thickness = 1.2
 			ButtonStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ButtonStroke.Parent = KeybindButton
@@ -5602,8 +5602,8 @@ function Astral:MakeWindow(config)
 			end
 
 			local function stopListeningVisual()
-				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(34, 34, 40)}):Play()
-				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(70, 70, 80)}):Play()
+				TweenService:Create(KeybindButton, TweenInfo.new(0.15), {BackgroundColor3 = themeColorFor("34,34,40", CurrentThemeName or "Dark")}):Play()
+				TweenService:Create(ButtonStroke, TweenInfo.new(0.15), {Color = themeColorFor("70,70,80", CurrentThemeName or "Dark")}):Play()
 			end
 
 			local function startListening()
@@ -5726,15 +5726,15 @@ function Astral:MakeWindow(config)
 			if typeof(v) == "Color3" then return v end
 			if type(v) == "string" then
 				local named = {
-					red = Color3.fromRGB(231, 76, 60),
-					green = Color3.fromRGB(46, 204, 113),
-					blue = Color3.fromRGB(0, 153, 235),
-					cyan = Color3.fromRGB(0, 210, 255),
+					red = themeColorFor("231,76,60", CurrentThemeName or "Dark"),
+					green = themeColorFor("46,204,113", CurrentThemeName or "Dark"),
+					blue = themeColorFor("0,153,235", CurrentThemeName or "Dark"),
+					cyan = themeColorFor("0,210,255", CurrentThemeName or "Dark"),
 					purple = Color3.fromRGB(138, 90, 255),
-					pink = Color3.fromRGB(255, 90, 180),
-					orange = Color3.fromRGB(243, 156, 18),
-					gold = Color3.fromRGB(255, 196, 40),
-					white = Color3.fromRGB(240, 240, 245),
+					pink = themeColorFor("255,90,180", CurrentThemeName or "Dark"),
+					orange = themeColorFor("243,156,18", CurrentThemeName or "Dark"),
+					gold = themeColorFor("255,196,40", CurrentThemeName or "Dark"),
+					white = themeColorFor("240,240,245", CurrentThemeName or "Dark"),
 					dark = Color3.fromRGB(40, 40, 46),
 				}
 				return named[v:lower()]
@@ -5769,7 +5769,7 @@ function Astral:MakeWindow(config)
 
 			local Card = Instance.new("Frame")
 			Card.Name = title .. "_MultiButton"
-			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			Card.BorderSizePixel = 0
 			Card.Size = UDim2.new(1, 0, 0, calculatedHeight)
 
@@ -5778,7 +5778,7 @@ function Astral:MakeWindow(config)
 			CardCorner.Parent = Card
 
 			local CardStroke = Instance.new("UIStroke")
-			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			CardStroke.Thickness = 1
 			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			CardStroke.Parent = Card
@@ -5787,7 +5787,7 @@ function Astral:MakeWindow(config)
 			if cardIcon then
 				local IconContainer = Instance.new("Frame")
 				IconContainer.Name = "IconContainer"
-				IconContainer.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 				IconContainer.BorderSizePixel = 0
 				IconContainer.Position = UDim2.new(0, pad, 0, pad)
 				IconContainer.Size = UDim2.new(0, 30, 0, 30)
@@ -5798,7 +5798,7 @@ function Astral:MakeWindow(config)
 				IconCorner.Parent = IconContainer
 
 				local IconStroke = Instance.new("UIStroke")
-				IconStroke.Color = Color3.fromRGB(255, 255, 255)
+				IconStroke.Color = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconStroke.Transparency = 0.3
 				IconStroke.Thickness = 1.5
 				IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -5811,7 +5811,7 @@ function Astral:MakeWindow(config)
 				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 				IconLabel.Size = UDim2.new(0, 18, 0, 18)
 				Astral.ApplyIcon(IconLabel, cardIcon)
-				IconLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				IconLabel.ScaleType = Enum.ScaleType.Fit
 				IconLabel.Parent = IconContainer
 			end
@@ -5836,7 +5836,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5849,7 +5849,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -5929,7 +5929,7 @@ function Astral:MakeWindow(config)
 					BIcon.Size = UDim2.new(0, iSize, 0, iSize)
 					BIcon.LayoutOrder = 1
 					Astral.ApplyIcon(BIcon, bIcon)
-					BIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+					BIcon.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					BIcon.ScaleType = Enum.ScaleType.Fit
 					BIcon.Parent = Content
 				end
@@ -5941,7 +5941,7 @@ function Astral:MakeWindow(config)
 					BLabel.Size = UDim2.new(1, bIcon and -20 or 0, 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					BLabel.Text = bTitle
-					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					BLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					BLabel.TextSize = IsMobile and 10 or 12
 					BLabel.TextXAlignment = Enum.TextXAlignment.Center
 					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6052,7 +6052,7 @@ function Astral:MakeWindow(config)
 
 			local Card = Instance.new("Frame")
 			Card.Name = title .. "_MultiColorPicker"
-			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			Card.BorderSizePixel = 0
 			Card.Size = UDim2.new(1, 0, 0, calculatedHeight)
 
@@ -6061,7 +6061,7 @@ function Astral:MakeWindow(config)
 			CardCorner.Parent = Card
 
 			local CardStroke = Instance.new("UIStroke")
-			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			CardStroke.Thickness = 1
 			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			CardStroke.Parent = Card
@@ -6079,7 +6079,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6092,7 +6092,7 @@ function Astral:MakeWindow(config)
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
 				tr(DescLabel, description)
-				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+				DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 				DescLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6163,7 +6163,7 @@ function Astral:MakeWindow(config)
 				local eh, es, ev = Color3.toHSV(initColor)
 				local Exp = Instance.new("Frame")
 				Exp.Name = "Expander"
-				Exp.BackgroundColor3 = Color3.fromRGB(24, 24, 29)
+				Exp.BackgroundColor3 = themeColorFor("24,24,29", CurrentThemeName or "Dark")
 				Exp.BorderSizePixel = 0
 				Exp.Position = UDim2.new(0, 0, 1, 4)
 				Exp.Size = UDim2.new(1, 0, 0, 0)
@@ -6175,7 +6175,7 @@ function Astral:MakeWindow(config)
 				ExpCorner.CornerRadius = UDim.new(0, 8)
 				ExpCorner.Parent = Exp
 				local ExpStroke = Instance.new("UIStroke")
-				ExpStroke.Color = Color3.fromRGB(50, 50, 55)
+				ExpStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 				ExpStroke.Thickness = 1
 				ExpStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				ExpStroke.Parent = Exp
@@ -6191,18 +6191,18 @@ function Astral:MakeWindow(config)
 				ExpCanvasCorner.Parent = ExpCanvas
 				local ExpRainbow = Instance.new("UIGradient")
 				ExpRainbow.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-					ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-					ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-					ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-					ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-					ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
+					ColorSequenceKeypoint.new(0, themeColorFor("255,0,0", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(0.17, themeColorFor("255,255,0", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(0.33, themeColorFor("0,255,0", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(0.5, themeColorFor("0,255,255", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(0.67, themeColorFor("0,0,255", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(0.83, themeColorFor("255,0,255", CurrentThemeName or "Dark")),
+					ColorSequenceKeypoint.new(1, themeColorFor("255,0,0", CurrentThemeName or "Dark")),
 				})
 				ExpRainbow.Parent = ExpCanvas
 				local ExpShade = Instance.new("Frame")
 				ExpShade.Size = UDim2.fromScale(1, 1)
-				ExpShade.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				ExpShade.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 				ExpShade.BorderSizePixel = 0
 				ExpShade.Parent = ExpCanvas
 				local ExpShadeCorner = Instance.new("UICorner")
@@ -6224,7 +6224,7 @@ function Astral:MakeWindow(config)
 				ExpCursorCorner.CornerRadius = UDim.new(1, 0)
 				ExpCursorCorner.Parent = ExpCursor
 				local ExpCursorStroke = Instance.new("UIStroke")
-				ExpCursorStroke.Color = Color3.fromRGB(0, 0, 0)
+				ExpCursorStroke.Color = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 				ExpCursorStroke.Thickness = 1.5
 				ExpCursorStroke.Parent = ExpCursor
 				local ExpBar = Instance.new("Frame")
@@ -6240,9 +6240,9 @@ function Astral:MakeWindow(config)
 				local ExpBarGrad = Instance.new("UIGradient")
 				ExpBarGrad.Rotation = 90
 				ExpBarGrad.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+					ColorSequenceKeypoint.new(0, themeColorFor("255,255,255", CurrentThemeName or "Dark")),
 					ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0, 1, 1)),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+					ColorSequenceKeypoint.new(1, themeColorFor("0,0,0", CurrentThemeName or "Dark")),
 				})
 				ExpBarGrad.Parent = ExpBar
 				local ExpBarCursor = Instance.new("Frame")
@@ -6268,7 +6268,7 @@ function Astral:MakeWindow(config)
 				ExpApply.BackgroundColor3 = AccentColor
 				ExpApply.Font = Enum.Font.GothamBold
 				ExpApply.Text = "Apply"
-				ExpApply.TextColor3 = Color3.fromRGB(255, 255, 255)
+				ExpApply.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				ExpApply.TextSize = 12
 				ExpApply.AutoButtonColor = false
 				ExpApply.Parent = Exp
@@ -6282,9 +6282,9 @@ function Astral:MakeWindow(config)
 					local bp = (es < 1) and (es * 0.5) or (1 - ev * 0.5)
 					ExpBarCursor.Position = UDim2.new(0.5, 0, bp, 0)
 					ExpBarGrad.Color = ColorSequence.new({
-						ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+						ColorSequenceKeypoint.new(0, themeColorFor("255,255,255", CurrentThemeName or "Dark")),
 						ColorSequenceKeypoint.new(0.5, Color3.fromHSV(eh, 1, 1)),
-						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+						ColorSequenceKeypoint.new(1, themeColorFor("0,0,0", CurrentThemeName or "Dark")),
 					})
 				end
 				local cDrag, bDrag = false, false
@@ -6338,12 +6338,12 @@ function Astral:MakeWindow(config)
 				local bTitle = item.Title
 				local bIcon = parseIcon(item.Icon)
 				local bCallback = item.Callback or function() end
-				local bColor = parseButtonColor(item.Color) or Color3.fromRGB(40, 40, 48)
+				local bColor = parseButtonColor(item.Color) or themeColorFor("40,40,48", CurrentThemeName or "Dark")
 				local baseName = (bTitle and bTitle ~= "") and bTitle or ("Color " .. i)
 
 				local Btn = Instance.new("TextButton")
 				Btn.Name = baseName .. "_MultiColorBtn"
-				Btn.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+				Btn.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 				Btn.BorderSizePixel = 0
 				Btn.Text = ""
 				Btn.AutoButtonColor = false
@@ -6356,7 +6356,7 @@ function Astral:MakeWindow(config)
 				BtnCorner.Parent = Btn
 
 				local BtnStroke = Instance.new("UIStroke")
-				BtnStroke.Color = Color3.fromRGB(50, 50, 55)
+				BtnStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 				BtnStroke.Thickness = 1
 				BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				BtnStroke.Parent = Btn
@@ -6380,7 +6380,7 @@ function Astral:MakeWindow(config)
 					PreviewCorner.Parent = TilePreview
 
 					local PreviewStroke = Instance.new("UIStroke")
-					PreviewStroke.Color = Color3.fromRGB(50, 50, 55)
+					PreviewStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 					PreviewStroke.Thickness = 1.2
 					PreviewStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 					PreviewStroke.Parent = TilePreview
@@ -6399,7 +6399,7 @@ function Astral:MakeWindow(config)
 					end
 					BIcon.Size = UDim2.new(0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22), 0, iconOnlyMode and (IsMobile and 28 or 34) or (IsMobile and 18 or 22))
 					Astral.ApplyIcon(BIcon, bIcon)
-					BIcon.ImageColor3 = iconOnlyMode and bColor or Color3.fromRGB(255, 255, 255)
+					BIcon.ImageColor3 = iconOnlyMode and bColor or themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					BIcon.ScaleType = Enum.ScaleType.Fit
 					BIcon.Parent = Btn
 				end
@@ -6412,7 +6412,7 @@ function Astral:MakeWindow(config)
 					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - (IsMobile and 68 or 76), 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
 					tr(BLabel, bTitle)
-					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					BLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					BLabel.TextSize = IsMobile and 10 or 12
 					BLabel.TextXAlignment = Enum.TextXAlignment.Left
 					BLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6461,10 +6461,10 @@ function Astral:MakeWindow(config)
 				end
 				Btn.MouseEnter:Connect(function()
 					if pickerOpen or selectorOpen then return end
-					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(36, 36, 40)}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")}):Play()
 				end)
 				Btn.MouseLeave:Connect(function()
-					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(26, 26, 30)}):Play()
+					TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")}):Play()
 				end)
 			end
 
@@ -6531,7 +6531,7 @@ function Astral:MakeWindow(config)
 
 			local Card = Instance.new("Frame")
 			Card.Name = title .. "_PlayerBrowser"
-			Card.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Card.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			Card.BorderSizePixel = 0
 			Card.Size = UDim2.new(1, 0, 0, cardH)
 			Card.ClipsDescendants = true
@@ -6541,7 +6541,7 @@ function Astral:MakeWindow(config)
 			CardCorner.Parent = Card
 
 			local CardStroke = Instance.new("UIStroke")
-			CardStroke.Color = Color3.fromRGB(50, 50, 55)
+			CardStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			CardStroke.Thickness = 1
 			CardStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			CardStroke.Parent = Card
@@ -6559,7 +6559,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Size = UDim2.new(1, -56, 0, 24)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(TitleLabel, 15)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6570,7 +6570,7 @@ function Astral:MakeWindow(config)
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 36)
 			CountPill.Size = UDim2.new(0, 64, 0, 28)
-			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+			CountPill.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 			CountPill.BorderSizePixel = 0
 			CountPill.Parent = Header
 
@@ -6583,7 +6583,7 @@ function Astral:MakeWindow(config)
 			CountPillLabel.Size = UDim2.new(1, 0, 1, 0)
 			CountPillLabel.Font = Enum.Font.GothamBold
 			CountPillLabel.Text = "0 / 0"
-			CountPillLabel.TextColor3 = Color3.fromRGB(200, 200, 208)
+			CountPillLabel.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
 			mTS(CountPillLabel, 11)
 			CountPillLabel.Parent = CountPill
 
@@ -6592,25 +6592,25 @@ function Astral:MakeWindow(config)
 			SearchBox.AnchorPoint = Vector2.new(0, 0)
 			SearchBox.Position = UDim2.new(0, 12, 0, 36)
 			SearchBox.Size = UDim2.new(1, -96, 0, 28)
-			SearchBox.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+			SearchBox.BackgroundColor3 = themeColorFor("18,18,22", CurrentThemeName or "Dark")
 			SearchBox.BorderSizePixel = 0
 			SearchBox.Font = Enum.Font.Gotham
 			SearchBox.Text = ""
-			SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+			SearchBox.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(SearchBox, 12)
 			SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 			SearchBox.ClearTextOnFocus = false
 			SearchBox.Visible = showSearch
 			SearchBox.Parent = Header
 			tr(SearchBox, "Search players...", "PlaceholderText")
-			SearchBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
+			SearchBox.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
 
 			local SearchBoxCorner = Instance.new("UICorner")
 			SearchBoxCorner.CornerRadius = UDim.new(0, 4)
 			SearchBoxCorner.Parent = SearchBox
 
 			local SearchBoxStroke = Instance.new("UIStroke")
-			SearchBoxStroke.Color = Color3.fromRGB(55, 55, 65)
+			SearchBoxStroke.Color = themeColorFor("55,55,65", CurrentThemeName or "Dark")
 			SearchBoxStroke.Thickness = 1
 			SearchBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SearchBoxStroke.Parent = SearchBox
@@ -6620,10 +6620,10 @@ function Astral:MakeWindow(config)
 			SearchPad.PaddingRight = UDim.new(0, 8)
 			SearchPad.Parent = SearchBox
 			SearchBox.Focused:Connect(function()
-				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(95, 95, 110) }):Play()
+				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = themeColorFor("95,95,110", CurrentThemeName or "Dark") }):Play()
 			end)
 			SearchBox.FocusLost:Connect(function()
-				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(55, 55, 65) }):Play()
+				TweenService:Create(SearchBoxStroke, TweenInfo.new(0.15), { Color = themeColorFor("55,55,65", CurrentThemeName or "Dark") }):Play()
 			end)
 
 			local ViewBtn = Instance.new("TextButton")
@@ -6631,7 +6631,7 @@ function Astral:MakeWindow(config)
 			ViewBtn.AnchorPoint = Vector2.new(1, 0)
 			ViewBtn.Position = UDim2.new(1, -10, 0, 5)
 			ViewBtn.Size = UDim2.new(0, 26, 0, 26)
-			ViewBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+			ViewBtn.BackgroundColor3 = themeColorFor("0,120,215", CurrentThemeName or "Dark")
 			ViewBtn.BorderSizePixel = 0
 			ViewBtn.Text = ""
 			ViewBtn.AutoButtonColor = false
@@ -6651,7 +6651,7 @@ function Astral:MakeWindow(config)
 					local sq = Instance.new("Frame")
 					sq.Size = UDim2.new(0, 6, 0, 6)
 					sq.Position = UDim2.new(0, 6 + c * 8, 0, 6 + r * 8)
-					sq.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+					sq.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					sq.BorderSizePixel = 0
 					sq.Parent = gridGlyph
 					local sqc = Instance.new("UICorner")
@@ -6669,7 +6669,7 @@ function Astral:MakeWindow(config)
 				local bar = Instance.new("Frame")
 				bar.Size = UDim2.new(0, 16, 0, 3)
 				bar.Position = UDim2.new(0.5, -8, 0, 5 + r * 7)
-				bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				bar.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 				bar.BorderSizePixel = 0
 				bar.Parent = rowGlyph
 				local barc = Instance.new("UICorner")
@@ -6686,7 +6686,7 @@ function Astral:MakeWindow(config)
 			GridScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 			GridScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			GridScroll.ScrollBarThickness = 3
-			GridScroll.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+			GridScroll.ScrollBarImageColor3 = themeColorFor("80,80,90", CurrentThemeName or "Dark")
 			GridScroll.ScrollBarImageTransparency = 0.4
 			GridScroll.Parent = Card
 
@@ -6713,7 +6713,7 @@ function Astral:MakeWindow(config)
 			RowScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			RowScroll.ScrollingDirection = Enum.ScrollingDirection.Y
 			RowScroll.ScrollBarThickness = 3
-			RowScroll.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+			RowScroll.ScrollBarImageColor3 = themeColorFor("80,80,90", CurrentThemeName or "Dark")
 			RowScroll.ScrollBarImageTransparency = 0.4
 			RowScroll.Visible = false
 			RowScroll.Parent = Card
@@ -6734,7 +6734,7 @@ function Astral:MakeWindow(config)
 			local selectedPlayer = LocalPlayer
 			local multiSelect = (config.Multi == true)
 			local selectedSet = {}
-			local SEL_BG = Color3.fromRGB(38, 38, 50)
+			local SEL_BG = themeColorFor("38,38,50", CurrentThemeName or "Dark")
 			local cardRefs = {}
 			local populate
 			local PlayerBrowserController
@@ -6748,7 +6748,7 @@ function Astral:MakeWindow(config)
 				for uid, refs in pairs(cardRefs) do
 					local on = isOn(uid)
 					pcall(function()
-						refs.Stroke.Color = on and AccentColor or Color3.fromRGB(50, 50, 55)
+						refs.Stroke.Color = on and AccentColor or themeColorFor("50,50,55", CurrentThemeName or "Dark")
 						refs.Stroke.Transparency = on and 0 or 0.45
 						refs.Stroke.Thickness = on and 2 or 1.5
 						refs.Frame.BackgroundColor3 = on and SEL_BG or refs.Base
@@ -6820,7 +6820,7 @@ function Astral:MakeWindow(config)
 
 			local cell = Instance.new("TextButton")
 				cell.Name = "Player_" .. uname
-				cell.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
+				cell.BackgroundColor3 = themeColorFor("30,30,37", CurrentThemeName or "Dark")
 				cell.BorderSizePixel = 0
 				cell.Text = ""
 				cell.AutoButtonColor = false
@@ -6832,7 +6832,7 @@ function Astral:MakeWindow(config)
 			cellCorner.Parent = cell
 
 			local cellStroke = Instance.new("UIStroke")
-			cellStroke.Color = Color3.fromRGB(50, 50, 55)
+			cellStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			cellStroke.Transparency = 0.45
 			cellStroke.Thickness = 1.5
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -6845,7 +6845,7 @@ function Astral:MakeWindow(config)
 			av.AnchorPoint = Vector2.new(0.5, 0)
 			av.Position = UDim2.new(0.5, 0, 0, 14)
 			av.Size = UDim2.new(0, 48, 0, 48)
-			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+			av.BackgroundColor3 = themeColorFor("20,20,24", CurrentThemeName or "Dark")
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
 			av.Parent = cell
@@ -6861,7 +6861,7 @@ function Astral:MakeWindow(config)
 			dn.Size = UDim2.new(1, -12, 0, 18)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
-			dn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			dn.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(dn, 13)
 			dn.TextTruncate = Enum.TextTruncate.AtEnd
 			dn.Parent = cell
@@ -6872,20 +6872,20 @@ function Astral:MakeWindow(config)
 			un.Size = UDim2.new(1, -12, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
-			un.TextColor3 = Color3.fromRGB(150, 150, 160)
+			un.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
 			mTS(un, 11)
 			un.TextTruncate = Enum.TextTruncate.AtEnd
 			un.Parent = cell
 
 			cell.MouseEnter:Connect(function()
-				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
 				local on = isOn(plr.UserId)
-				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or Color3.fromRGB(30, 30, 37) }):Play()
+				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or themeColorFor("30,30,37", CurrentThemeName or "Dark") }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = Color3.fromRGB(30, 30, 37)}
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark")}
 				cell.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
@@ -6906,7 +6906,7 @@ function Astral:MakeWindow(config)
 
 			local chip = Instance.new("TextButton")
 				chip.Name = "Player_" .. uname
-			chip.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
+			chip.BackgroundColor3 = themeColorFor("30,30,37", CurrentThemeName or "Dark")
 			chip.BorderSizePixel = 0
 			chip.Size = UDim2.new(1, 0, 0, 62)
 				chip.Text = ""
@@ -6919,7 +6919,7 @@ function Astral:MakeWindow(config)
 			chipCorner.Parent = chip
 
 			local chipStroke = Instance.new("UIStroke")
-			chipStroke.Color = Color3.fromRGB(50, 50, 55)
+			chipStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			chipStroke.Transparency = 0.45
 			chipStroke.Thickness = 1.5
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -6929,7 +6929,7 @@ function Astral:MakeWindow(config)
 			av.AnchorPoint = Vector2.new(0, 0.5)
 			av.Position = UDim2.new(0, 7, 0.5, 0)
 			av.Size = UDim2.new(0, 32, 0, 32)
-			av.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+			av.BackgroundColor3 = themeColorFor("20,20,24", CurrentThemeName or "Dark")
 			av.BorderSizePixel = 0
 			av.ScaleType = Enum.ScaleType.Crop
 			av.Parent = chip
@@ -6945,7 +6945,7 @@ function Astral:MakeWindow(config)
 			dn.Size = UDim2.new(1, -150, 0, 19)
 			dn.Font = Enum.Font.GothamBold
 			dn.Text = dname
-			dn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			dn.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			mTS(dn, 13)
 			dn.TextXAlignment = Enum.TextXAlignment.Left
 			dn.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6957,7 +6957,7 @@ function Astral:MakeWindow(config)
 			un.Size = UDim2.new(1, -150, 0, 15)
 			un.Font = Enum.Font.Gotham
 			un.Text = "@" .. uname
-			un.TextColor3 = Color3.fromRGB(150, 150, 160)
+			un.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
 			mTS(un, 11)
 			un.TextXAlignment = Enum.TextXAlignment.Left
 			un.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6971,7 +6971,7 @@ function Astral:MakeWindow(config)
 			meta.Size = UDim2.new(1, -150, 0, 12)
 			meta.Font = Enum.Font.Gotham
 			meta.Text = uidTxt
-			meta.TextColor3 = Color3.fromRGB(120, 120, 130)
+			meta.TextColor3 = themeColorFor("120,120,130", CurrentThemeName or "Dark")
 			mTS(meta, 9)
 			meta.TextXAlignment = Enum.TextXAlignment.Left
 			meta.TextTruncate = Enum.TextTruncate.AtEnd
@@ -6979,14 +6979,14 @@ function Astral:MakeWindow(config)
 
 			-- (per-player options button removed; use row click + Callback)
 			chip.MouseEnter:Connect(function()
-				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(37, 37, 45) }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
 				local on = isOn(plr.UserId)
-				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or Color3.fromRGB(30, 30, 37) }):Play()
+				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or themeColorFor("30,30,37", CurrentThemeName or "Dark") }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = Color3.fromRGB(30, 30, 37)}
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark")}
 				chip.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
@@ -7166,7 +7166,7 @@ function Astral:MakeWindow(config)
 
 			local StBtn = Instance.new("TextButton")
 			StBtn.Name = stName .. "_SubTabBtn"
-			StBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 40)
+			StBtn.BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark")
 			StBtn.BackgroundTransparency = 0
 			StBtn.BorderSizePixel = 0
 			StBtn.Size = UDim2.new(0, 0, 0, SubTabBtnHeight)
@@ -7183,7 +7183,7 @@ function Astral:MakeWindow(config)
 			StBtnCorner.Parent = StBtn
 
 			local StBtnStroke = Instance.new("UIStroke")
-			StBtnStroke.Color = Color3.fromRGB(70, 70, 80)
+			StBtnStroke.Color = themeColorFor("70,70,80", CurrentThemeName or "Dark")
 			StBtnStroke.Thickness = 1
 			StBtnStroke.Transparency = 0.5
 			StBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -7208,7 +7208,7 @@ function Astral:MakeWindow(config)
 				StBtnIco.LayoutOrder = 1
 				StBtnIco.ZIndex = 8
 				Astral.ApplyIcon(StBtnIco, stIcon)
-				StBtnIco.ImageColor3 = Color3.fromRGB(160, 160, 168)
+				StBtnIco.ImageColor3 = themeColorFor("160,160,168", CurrentThemeName or "Dark")
 				StBtnIco.Parent = StBtn
 			end
 
@@ -7219,7 +7219,7 @@ function Astral:MakeWindow(config)
 			StBtnText.AutomaticSize = Enum.AutomaticSize.X
 			StBtnText.Font = Enum.Font.GothamBold
 			tr(StBtnText, stName)
-			StBtnText.TextColor3 = Color3.fromRGB(160, 160, 168)
+			StBtnText.TextColor3 = themeColorFor("160,160,168", CurrentThemeName or "Dark")
 			mTS(StBtnText, 15)
 			StBtnText.TextXAlignment = Enum.TextXAlignment.Center
 			StBtnText.TextYAlignment = Enum.TextYAlignment.Center
@@ -7234,13 +7234,13 @@ function Astral:MakeWindow(config)
 			StBtn.MouseEnter:Connect(function()
 				if currentSubTab ~= stIdx then
 					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0.55}):Play()
-					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(220, 220, 228)}):Play()
+					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = themeColorFor("220,220,228", CurrentThemeName or "Dark")}):Play()
 				end
 			end)
 			StBtn.MouseLeave:Connect(function()
 				if currentSubTab ~= stIdx then
 					TweenService:Create(StBtn, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
-					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = Color3.fromRGB(160, 160, 168)}):Play()
+					TweenService:Create(StBtnText, TweenInfo.new(0.15), {TextColor3 = themeColorFor("160,160,168", CurrentThemeName or "Dark")}):Play()
 				end
 			end)
 			StBtn.MouseButton1Click:Connect(function()
@@ -7278,7 +7278,7 @@ function Astral:MakeWindow(config)
 	-- Create Minimize Button at the bottom of the Sidebar
 	local MinimizeButton = Instance.new("TextButton")
 	MinimizeButton.Name = "MinimizeButton"
-	MinimizeButton.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+	MinimizeButton.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 	MinimizeButton.BorderSizePixel = 0
 	MinimizeButton.Position = IsMobile and UDim2.new(0.5, -18, 1, -42) or UDim2.new(0, 6, 1, -42)
 	MinimizeButton.Size = IsMobile and UDim2.new(0, 36, 0, 36) or UDim2.new(1, -12, 0, 36)
@@ -7293,7 +7293,7 @@ function Astral:MakeWindow(config)
 
 	local MinimizeStroke = Instance.new("UIStroke")
 	MinimizeStroke.Thickness = 1
-	MinimizeStroke.Color = Color3.fromRGB(42, 42, 46)
+	MinimizeStroke.Color = themeColorFor("42,42,46", CurrentThemeName or "Dark")
 	MinimizeStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	MinimizeStroke.ZIndex = 10
 	MinimizeStroke.Parent = MinimizeButton
@@ -7306,7 +7306,7 @@ function Astral:MakeWindow(config)
 	MinimizeIcon.Size = IsMobile and UDim2.new(0, 28, 0, 28) or UDim2.new(0, 24, 0, 24)
 	MinimizeIcon.Rotation = IsMobile and 180 or 0
 	MinimizeIcon.Image = "rbxassetid://96304569438872"
-	MinimizeIcon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	MinimizeIcon.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	MinimizeIcon.ScaleType = Enum.ScaleType.Fit
 	MinimizeIcon.ZIndex = 11
 	MinimizeIcon.Parent = MinimizeButton
@@ -7318,7 +7318,7 @@ function Astral:MakeWindow(config)
 	MinimizeText.Size = UDim2.new(1, -42, 1, 0)
 	MinimizeText.Font = Enum.Font.GothamSemibold
 	MinimizeText.Text = "Minimize"
-	MinimizeText.TextColor3 = Color3.fromRGB(180, 180, 185)
+	MinimizeText.TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 	mTS(MinimizeText, 11)
 	MinimizeText.TextXAlignment = Enum.TextXAlignment.Left
 	MinimizeText.TextYAlignment = Enum.TextYAlignment.Center
@@ -7462,10 +7462,10 @@ function Astral:MakeWindow(config)
 	MinimizeButton.MouseEnter:Connect(function()
 		if pickerOpen or selectorOpen then return end
 		TweenService:Create(MinimizeButton, TweenInfo.new(0.15), {
-			BackgroundColor3 = Color3.fromRGB(32, 32, 34)
+			BackgroundColor3 = themeColorFor("32,32,34", CurrentThemeName or "Dark")
 		}):Play()
 		TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
-			Color = Color3.fromRGB(52, 52, 56)
+			Color = themeColorFor("52,52,56", CurrentThemeName or "Dark")
 		}):Play()
 	end)
 
@@ -7474,7 +7474,7 @@ function Astral:MakeWindow(config)
 			BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")
 		}):Play()
 		TweenService:Create(MinimizeStroke, TweenInfo.new(0.15), {
-			Color = Color3.fromRGB(42, 42, 46)
+			Color = themeColorFor("42,42,46", CurrentThemeName or "Dark")
 		}):Play()
 	end)
 
@@ -7499,7 +7499,7 @@ function Astral:MakeWindow(config)
 	end
 	defaultLogoPos = LogoButton.Position
 	
-	LogoButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Dark black base matching image reference
+	LogoButton.BackgroundColor3 = themeColorFor("15,15,15", CurrentThemeName or "Dark") -- Dark black base matching image reference
 	LogoButton.BorderSizePixel = 0
 	LogoButton.Text = ""
 	LogoButton.AutoButtonColor = false
@@ -7513,7 +7513,7 @@ function Astral:MakeWindow(config)
 	LogoCorner.Parent = LogoButton
 
 	local LogoStroke = Instance.new("UIStroke")
-	LogoStroke.Color = Color3.fromRGB(58, 58, 66) -- Neutral ring (no accent)
+	LogoStroke.Color = themeColorFor("58,58,66", CurrentThemeName or "Dark") -- Neutral ring (no accent)
 	LogoStroke.Thickness = 1.5
 	LogoStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	LogoStroke.Parent = LogoButton
@@ -7539,7 +7539,7 @@ function Astral:MakeWindow(config)
 	LogoShadow.Name = "LogoShadow"
 	LogoShadow.Size = LogoButton.Size
 	LogoShadow.Position = LogoButton.Position + UDim2.new(0, 2, 0, 2)
-	LogoShadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	LogoShadow.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
 	LogoShadow.BackgroundTransparency = 0.4
 	LogoShadow.ZIndex = 100
 	LogoShadow.Parent = ScreenGui
@@ -7585,10 +7585,10 @@ function Astral:MakeWindow(config)
 		if type(urlOrId) ~= "string" or urlOrId == "" then return end
 		if urlOrId:match("^https?://") then
 			BackgroundImage.Image = bgFunc(urlOrId)
-			BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255)
+			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		else
 			BackgroundImage.Image = urlOrId
-			BackgroundImage.ImageColor3 = Color3.fromRGB(255,255,255)
+			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
@@ -7603,7 +7603,7 @@ function Astral:MakeWindow(config)
 
 	function Window:ResetBackground()
 		BackgroundImage.Image = ""
-		BackgroundImage.ImageColor3 = Color3.fromRGB(58,58,64)
+		BackgroundImage.ImageColor3 = themeColorFor("58,58,64", CurrentThemeName or "Dark")
 	end
 	-- Manual window size override (preview PC vs mobile sizes live)
 	function Window:SetWindowSize(w, h)
@@ -7782,7 +7782,7 @@ function Astral:MakeWindow(config)
 				pcall(function() td.Stroke.Color = color; td.Stroke.Transparency = 0 end)
 				if td.Gradient then td.Gradient.Enabled = false end
 			else
-				pcall(function() td.Stroke.Color = Color3.fromRGB(42, 42, 46) end)
+				pcall(function() td.Stroke.Color = themeColorFor("42,42,46", CurrentThemeName or "Dark") end)
 			end
 		end
 	end
@@ -7873,9 +7873,9 @@ function Astral:MakeWindow(config)
 		-- NOTIFICATION SYSTEM
 		-- ==========================================
 		local notifTypeColors = {
-			good = {bg = Color3.fromRGB(46, 204, 113)},
-			warning = {bg = Color3.fromRGB(255, 196, 40)},
-			bad = {bg = Color3.fromRGB(231, 76, 60)}
+			good = {bg = themeColorFor("46,204,113", CurrentThemeName or "Dark")},
+			warning = {bg = themeColorFor("255,196,40", CurrentThemeName or "Dark")},
+			bad = {bg = themeColorFor("231,76,60", CurrentThemeName or "Dark")}
 		}
 		local notifTypeIcons = {
 			good = Astral.Icons.Checkmark,
@@ -7908,7 +7908,7 @@ function Astral:MakeWindow(config)
 
 			local Frame = Instance.new("Frame")
 			Frame.Size = UDim2.new(0, notifW, 0, notifH)
-			Frame.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
+			Frame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			Frame.BorderSizePixel = 0
 			Frame.ZIndex = 200
 			Frame.ClipsDescendants = true
@@ -7920,7 +7920,7 @@ function Astral:MakeWindow(config)
 
 			local Stroke = Instance.new("UIStroke")
 			Stroke.Thickness = 1.4
-			Stroke.Color = Color3.fromRGB(50, 50, 55)
+			Stroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			Stroke.Transparency = 0.5
 			Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			Stroke.Parent = Frame
@@ -7930,7 +7930,7 @@ function Astral:MakeWindow(config)
 			local IconFrame = Instance.new("Frame")
 			IconFrame.Size = UDim2.fromOffset(IsMobile and 26 or 34, IsMobile and 26 or 34)
 			IconFrame.Position = UDim2.new(0, 10, 0, hasActions and 10 or 12)
-			IconFrame.BackgroundColor3 = mix(Color3.fromRGB(30, 30, 36), tc, 0.28)
+			IconFrame.BackgroundColor3 = mix(themeColorFor("30,30,36", CurrentThemeName or "Dark"), tc, 0.28)
 			IconFrame.BorderSizePixel = 0
 			IconFrame.ZIndex = 200
 			IconFrame.Parent = Frame
@@ -7969,7 +7969,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
-			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			regText(TitleLabel, IsMobile and 10 or 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
@@ -7982,7 +7982,7 @@ function Astral:MakeWindow(config)
 			DescLabel.BackgroundTransparency = 1
 			DescLabel.Font = Enum.Font.Gotham
 			DescLabel.Text = message
-			DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
+			DescLabel.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
 			regText(DescLabel, IsMobile and 9 or 11)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
@@ -7994,7 +7994,7 @@ function Astral:MakeWindow(config)
 			-- countdown seconds (top-right)
 			local CountPill = Instance.new("Frame")
 			CountPill.Name = "CountdownPill"
-			CountPill.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+			CountPill.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 			CountPill.BorderSizePixel = 0
 			CountPill.AnchorPoint = Vector2.new(1, 0)
 			CountPill.Position = UDim2.new(1, -12, 0, 11)
@@ -8007,7 +8007,7 @@ function Astral:MakeWindow(config)
 			CountPillCorner.Parent = CountPill
 
 			local CountPillStroke = Instance.new("UIStroke")
-			CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
+			CountPillStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			CountPillStroke.Transparency = 0.5
 			CountPillStroke.Thickness = 1
 			CountPillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -8020,7 +8020,7 @@ function Astral:MakeWindow(config)
 			CountLabel.Font = Enum.Font.GothamBold
 			CountLabel.Text = tostring(math.ceil(duration)) .. "s"
 			CountLabel.TextSize = IsMobile and 10 or 11
-			CountLabel.TextColor3 = Color3.fromRGB(180, 180, 185)
+			CountLabel.TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 			CountLabel.TextXAlignment = Enum.TextXAlignment.Center
 			CountLabel.ZIndex = 203
 			CountLabel.Parent = CountPill
@@ -8030,7 +8030,7 @@ function Astral:MakeWindow(config)
 			ProgressTrack.Name = "ProgressTrack"
 			ProgressTrack.Size = UDim2.new(1, -24, 0, 3)
 			ProgressTrack.Position = UDim2.new(0, 12, 1, -6)
-			ProgressTrack.BackgroundColor3 = Color3.fromRGB(36, 36, 40)
+			ProgressTrack.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
 			ProgressTrack.BorderSizePixel = 0
 			ProgressTrack.ZIndex = 201
 			ProgressTrack.Parent = Frame
@@ -8042,7 +8042,7 @@ function Astral:MakeWindow(config)
 			local ProgressFill = Instance.new("Frame")
 			ProgressFill.Name = "ProgressFill"
 			ProgressFill.Size = UDim2.new(1, 0, 1, 0)
-			ProgressFill.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+			ProgressFill.BackgroundColor3 = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ProgressFill.BorderSizePixel = 0
 			ProgressFill.ZIndex = 202
 			ProgressFill.Parent = ProgressTrack
@@ -8075,11 +8075,11 @@ function Astral:MakeWindow(config)
 					local isPrimary = (i == 1)
 					local Btn = Instance.new("TextButton")
 					Btn.Size = UDim2.new(0, IsMobile and 44 or 72, 0, IsMobile and 22 or 26)
-					Btn.BackgroundColor3 = isPrimary and aColor or Color3.fromRGB(36, 36, 40)
+					Btn.BackgroundColor3 = isPrimary and aColor or themeColorFor("36,36,40", CurrentThemeName or "Dark")
 					Btn.BorderSizePixel = 0
 					Btn.Font = Enum.Font.GothamBold
 					Btn.Text = action.Text or ""
-					Btn.TextColor3 = isPrimary and Color3.fromRGB(15, 15, 15) or Color3.fromRGB(255, 255, 255)
+					Btn.TextColor3 = isPrimary and themeColorFor("15,15,15", CurrentThemeName or "Dark") or themeColorFor("255,255,255", CurrentThemeName or "Dark")
 					Btn.TextSize = IsMobile and 10 or 11
 					Btn.AutoButtonColor = false
 					Btn.ZIndex = 200
@@ -8092,7 +8092,7 @@ function Astral:MakeWindow(config)
 					if not isPrimary then
 						local BtnStroke = Instance.new("UIStroke")
 						BtnStroke.Thickness = 1
-						BtnStroke.Color = Color3.fromRGB(50, 50, 55)
+						BtnStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 						BtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 						BtnStroke.Parent = Btn
 					end
@@ -8214,16 +8214,16 @@ function Astral:MakeWindow(config)
 		local rows = {}
 
 		local NAMED = {
-			red = Color3.fromRGB(231, 76, 60),
-			green = Color3.fromRGB(46, 204, 113),
-			blue = Color3.fromRGB(0, 153, 235),
-			cyan = Color3.fromRGB(0, 210, 255),
+			red = themeColorFor("231,76,60", CurrentThemeName or "Dark"),
+			green = themeColorFor("46,204,113", CurrentThemeName or "Dark"),
+			blue = themeColorFor("0,153,235", CurrentThemeName or "Dark"),
+			cyan = themeColorFor("0,210,255", CurrentThemeName or "Dark"),
 			purple = Color3.fromRGB(138, 90, 255),
-			pink = Color3.fromRGB(255, 90, 180),
-			orange = Color3.fromRGB(243, 156, 18),
-			gold = Color3.fromRGB(255, 196, 40),
-			white = Color3.fromRGB(240, 240, 245),
-			gray = Color3.fromRGB(160, 160, 168),
+			pink = themeColorFor("255,90,180", CurrentThemeName or "Dark"),
+			orange = themeColorFor("243,156,18", CurrentThemeName or "Dark"),
+			gold = themeColorFor("255,196,40", CurrentThemeName or "Dark"),
+			white = themeColorFor("240,240,245", CurrentThemeName or "Dark"),
+			gray = themeColorFor("160,160,168", CurrentThemeName or "Dark"),
 		}
 		local function parseColor(v)
 			if typeof(v) == "Color3" then return v end
@@ -8236,7 +8236,7 @@ function Astral:MakeWindow(config)
 
 		local Panel = Instance.new("Frame")
 		Panel.Name = "GameStatus"
-		Panel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+		Panel.BackgroundColor3 = themeColorFor("20,20,25", CurrentThemeName or "Dark")
 		Panel.BorderSizePixel = 0
 		Panel.Size = UDim2.new(0, panelW, 0, gsHeaderH)
 		Panel.Position = config.Position or UDim2.new(0, 1254, 0, 64)
@@ -8256,14 +8256,14 @@ function Astral:MakeWindow(config)
 		PanelCorner.Parent = Panel
 
 		local PanelStroke = Instance.new("UIStroke")
-		PanelStroke.Color = Color3.fromRGB(54, 54, 64)
+		PanelStroke.Color = themeColorFor("54,54,64", CurrentThemeName or "Dark")
 		PanelStroke.Thickness = 1.2
 		PanelStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		PanelStroke.Parent = Panel
 
 		local PanelGrad = Instance.new("UIGradient")
 		PanelGrad.Rotation = 90
-		PanelGrad.Color = ColorSequence.new(Color3.fromRGB(30, 30, 38), Color3.fromRGB(16, 16, 20))
+		PanelGrad.Color = ColorSequence.new(themeColorFor("30,30,38", CurrentThemeName or "Dark"), themeColorFor("16,16,20", CurrentThemeName or "Dark"))
 		PanelGrad.Parent = Panel
 
 		local PanelLayout = Instance.new("UIListLayout")
@@ -8275,7 +8275,7 @@ function Astral:MakeWindow(config)
 		-- Header doubles as the drag handle
 		local Header = Instance.new("Frame")
 		Header.Name = "Header"
-		Header.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+		Header.BackgroundColor3 = themeColorFor("28,28,35", CurrentThemeName or "Dark")
 		Header.BackgroundTransparency = 0.35
 		Header.BorderSizePixel = 0
 		Header.Size = UDim2.new(1, 0, 0, IsMobile and 36 or 44)
@@ -8311,7 +8311,7 @@ function Astral:MakeWindow(config)
 		TitleLabel.Font = Enum.Font.GothamBold
 		tr(TitleLabel, title)
 		TitleLabel.TextSize = IsMobile and 13 or 15
-		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 		TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 		TitleLabel.ZIndex = 502
@@ -8321,12 +8321,12 @@ function Astral:MakeWindow(config)
 		local gsMinimized = false
 		local MinBtn = Instance.new("TextButton")
 		MinBtn.Name = "MinimizeBtn"
-		MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 48)
+		MinBtn.BackgroundColor3 = themeColorFor("40,40,48", CurrentThemeName or "Dark")
 		MinBtn.Size = UDim2.new(0, IsMobile and 22 or 26, 0, IsMobile and 22 or 26)
 		MinBtn.AnchorPoint = Vector2.new(1, 0.5)
 		MinBtn.Position = UDim2.new(1, -10, 0.5, 0)
 		MinBtn.Text = "-"
-		MinBtn.TextColor3 = Color3.fromRGB(180, 180, 185)
+		MinBtn.TextColor3 = themeColorFor("180,180,185", CurrentThemeName or "Dark")
 		MinBtn.Font = Enum.Font.GothamBold
 		MinBtn.TextSize = IsMobile and 14 or 16
 		MinBtn.AutoButtonColor = false
@@ -8370,15 +8370,15 @@ function Astral:MakeWindow(config)
 		end)
 
 		MinBtn.MouseEnter:Connect(function()
-			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(55, 55, 65)}):Play()
+			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = themeColorFor("55,55,65", CurrentThemeName or "Dark")}):Play()
 		end)
 		MinBtn.MouseLeave:Connect(function()
-			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 48)}):Play()
+			TweenService:Create(MinBtn, TweenInfo.new(0.1), {BackgroundColor3 = themeColorFor("40,40,48", CurrentThemeName or "Dark")}):Play()
 		end)
 
 		local Sep = Instance.new("Frame")
 		Sep.Name = "Separator"
-		Sep.BackgroundColor3 = Color3.fromRGB(48, 48, 58)
+		Sep.BackgroundColor3 = themeColorFor("48,48,58", CurrentThemeName or "Dark")
 		Sep.BorderSizePixel = 0
 		Sep.AnchorPoint = Vector2.new(0.5, 1)
 		Sep.Position = UDim2.new(0.5, 0, 1, 0)
@@ -8394,7 +8394,7 @@ function Astral:MakeWindow(config)
 		RowsContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
 		RowsContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		RowsContainer.ScrollBarThickness = 3
-		RowsContainer.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 90)
+		RowsContainer.ScrollBarImageColor3 = themeColorFor("80,80,90", CurrentThemeName or "Dark")
 		RowsContainer.ScrollBarImageTransparency = 0.4
 		RowsContainer.LayoutOrder = 2
 		RowsContainer.ZIndex = 501
@@ -8463,7 +8463,7 @@ function Astral:MakeWindow(config)
 			-- Rounded hover highlight behind the text
 			local RowHover = Instance.new("Frame")
 			RowHover.Name = "Hover"
-			RowHover.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+			RowHover.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
 			RowHover.BackgroundTransparency = 1
 			RowHover.BorderSizePixel = 0
 			RowHover.Position = UDim2.new(0, -6, 0, 0)
@@ -8483,7 +8483,7 @@ function Astral:MakeWindow(config)
 			IconLabel.Size = UDim2.new(0, IsMobile and 14 or 17, 0, IsMobile and 14 or 17)
 			IconLabel.Visible = false
 			IconLabel.ScaleType = Enum.ScaleType.Fit
-			IconLabel.ImageColor3 = colorOverride or Color3.fromRGB(205, 205, 214)
+			IconLabel.ImageColor3 = colorOverride or themeColorFor("205,205,214", CurrentThemeName or "Dark")
 			IconLabel.ZIndex = 502
 			IconLabel.Parent = Row
 
@@ -8496,7 +8496,7 @@ function Astral:MakeWindow(config)
 			NameLabel.Font = Enum.Font.Gotham
 			tr(NameLabel, tostring(name))
 			NameLabel.TextSize = IsMobile and 12 or 14
-			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
+			NameLabel.TextColor3 = themeColorFor("165,165,176", CurrentThemeName or "Dark")
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			NameLabel.TextTruncate = Enum.TextTruncate.None
 			NameLabel.TextWrapped = true
@@ -8555,7 +8555,7 @@ function Astral:MakeWindow(config)
 			if opts.Color ~= nil then
 				row.color = parseColor(opts.Color)
 				row.Value.TextColor3 = row.color or AccentColor
-				row.Icon.ImageColor3 = row.color or Color3.fromRGB(205, 205, 214)
+				row.Icon.ImageColor3 = row.color or themeColorFor("205,205,214", CurrentThemeName or "Dark")
 			end
 			if opts.Value ~= nil then
 				row.Value.Text = tostring(opts.Value)
