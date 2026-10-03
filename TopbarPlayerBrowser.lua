@@ -4877,7 +4877,7 @@ function Astral:MakeWindow(config)
 
 			local BarL = Instance.new("Frame")
 			BarL.Name = "BarL"
-			BarL.Size = UDim2.new(0, IsMobile and 44 or 68, 0, IsMobile and 8 or 10)
+			BarL.Size = UDim2.new(0, IsMobile and 52 or 80, 0, IsMobile and 12 or 14)
 			BarL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarL.BorderSizePixel = 0
 			BarL.LayoutOrder = 1
@@ -4920,7 +4920,7 @@ function Astral:MakeWindow(config)
 
 			local BarR = Instance.new("Frame")
 			BarR.Name = "BarR"
-			BarR.Size = UDim2.new(0, IsMobile and 44 or 68, 0, IsMobile and 8 or 10)
+			BarR.Size = UDim2.new(0, IsMobile and 52 or 80, 0, IsMobile and 12 or 14)
 			BarR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarR.BorderSizePixel = 0
 			BarR.LayoutOrder = 4
@@ -4934,6 +4934,19 @@ function Astral:MakeWindow(config)
 				ColorSequenceKeypoint.new(1, Color3.fromRGB(59, 130, 246)),
 			})
 			BarRGrad.Parent = BarR
+			local function paintSectionBars(c)
+				local light = Color3.new(c.R + (1 - c.R) * 0.55, c.G + (1 - c.G) * 0.55, c.B + (1 - c.B) * 0.55)
+				BarLGrad.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, c),
+					ColorSequenceKeypoint.new(1, light),
+				})
+				BarRGrad.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, light),
+					ColorSequenceKeypoint.new(1, c),
+				})
+			end
+			paintSectionBars(AccentColor)
+			onAccentChange(function(c) pcall(function() paintSectionBars(c) end) end)
 
 			registerElement(SectionFrame, h, sectionConfig.Position)
 
