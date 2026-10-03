@@ -4860,7 +4860,7 @@ function Astral:MakeWindow(config)
 			sectionConfig = sectionConfig or {}
 			local title = sectionConfig.Title or sectionConfig.Name or "Section"
 			local icon = parseIcon(sectionConfig.Icon)
-			local h = IsMobile and 30 or 34
+			local h = IsMobile and 36 or 42
 
 			local SectionFrame = Instance.new("Frame")
 			SectionFrame.Name = title .. "_Section"
@@ -4877,7 +4877,7 @@ function Astral:MakeWindow(config)
 
 			local BarL = Instance.new("Frame")
 			BarL.Name = "BarL"
-			BarL.Size = UDim2.new(0, IsMobile and 52 or 80, 0, IsMobile and 12 or 14)
+			BarL.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
 			BarL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarL.BorderSizePixel = 0
 			BarL.LayoutOrder = 1
@@ -4893,15 +4893,32 @@ function Astral:MakeWindow(config)
 			BarLGrad.Parent = BarL
 
 			if icon then
+				local IcoBox = Instance.new("Frame")
+				IcoBox.Name = "IconBox"
+				IcoBox.Size = UDim2.new(0, 26, 0, 26)
+				IcoBox.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+				IcoBox.BorderSizePixel = 0
+				IcoBox.LayoutOrder = 2
+				IcoBox.Parent = SectionFrame
+				local IcoBoxCorner = Instance.new("UICorner")
+				IcoBoxCorner.CornerRadius = UDim.new(1, 0)
+				IcoBoxCorner.Parent = IcoBox
+				local IcoBoxStroke = Instance.new("UIStroke")
+				IcoBoxStroke.Color = AccentColor
+				IcoBoxStroke.Thickness = 1.5
+				IcoBoxStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				IcoBoxStroke.Parent = IcoBox
 				local Ico = Instance.new("ImageLabel")
 				Ico.Name = "Icon"
 				Ico.BackgroundTransparency = 1
-				Ico.Size = UDim2.new(0, 16, 0, 16)
-				Ico.LayoutOrder = 2
+				Ico.AnchorPoint = Vector2.new(0.5, 0.5)
+				Ico.Position = UDim2.new(0.5, 0, 0.5, 0)
+				Ico.Size = UDim2.new(0, 15, 0, 15)
 				Astral.ApplyIcon(Ico, icon)
-				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
+				Ico.ImageColor3 = Color3.fromRGB(255, 255, 255)
 				Ico.ScaleType = Enum.ScaleType.Fit
-				Ico.Parent = SectionFrame
+				Ico.Parent = IcoBox
+				onAccentChange(function(c) pcall(function() IcoBoxStroke.Color = c end) end)
 			end
 
 			local TitleLabel = Instance.new("TextLabel")
@@ -4912,7 +4929,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-			mTS(TitleLabel, IsMobile and 15 or 16)
+			mTS(TitleLabel, IsMobile and 19 or 22)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
 			TitleLabel.LayoutOrder = 3
@@ -4920,7 +4937,7 @@ function Astral:MakeWindow(config)
 
 			local BarR = Instance.new("Frame")
 			BarR.Name = "BarR"
-			BarR.Size = UDim2.new(0, IsMobile and 52 or 80, 0, IsMobile and 12 or 14)
+			BarR.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
 			BarR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarR.BorderSizePixel = 0
 			BarR.LayoutOrder = 4
@@ -4955,7 +4972,7 @@ function Astral:MakeWindow(config)
 			end
 			SectionController.SetText = SectionController.SetTitle
 			function SectionController:SetIcon(iconInput)
-				local ic = SectionFrame:FindFirstChild("Icon")
+				local ic = SectionFrame:FindFirstChild("Icon", true)
 				if ic then Astral.ApplyIcon(ic, parseIcon(iconInput)) end
 			end
 			return SectionController
