@@ -4703,7 +4703,7 @@ function Astral:MakeWindow(config)
 			BarL.LayoutOrder = 1
 			BarL.Parent = SectionFrame
 			local BarLCorner = Instance.new("UICorner")
-			BarLCorner.CornerRadius = UDim.new(1, 0)
+			BarLCorner.CornerRadius = UDim.new(0, 4)
 			BarLCorner.Parent = BarL
 			local BarLGrad = Instance.new("UIGradient")
 			BarLGrad.Color = ColorSequence.new({
@@ -4763,7 +4763,7 @@ function Astral:MakeWindow(config)
 			BarR.LayoutOrder = 4
 			BarR.Parent = SectionFrame
 			local BarRCorner = Instance.new("UICorner")
-			BarRCorner.CornerRadius = UDim.new(1, 0)
+			BarRCorner.CornerRadius = UDim.new(0, 4)
 			BarRCorner.Parent = BarR
 			local BarRGrad = Instance.new("UIGradient")
 			BarRGrad.Color = ColorSequence.new({
