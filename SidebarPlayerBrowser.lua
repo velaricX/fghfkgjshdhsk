@@ -4755,13 +4755,12 @@ function Astral:MakeWindow(config)
 			})
 			BarRGrad.Parent = BarR
 			local function paintSectionBars(c)
-				local light = Color3.new(c.R + (1 - c.R) * 0.55, c.G + (1 - c.G) * 0.55, c.B + (1 - c.B) * 0.55)
 				BarLGrad.Color = ColorSequence.new({
 					ColorSequenceKeypoint.new(0, c),
-					ColorSequenceKeypoint.new(1, light),
+					ColorSequenceKeypoint.new(1, c),
 				})
 				BarRGrad.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, light),
+					ColorSequenceKeypoint.new(0, c),
 					ColorSequenceKeypoint.new(1, c),
 				})
 			end
