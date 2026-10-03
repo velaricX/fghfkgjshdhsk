@@ -4680,125 +4680,64 @@ function Astral:MakeWindow(config)
 			sectionConfig = sectionConfig or {}
 			local title = sectionConfig.Title or sectionConfig.Name or "Section"
 			local icon = parseIcon(sectionConfig.Icon)
-			local h = IsMobile and 34 or 38
+			local h = IsMobile and 40 or 46
 
 			local SectionFrame = Instance.new("Frame")
 			SectionFrame.Name = title .. "_Section"
-			SectionFrame.BackgroundTransparency = 1
+			SectionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
 			SectionFrame.BorderSizePixel = 0
 
-			local RowLayout = Instance.new("UIListLayout")
-			RowLayout.FillDirection = Enum.FillDirection.Horizontal
-			RowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-			RowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			RowLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			RowLayout.Padding = UDim.new(0, 8)
-			RowLayout.Parent = SectionFrame
+			local SectionCorner = Instance.new("UICorner")
+			SectionCorner.CornerRadius = UDim.new(0, 10)
+			SectionCorner.Parent = SectionFrame
 
-			local LineL = Instance.new("Frame")
-			LineL.Name = "LineL"
-			LineL.Size = UDim2.new(1, 0, 0, 2)
-			LineL.BackgroundColor3 = AccentColor
-			LineL.BackgroundTransparency = 0.45
-			LineL.BorderSizePixel = 0
-			LineL.LayoutOrder = 1
-			LineL.Parent = SectionFrame
-			local LineLGrad = Instance.new("UIGradient")
-			LineLGrad.Rotation = 0
-			LineLGrad.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, 1),
-				NumberSequenceKeypoint.new(1, 0.35),
-			})
-			LineLGrad.Parent = LineL
+			local SectionStroke = Instance.new("UIStroke")
+			SectionStroke.Color = Color3.fromRGB(50, 50, 55)
+			SectionStroke.Thickness = 1.2
+			SectionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			SectionStroke.Parent = SectionFrame
 
-			local Pill = Instance.new("Frame")
-			Pill.Name = "Pill"
-			Pill.Size = UDim2.new(0, 0, 0, IsMobile and 30 or 34)
-			Pill.AutomaticSize = Enum.AutomaticSize.X
-			Pill.BackgroundColor3 = Color3.fromRGB(46, 46, 60)
-			Pill.BorderSizePixel = 0
-			Pill.LayoutOrder = 2
-			Pill.Parent = SectionFrame
-			local PillCorner = Instance.new("UICorner")
-			PillCorner.CornerRadius = UDim.new(0, 0)
-			PillCorner.Parent = Pill
-			local PillStroke = Instance.new("UIStroke")
-			PillStroke.Color = Color3.fromRGB(80, 80, 95)
-			PillStroke.Thickness = 1.5
-			PillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			PillStroke.Parent = Pill
-			local PillGrad = Instance.new("UIGradient")
-			PillGrad.Rotation = 0
-			PillGrad.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, AccentColor),
-				ColorSequenceKeypoint.new(1, Color3.fromRGB(46, 46, 60)),
-			})
-			PillGrad.Parent = Pill
-			local PillPad = Instance.new("UIPadding")
-			PillPad.PaddingLeft = UDim.new(0, 12)
-			PillPad.PaddingRight = UDim.new(0, 12)
-			PillPad.Parent = Pill
-			local PillMin = Instance.new("UISizeConstraint")
-			PillMin.MinSize = Vector2.new(IsMobile and 120 or 160, 0)
-			PillMin.Parent = Pill
-			local PillLayout = Instance.new("UIListLayout")
-			PillLayout.FillDirection = Enum.FillDirection.Horizontal
-			PillLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			PillLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			PillLayout.Padding = UDim.new(0, 7)
-			PillLayout.Parent = Pill
-			onAccentChange(function(c) pcall(function()
-				PillGrad.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, c),
-					ColorSequenceKeypoint.new(1, Color3.fromRGB(46, 46, 60)),
-				})
-			end) end)
+			local Bar = Instance.new("Frame")
+			Bar.Name = "Bar"
+			Bar.AnchorPoint = Vector2.new(0, 0.5)
+			Bar.Position = UDim2.new(0, 12, 0.5, 0)
+			Bar.Size = UDim2.new(0, 4, 0, 22)
+			Bar.BackgroundColor3 = AccentColor
+			Bar.BorderSizePixel = 0
+			Bar.Parent = SectionFrame
+			local BarCorner = Instance.new("UICorner")
+			BarCorner.CornerRadius = UDim.new(1, 0)
+			BarCorner.Parent = Bar
+			onAccentChange(function(c) pcall(function() Bar.BackgroundColor3 = c end) end)
 
+			local tx = 24
 			if icon then
 				local Ico = Instance.new("ImageLabel")
 				Ico.Name = "Icon"
 				Ico.BackgroundTransparency = 1
-				Ico.Size = UDim2.new(0, IsMobile and 14 or 16, 0, IsMobile and 14 or 16)
-				Ico.LayoutOrder = 3
+				Ico.AnchorPoint = Vector2.new(0, 0.5)
+				Ico.Position = UDim2.new(0, 24, 0.5, 0)
+				Ico.Size = UDim2.new(0, 18, 0, 18)
 				Astral.ApplyIcon(Ico, icon)
 				Ico.ImageColor3 = Color3.fromRGB(200, 200, 208)
 				Ico.ScaleType = Enum.ScaleType.Fit
-				Ico.Parent = Pill
+				Ico.Parent = SectionFrame
+				tx = 50
 			end
 
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(0, 0, 0, IsMobile and 16 or 18)
-			TitleLabel.AutomaticSize = Enum.AutomaticSize.X
+			TitleLabel.AnchorPoint = Vector2.new(0, 0.5)
+			TitleLabel.Position = UDim2.new(0, tx, 0.5, 0)
+			TitleLabel.Size = UDim2.new(1, -tx - 12, 1, 0)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			mTS(TitleLabel, IsMobile and 16 or 18)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-			TitleLabel.LayoutOrder = 4
-			TitleLabel.Parent = Pill
-
-			local Line = Instance.new("Frame")
-			Line.Name = "Line"
-			Line.Size = UDim2.new(1, 0, 0, 2)
-			Line.BackgroundColor3 = AccentColor
-			Line.BackgroundTransparency = 0.45
-			Line.BorderSizePixel = 0
-			Line.LayoutOrder = 5
-			Line.Parent = SectionFrame
-			local LineRGrad = Instance.new("UIGradient")
-			LineRGrad.Rotation = 0
-			LineRGrad.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, 0.35),
-				NumberSequenceKeypoint.new(1, 1),
-			})
-			LineRGrad.Parent = Line
-			onAccentChange(function(c) pcall(function()
-				LineL.BackgroundColor3 = c
-				Line.BackgroundColor3 = c
-			end) end)
+			TitleLabel.Parent = SectionFrame
 
 			registerElement(SectionFrame, h, sectionConfig.Position)
 
@@ -4808,8 +4747,7 @@ function Astral:MakeWindow(config)
 			end
 			SectionController.SetText = SectionController.SetTitle
 			function SectionController:SetIcon(iconInput)
-				local pill = SectionFrame:FindFirstChild("Pill")
-				local ic = pill and pill:FindFirstChild("Icon")
+				local ic = SectionFrame:FindFirstChild("Icon")
 				if ic then Astral.ApplyIcon(ic, parseIcon(iconInput)) end
 			end
 			return SectionController
