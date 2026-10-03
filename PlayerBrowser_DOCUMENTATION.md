@@ -64,3 +64,23 @@ S:Show()  S:Hide()  S:Toggle()  S:StopCountdown("Full Moon")
 - Draggable by header, `-`/`+` minimize button, live countdown pills.
 
 Full runnable test: `LumuExample_Players.lua` (tester scripts folder).
+
+## Themes
+
+```lua
+Window:SetTheme("Midnight") -- Dark, Midnight, Purple, Crimson, Forest,
+                            -- Ocean, Sunset, Rose, Slate, Coffee
+Window:GetTheme() -- current name
+Window:SetCustomTheme({
+  Background = Color3.fromRGB(10, 10, 14),
+  Card = Color3.fromRGB(20, 22, 34),
+  Text = Color3.fromRGB(255, 255, 255),
+  SubText = Color3.fromRGB(170, 170, 180),
+  Border = Color3.fromRGB(60, 60, 72),
+  Accent = Color3.fromRGB(0, 153, 235),
+})
+```
+
+- Recolors the whole UI live: cards, text, borders, gradients, scrollbars.
+- Your accent color is never touched by themes.
+- Every element built afterwards also follows the active theme.
