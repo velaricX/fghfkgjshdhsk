@@ -1007,7 +1007,17 @@ function Astral:MakeWindow(config)
 	TitleLabel.AutomaticSize = Enum.AutomaticSize.X
 	TitleLabel.Font = Enum.Font.GothamBold
 	TitleLabel.RichText = true
-	TitleLabel.Text = titleText .. ' <font color="#1E6EE6">' .. subTitleText .. '</font>'
+	local function accentHex()
+		local c = AccentColor
+		return string.format("%02X%02X%02X", math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5))
+	end
+	local function paintTitle()
+		pcall(function()
+			TitleLabel.Text = titleText .. ' <font color="#' .. accentHex() .. '">' .. subTitleText .. '</font>'
+		end)
+	end
+	paintTitle()
+	onAccentChange(function() paintTitle() end)
 	TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 	TitleLabel.TextSize = IsMobile and 14 or 18
 	TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -1062,7 +1072,33 @@ function Astral:MakeWindow(config)
 	DecoArrows.AutomaticSize = Enum.AutomaticSize.X
 	DecoArrows.Font = Enum.Font.GothamBold
 	DecoArrows.RichText = true
-	DecoArrows.Text = '<font color="#FFFFFF">&gt;&gt;</font> <font color="#1E6EE6">&gt;&gt;</font> <font color="#FFFFFF">&gt;&gt;</font> <font color="#1E6EE6">&gt;&gt;</font>'
+	DecoArrows.Text = ""
+	local arrowPhase = false
+	local function paintArrows()
+		pcall(function()
+			local a = accentHex()
+			local w = "FFFFFF"
+			pcall(function()
+				local tw = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				w = string.format("%02X%02X%02X", math.floor(tw.R * 255 + 0.5), math.floor(tw.G * 255 + 0.5), math.floor(tw.B * 255 + 0.5))
+			end)
+			if arrowPhase then
+				DecoArrows.Text = '<font color="#' .. w .. '">&gt;&gt;</font> <font color="#' .. a .. '">&gt;&gt;</font> <font color="#' .. w .. '">&gt;&gt;</font> <font color="#' .. a .. '">&gt;&gt;</font>'
+			else
+				DecoArrows.Text = '<font color="#' .. a .. '">&gt;&gt;</font> <font color="#' .. w .. '">&gt;&gt;</font> <font color="#' .. a .. '">&gt;&gt;</font> <font color="#' .. w .. '">&gt;&gt;</font>'
+			end
+		end)
+	end
+	paintArrows()
+	onAccentChange(function() paintArrows() end)
+	task.spawn(function()
+		while DecoArrows.Parent ~= nil do
+			task.wait(0.6)
+			if DecoArrows.Parent == nil then return end
+			arrowPhase = not arrowPhase
+			paintArrows()
+		end
+	end)
 	DecoArrows.TextSize = 13
 	DecoArrows.TextXAlignment = Enum.TextXAlignment.Left
 	DecoArrows.TextYAlignment = Enum.TextYAlignment.Center
