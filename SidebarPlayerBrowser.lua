@@ -4680,7 +4680,7 @@ function Astral:MakeWindow(config)
 			sectionConfig = sectionConfig or {}
 			local title = sectionConfig.Title or sectionConfig.Name or "Section"
 			local icon = parseIcon(sectionConfig.Icon)
-			local h = IsMobile and 40 or 46
+			local h = IsMobile and 30 or 34
 
 			local SectionFrame = Instance.new("Frame")
 			SectionFrame.Name = title .. "_Section"
@@ -4697,7 +4697,7 @@ function Astral:MakeWindow(config)
 
 			local BarL = Instance.new("Frame")
 			BarL.Name = "BarL"
-			BarL.Size = UDim2.new(0, IsMobile and 36 or 48, 0, IsMobile and 8 or 10)
+			BarL.Size = UDim2.new(0, IsMobile and 44 or 68, 0, IsMobile and 8 or 10)
 			BarL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarL.BorderSizePixel = 0
 			BarL.LayoutOrder = 1
@@ -4740,7 +4740,7 @@ function Astral:MakeWindow(config)
 
 			local BarR = Instance.new("Frame")
 			BarR.Name = "BarR"
-			BarR.Size = UDim2.new(0, IsMobile and 36 or 48, 0, IsMobile and 8 or 10)
+			BarR.Size = UDim2.new(0, IsMobile and 44 or 68, 0, IsMobile and 8 or 10)
 			BarR.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			BarR.BorderSizePixel = 0
 			BarR.LayoutOrder = 4
