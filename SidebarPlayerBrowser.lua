@@ -4697,6 +4697,17 @@ function Astral:MakeWindow(config)
 			SectionStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SectionStroke.Parent = SectionFrame
 
+			-- Square open bottom: the header reads as attached to the
+			-- buttons below it instead of a separate floating card.
+			local BottomPatch = Instance.new("Frame")
+			BottomPatch.Name = "BottomPatch"
+			BottomPatch.BackgroundColor3 = Color3.fromRGB(30, 30, 37)
+			BottomPatch.BorderSizePixel = 0
+			BottomPatch.AnchorPoint = Vector2.new(0, 1)
+			BottomPatch.Position = UDim2.new(0, 1, 1, 0)
+			BottomPatch.Size = UDim2.new(1, -2, 0, 12)
+			BottomPatch.Parent = SectionFrame
+
 			local tx = 14
 			if icon then
 				local Ico = Instance.new("ImageLabel")
