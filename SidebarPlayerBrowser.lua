@@ -4711,7 +4711,7 @@ function Astral:MakeWindow(config)
 			local STATUS_DEFS = {
 				good    = { Icon = "Checkmark", Color = themeColorFor("46,204,113", CurrentThemeName or "Dark"),  Text = "SPAWNED" },
 				bad     = { Icon = "Close",     Color = themeColorFor("231,76,60", CurrentThemeName or "Dark"),   Text = "NOT SPAWNED" },
-				waiting = { Icon = "timer",     Color = themeColorFor("255,196,40", CurrentThemeName or "Dark"),  Text = "WAITING" },
+				waiting = { Icon = "timer",     Color = themeColorFor("255,212,0", CurrentThemeName or "Dark"),  Text = "WAITING" },
 			}
 			local function tint(c, f)
 				return Color3.fromRGB(math.floor(c.R * 255 * f), math.floor(c.G * 255 * f), math.floor(c.B * 255 * f))
@@ -5769,7 +5769,7 @@ function Astral:MakeWindow(config)
 					purple = Color3.fromRGB(138, 90, 255),
 					pink = themeColorFor("255,90,180", CurrentThemeName or "Dark"),
 					orange = themeColorFor("243,156,18", CurrentThemeName or "Dark"),
-					gold = themeColorFor("255,196,40", CurrentThemeName or "Dark"),
+					gold = themeColorFor("255,212,0", CurrentThemeName or "Dark"),
 					white = themeColorFor("240,240,245", CurrentThemeName or "Dark"),
 					dark = Color3.fromRGB(40, 40, 46),
 				}
@@ -8017,7 +8017,7 @@ function Astral:MakeWindow(config)
 		-- ==========================================
 		local notifTypeColors = {
 			good = {bg = themeColorFor("46,204,113", CurrentThemeName or "Dark")},
-			warning = {bg = themeColorFor("255,196,40", CurrentThemeName or "Dark")},
+			warning = {bg = themeColorFor("255,212,0", CurrentThemeName or "Dark")},
 			bad = {bg = themeColorFor("231,76,60", CurrentThemeName or "Dark")}
 		}
 		local notifTypeIcons = {
@@ -8364,7 +8364,7 @@ function Astral:MakeWindow(config)
 			purple = Color3.fromRGB(138, 90, 255),
 			pink = themeColorFor("255,90,180", CurrentThemeName or "Dark"),
 			orange = themeColorFor("243,156,18", CurrentThemeName or "Dark"),
-			gold = themeColorFor("255,196,40", CurrentThemeName or "Dark"),
+			gold = themeColorFor("255,212,0", CurrentThemeName or "Dark"),
 			white = themeColorFor("240,240,245", CurrentThemeName or "Dark"),
 			gray = themeColorFor("160,160,168", CurrentThemeName or "Dark"),
 		}
