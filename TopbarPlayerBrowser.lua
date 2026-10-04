@@ -5457,7 +5457,7 @@ function Astral:MakeWindow(config)
 
 			local Banner = Instance.new("ImageLabel")
 			Banner.Name = "Banner"
-			Banner.Size = UDim2.new(1, 0, 0, 60)
+			Banner.Size = UDim2.new(1, 0, 0, 110)
 			Banner.Position = UDim2.new(0, 0, 0, 0)
 			Banner.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 			Banner.Image = data.BackgroundBannerId or "rbxassetid://127861212431489"
@@ -5469,18 +5469,12 @@ function Astral:MakeWindow(config)
 			BannerCorner.CornerRadius = UDim.new(0, 16)
 			BannerCorner.Parent = Banner
 
-			local BannerGradient = Instance.new("UIGradient")
-			BannerGradient.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, Color3.fromHex("#3da5ff")),
-				ColorSequenceKeypoint.new(1, Color3.fromHex("#0084ff"))
-			})
-			BannerGradient.Rotation = 90
-			BannerGradient.Parent = Banner
+			-- (banner art shows true colors, no tint)
 
 			local ServerIcon = Instance.new("ImageLabel")
 			ServerIcon.Name = "ServerIcon"
-			ServerIcon.Size = UDim2.new(0, 56, 0, 56)
-			ServerIcon.Position = UDim2.new(0, 14, 0, 28)
+			ServerIcon.Size = UDim2.new(0, 64, 0, 64)
+			ServerIcon.Position = UDim2.new(0, 14, 0, 78)
 			ServerIcon.Image = data.ServerIconId or "rbxassetid://106987676739927"
 			ServerIcon.BackgroundColor3 = Color3.fromHex("#1e1f22")
 			ServerIcon.BorderSizePixel = 0
@@ -5488,7 +5482,7 @@ function Astral:MakeWindow(config)
 			ServerIcon.Parent = MainFrame
 
 			local IconCorner = Instance.new("UICorner")
-			IconCorner.CornerRadius = UDim.new(0, 14)
+			IconCorner.CornerRadius = UDim.new(1, 0)
 			IconCorner.Parent = ServerIcon
 
 			local IconStroke = Instance.new("UIStroke")
@@ -5498,8 +5492,8 @@ function Astral:MakeWindow(config)
 
 			local InfoHolder = Instance.new("Frame")
 			InfoHolder.Name = "InfoHolder"
-			InfoHolder.Size = UDim2.new(1, -28, 0, 95)
-			InfoHolder.Position = UDim2.new(0, 14, 0, 92)
+			InfoHolder.Size = UDim2.new(1, -100, 0, 76)
+			InfoHolder.Position = UDim2.new(0, 86, 0, 112)
 			InfoHolder.BackgroundTransparency = 1
 			InfoHolder.Parent = MainFrame
 
@@ -5527,7 +5521,7 @@ function Astral:MakeWindow(config)
 			ServerName.AutomaticSize = Enum.AutomaticSize.X
 			ServerName.Text = data.ServerName or "LumuHub"
 			ServerName.Font = Enum.Font.GothamBold
-			mTS(ServerName, 16)
+			mTS(ServerName, 17)
 			ServerName.TextColor3 = Color3.fromHex("#ffffff")
 			ServerName.TextXAlignment = Enum.TextXAlignment.Left
 			ServerName.BackgroundTransparency = 1
@@ -5543,10 +5537,10 @@ function Astral:MakeWindow(config)
 			BadgeIcon.Parent = NameFrame
 
 			local MetricsFrame = Instance.new("Frame")
-			MetricsFrame.Size = UDim2.new(1, 0, 0, 16)
+			MetricsFrame.Size = UDim2.new(0.5, 0, 0, 16)
+			MetricsFrame.Position = UDim2.new(0, 14, 1, -54)
 			MetricsFrame.BackgroundTransparency = 1
-			MetricsFrame.LayoutOrder = 2
-			MetricsFrame.Parent = InfoHolder
+			MetricsFrame.Parent = MainFrame
 
 			local MetricsLayout = Instance.new("UIListLayout")
 			MetricsLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -5633,21 +5627,9 @@ function Astral:MakeWindow(config)
 				end)
 			end)
 
-			local EstLabel = Instance.new("TextLabel")
-			EstLabel.Name = "EstLabel"
-			EstLabel.Size = UDim2.new(1, 0, 0, 14)
-			EstLabel.Text = data.EstablishedDate or "Est. Jun 2025"
-			EstLabel.Font = Enum.Font.GothamMedium
-			mTS(EstLabel, 12)
-			EstLabel.TextColor3 = Color3.fromHex("#949ba4")
-			EstLabel.TextXAlignment = Enum.TextXAlignment.Left
-			EstLabel.BackgroundTransparency = 1
-			EstLabel.LayoutOrder = 3
-			EstLabel.Parent = InfoHolder
-
 			local DescLabel = Instance.new("TextLabel")
 			DescLabel.Name = "DescLabel"
-			DescLabel.Size = UDim2.new(1, 0, 0, 18)
+			DescLabel.Size = UDim2.new(1, 0, 0, 32)
 			DescLabel.Text = data.Description or "Official LumuHub Community"
 			DescLabel.Font = Enum.Font.GothamMedium
 			regText(DescLabel, 12)
@@ -5656,50 +5638,18 @@ function Astral:MakeWindow(config)
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
 			DescLabel.BackgroundTransparency = 1
-			DescLabel.LayoutOrder = 4
+			DescLabel.LayoutOrder = 2
 			DescLabel.Parent = InfoHolder
-
-			local GameActivityFrame = Instance.new("Frame")
-			GameActivityFrame.Size = UDim2.new(1, -28, 0, 26)
-			GameActivityFrame.Position = UDim2.new(0, 14, 1, -70)
-			GameActivityFrame.BackgroundTransparency = 1
-			GameActivityFrame.Parent = MainFrame
-
-			local GameIcon = Instance.new("ImageLabel")
-			GameIcon.Size = UDim2.new(0, 22, 0, 22)
-			GameIcon.Position = UDim2.new(0, 0, 0.5, -11)
-			GameIcon.Image = "rbxassetid://104079816442680"
-			GameIcon.BackgroundTransparency = 1
-			GameIcon.Parent = GameActivityFrame
-
-			local FlameBadge = Instance.new("ImageLabel")
-			FlameBadge.Size = UDim2.new(0, 10, 0, 10)
-			FlameBadge.Position = UDim2.new(1, -5, 0, -3)
-			FlameBadge.Image = "rbxassetid://10841141110"
-			FlameBadge.ImageColor3 = Color3.fromHex("#ff7324")
-			FlameBadge.BackgroundTransparency = 1
-			FlameBadge.Parent = GameIcon
-
-			local GameLabel = Instance.new("TextLabel")
-			GameLabel.Size = UDim2.new(1, -28, 1, 0)
-			GameLabel.Position = UDim2.new(0, 28, 0, 0)
-			GameLabel.Text = data.GameLabel or "ROBLOX"
-			GameLabel.Font = Enum.Font.GothamBold
-			mTS(GameLabel, 12)
-			GameLabel.TextColor3 = Color3.fromHex("#ffffff")
-			GameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			GameLabel.BackgroundTransparency = 1
-			GameLabel.Parent = GameActivityFrame
 
 			local ActionButton = Instance.new("TextButton")
 			ActionButton.Name = "JoinButton"
-			ActionButton.Size = UDim2.new(1, -28, 0, 34)
-			ActionButton.Position = UDim2.new(0, 14, 1, -40)
-			ActionButton.BackgroundColor3 = Color3.fromHex("#248046")
+			ActionButton.Size = UDim2.new(0, 110, 0, 36)
+			ActionButton.Position = UDim2.new(1, -124, 1, -50)
+			ActionButton.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
 			ActionButton.BorderSizePixel = 0
-			ActionButton.Text = "Join Server"
+			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
-			mTS(ActionButton, 13)
+			mTS(ActionButton, 14)
 			ActionButton.TextColor3 = Color3.fromHex("#ffffff")
 			ActionButton.AutoButtonColor = false
 			ActionButton.Parent = MainFrame
@@ -5708,7 +5658,7 @@ function Astral:MakeWindow(config)
 			ButtonCorner.CornerRadius = UDim.new(0, 8)
 			ButtonCorner.Parent = ActionButton
 
-			local baseColor = Color3.fromHex("#248046")
+			local baseColor = Color3.fromRGB(46, 204, 113)
 			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
@@ -5756,7 +5706,7 @@ function Astral:MakeWindow(config)
 				ActionButton.Text = "Opened!"
 				ActionButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 				task.wait(2)
-				ActionButton.Text = "Join Server"
+				ActionButton.Text = "Join"
 				ActionButton.BackgroundColor3 = baseColor
 			end)
 
