@@ -18,6 +18,7 @@ local pb = Tab:AddPlayerBrowser({
       local ls = plr:FindFirstChild("leaderstats")
       local lv = ls and (ls:FindFirstChild("Level") or ls:FindFirstChild("Lvl"))
       if lv then return "LV " .. tostring(lv.Value) end
+      return nil
     end,
 })
 pb:SetMode("Row") -- switch Grid <-> Row live
