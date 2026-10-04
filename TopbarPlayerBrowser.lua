@@ -3308,6 +3308,11 @@ function Astral:MakeWindow(config)
 			frame:SetAttribute("SubTabIdx", currentBuildSubTab)
 			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced, SubTabIdx = currentBuildSubTab})
 			table.insert(tabData.Elements, elements[#elements])
+			Window._TransparencyTargets = Window._TransparencyTargets or {}
+			table.insert(Window._TransparencyTargets, {Frame = frame, Base = frame.BackgroundTransparency or 0})
+			if (Window._TransparencyCurrent or 0) > 0 then
+				pcall(function() frame.BackgroundTransparency = math.clamp((frame.BackgroundTransparency or 0) + Window._TransparencyCurrent, 0, 0.9) end)
+			end
 			-- if a non-dark theme is active, theme just this new element (cheap subtree pass)
 			if CurrentThemeName and CurrentThemeName ~= "Dark" then
 				pcall(function() applyThemeToGui(frame, AccentColor, "Dark", CurrentThemeName) end)
@@ -7847,6 +7852,9 @@ function Astral:MakeWindow(config)
 			BackgroundImage.Image = urlOrId
 			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
+		if BgDim.BackgroundTransparency >= 1 then
+			BgDim.BackgroundTransparency = 0.25
+		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
 	function Window:LoadBackgroundFromUrl(url)
@@ -7859,12 +7867,20 @@ function Astral:MakeWindow(config)
 	end
 	function Window:SetTransparency(t)
 		t = math.clamp(tonumber(t) or 0, 0, 0.75)
+		Window._TransparencyCurrent = t
 		pcall(function() MainFrame.BackgroundTransparency = t end)
 		pcall(function()
 			Sidebar.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 			SidebarFillerTop.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 			SidebarFillerRight.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 		end)
+		for _, rec in ipairs(Window._TransparencyTargets or {}) do
+			pcall(function()
+				if rec.Frame and rec.Frame.Parent then
+					rec.Frame.BackgroundTransparency = math.clamp(rec.Base + t, 0, 0.9)
+				end
+			end)
+		end
 	end
 
 	function Window:ResetBackground()

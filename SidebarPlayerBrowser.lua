@@ -770,6 +770,8 @@ function Astral:MakeWindow(config)
 	-- Accent engine FIRST: panels and elements below hook into it during build
 	local AccentColor = Color3.fromRGB(0, 153, 235)
 	local accentAppliers = {}
+	local transparencyTargets = {}
+	local currentTransparency = 0
 	local function onAccentChange(fn)
 		table.insert(accentAppliers, fn)
 		pcall(fn, AccentColor)
@@ -3123,6 +3125,10 @@ function Astral:MakeWindow(config)
 			frame:SetAttribute("SubTabIdx", currentBuildSubTab)
 			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced, SubTabIdx = currentBuildSubTab})
 			table.insert(tabData.Elements, elements[#elements])
+			table.insert(transparencyTargets, {Frame = frame, Base = frame.BackgroundTransparency or 0})
+			if currentTransparency > 0 then
+				pcall(function() frame.BackgroundTransparency = math.clamp((frame.BackgroundTransparency or 0) + currentTransparency, 0, 0.9) end)
+			end
 			-- if a non-dark theme is active, theme just this new element (cheap subtree pass)
 			if CurrentThemeName and CurrentThemeName ~= "Dark" then
 				pcall(function() applyThemeToGui(frame, AccentColor, "Dark", CurrentThemeName) end)
@@ -7872,6 +7878,9 @@ function Astral:MakeWindow(config)
 			BackgroundImage.Image = urlOrId
 			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
+		if BgDim.BackgroundTransparency >= 1 then
+			BgDim.BackgroundTransparency = 0.25
+		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
 	function Window:LoadBackgroundFromUrl(url)
@@ -7884,12 +7893,20 @@ function Astral:MakeWindow(config)
 	end
 	function Window:SetTransparency(t)
 		t = math.clamp(tonumber(t) or 0, 0, 0.75)
+		currentTransparency = t
 		pcall(function() MainFrame.BackgroundTransparency = t end)
 		pcall(function()
 			Sidebar.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 			SidebarFillerTop.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 			SidebarFillerRight.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
 		end)
+		for _, rec in ipairs(transparencyTargets) do
+			pcall(function()
+				if rec.Frame and rec.Frame.Parent then
+					rec.Frame.BackgroundTransparency = math.clamp(rec.Base + t, 0, 0.9)
+				end
+			end)
+		end
 	end
 
 	function Window:ResetBackground()
