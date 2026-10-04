@@ -7847,7 +7847,6 @@ function Astral:MakeWindow(config)
 			BackgroundImage.Image = urlOrId
 			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
-		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
 	function Window:LoadBackgroundFromUrl(url)
