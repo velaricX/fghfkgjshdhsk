@@ -13,6 +13,12 @@ local pb = Tab:AddPlayerBrowser({
     Search = true,          -- search box on/off
     Multi = false,          -- true = tick several players, false = pick 1
     Callback = function(plr) print(plr.DisplayName, "@" .. plr.Name) end,
+    -- Optional per-player tag (level, role, team...). Return nil to hide it.
+    Extra = function(plr)
+      local ls = plr:FindFirstChild("leaderstats")
+      local lv = ls and (ls:FindFirstChild("Level") or ls:FindFirstChild("Lvl"))
+      if lv then return "LV " .. tostring(lv.Value) end
+    end,
 })
 pb:SetMode("Row") -- switch Grid <-> Row live
 pb:Refresh()      -- rebuild list (players joined/left)

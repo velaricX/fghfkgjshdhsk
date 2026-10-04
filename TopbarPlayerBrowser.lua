@@ -6965,8 +6965,8 @@ function Astral:MakeWindow(config)
 					local th = CurrentThemeName or "Dark"
 					pcall(function()
 						refs.Stroke.Color = on and AccentColor or themeColorFor("50,50,55", th)
-						refs.Stroke.Transparency = on and 0 or 0.45
-						refs.Stroke.Thickness = on and 2 or 1.5
+						refs.Stroke.Transparency = on and 0 or 0.3
+						refs.Stroke.Thickness = on and 3 or 2
 						refs.Frame.BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th)
 					end)
 				end
@@ -7049,8 +7049,8 @@ function Astral:MakeWindow(config)
 
 			local cellStroke = Instance.new("UIStroke")
 			cellStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
-			cellStroke.Transparency = 0.45
-			cellStroke.Thickness = 1.5
+			cellStroke.Transparency = 0.3
+			cellStroke.Thickness = 2
 				cellStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				cellStroke.Parent = cell
 
@@ -7066,6 +7066,28 @@ function Astral:MakeWindow(config)
 			mTS(rank, 10)
 			rank.TextXAlignment = Enum.TextXAlignment.Left
 			rank.Parent = cell
+
+			local extraTxt = nil
+			pcall(function()
+				if config.Extra then extraTxt = config.Extra(plr) end
+			end)
+			if extraTxt ~= nil and tostring(extraTxt) ~= "" then
+				local tag = Instance.new("TextLabel")
+				tag.AnchorPoint = Vector2.new(1, 0)
+				tag.Position = UDim2.new(1, -6, 0, 5)
+				tag.Size = UDim2.new(0, 0, 0, 16)
+				tag.AutomaticSize = Enum.AutomaticSize.X
+				tag.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
+				tag.BorderSizePixel = 0
+				tag.Font = Enum.Font.GothamBold
+				tag.Text = "  " .. tostring(extraTxt) .. "  "
+				tag.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
+				mTS(tag, 10)
+				tag.Parent = cell
+				local tagc = Instance.new("UICorner")
+				tagc.CornerRadius = UDim.new(1, 0)
+				tagc.Parent = tag
+			end
 
 			local av = Instance.new("ImageLabel")
 			av.Name = "Avatar"
@@ -7112,7 +7134,7 @@ function Astral:MakeWindow(config)
 				local on = isOn(plr.UserId)
 				local th = CurrentThemeName or "Dark"
 				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th) }):Play()
-				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.45 }):Play()
+				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.3 }):Play()
 			end)
 
 			local cellScale = Instance.new("UIScale")
@@ -7160,8 +7182,8 @@ function Astral:MakeWindow(config)
 
 			local chipStroke = Instance.new("UIStroke")
 			chipStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
-			chipStroke.Transparency = 0.45
-			chipStroke.Thickness = 1.5
+			chipStroke.Transparency = 0.3
+			chipStroke.Thickness = 2
 				chipStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 				chipStroke.Parent = chip
 
@@ -7229,6 +7251,28 @@ function Astral:MakeWindow(config)
 			mTS(rank, 10)
 			rank.TextXAlignment = Enum.TextXAlignment.Right
 			rank.Parent = chip
+
+			local extraTxt = nil
+			pcall(function()
+				if config.Extra then extraTxt = config.Extra(plr) end
+			end)
+			if extraTxt ~= nil and tostring(extraTxt) ~= "" then
+				local tag = Instance.new("TextLabel")
+				tag.AnchorPoint = Vector2.new(1, 0.5)
+				tag.Position = UDim2.new(1, -50, 0.5, 0)
+				tag.Size = UDim2.new(0, 0, 0, 18)
+				tag.AutomaticSize = Enum.AutomaticSize.X
+				tag.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
+				tag.BorderSizePixel = 0
+				tag.Font = Enum.Font.GothamBold
+				tag.Text = "  " .. tostring(extraTxt) .. "  "
+				tag.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
+				mTS(tag, 10)
+				tag.Parent = chip
+				local tagc = Instance.new("UICorner")
+				tagc.CornerRadius = UDim.new(1, 0)
+				tagc.Parent = tag
+			end
 			chip.MouseEnter:Connect(function()
 				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
 				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
@@ -7237,7 +7281,7 @@ function Astral:MakeWindow(config)
 				local on = isOn(plr.UserId)
 				local th = CurrentThemeName or "Dark"
 				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th) }):Play()
-				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.45 }):Play()
+				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.3 }):Play()
 			end)
 
 			local chipScale = Instance.new("UIScale")
