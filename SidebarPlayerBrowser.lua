@@ -5287,7 +5287,7 @@ function Astral:MakeWindow(config)
 
 			local Banner = Instance.new("ImageLabel")
 			Banner.Name = "Banner"
-			Banner.Size = UDim2.new(1, 0, 0, 110)
+			Banner.Size = UDim2.new(1, 0, 0, 84)
 			Banner.Position = UDim2.new(0, 0, 0, 0)
 			Banner.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 			Banner.Image = data.BackgroundBannerId or "rbxassetid://127861212431489"
@@ -5303,8 +5303,8 @@ function Astral:MakeWindow(config)
 
 			local ServerIcon = Instance.new("ImageLabel")
 			ServerIcon.Name = "ServerIcon"
-			ServerIcon.Size = UDim2.new(0, 64, 0, 64)
-			ServerIcon.Position = UDim2.new(0, 14, 0, 78)
+			ServerIcon.Size = UDim2.new(0, 52, 0, 52)
+			ServerIcon.Position = UDim2.new(0, 14, 0, 58)
 			ServerIcon.Image = data.ServerIconId or "rbxassetid://106987676739927"
 			ServerIcon.BackgroundColor3 = Color3.fromHex("#1e1f22")
 			ServerIcon.BorderSizePixel = 0
@@ -5322,8 +5322,8 @@ function Astral:MakeWindow(config)
 
 			local InfoHolder = Instance.new("Frame")
 			InfoHolder.Name = "InfoHolder"
-			InfoHolder.Size = UDim2.new(1, -100, 0, 76)
-			InfoHolder.Position = UDim2.new(0, 86, 0, 112)
+			InfoHolder.Size = UDim2.new(1, -100, 0, 60)
+			InfoHolder.Position = UDim2.new(0, 86, 0, 92)
 			InfoHolder.BackgroundTransparency = 1
 			InfoHolder.Parent = MainFrame
 
@@ -5548,7 +5548,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
 			end)
 
-			registerElement(MainFrame, 260, config.Position)
+			registerElement(MainFrame, 215, config.Position)
 
 		end
 		-- =========================================================================
