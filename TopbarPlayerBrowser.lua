@@ -516,7 +516,7 @@ local THEME_SWAP = {
 	["80,80,90"] = { "55,70,105", "85,60,130", "115,58,60", "52,108,56", "46,106,118", "122,82,44", "128,58,96", "99,114,141", "107,78,52" },
 	["95,95,110"] = { "118,130,163", "150,140,175", "165,145,145", "145,165,145", "140,165,180", "170,155,140", "170,150,165", "150,160,185", "165,150,130" },
 }
-local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2, Crimson = 3, Forest = 4, Ocean = 5, Sunset = 6, Rose = 7, Slate = 8, Coffee = 9, Light = 10, Custom = -1 }
+local THEME_INDEX = { Dark = 0, Midnight = 1, Purple = 2, Crimson = 3, Forest = 4, Ocean = 5, Sunset = 6, Rose = 7, Slate = 8, Coffee = 9, Custom = -1 }
 local THEME_ACCENT = {
 	Dark = Color3.fromRGB(0, 153, 235),
 	Midnight = Color3.fromRGB(88, 101, 242),
@@ -528,7 +528,6 @@ local THEME_ACCENT = {
 	Rose = Color3.fromRGB(255, 90, 180),
 	Slate = Color3.fromRGB(148, 170, 200),
 	Coffee = Color3.fromRGB(210, 170, 90),
-	Light = Color3.fromRGB(0, 153, 235),
 }
 local CustomThemeValues = nil -- darkKey -> "r,g,b" string, built by SetCustomTheme
 local CurrentThemeName = "Dark" -- global fallback for chrome built before Window exists
@@ -591,7 +590,7 @@ end
 	end
 	for srcKey in pairs(THEME_SWAP) do
 		mapVariant(srcKey, 0)
-		for idx = 1, 10 do mapVariant(srcKey, idx) end
+		for idx = 1, 9 do mapVariant(srcKey, idx) end
 		mapVariant(srcKey, -1)
 	end
 	if CustomThemeValues then
@@ -2756,7 +2755,7 @@ function Astral:MakeWindow(config)
 		GearBtn.Name = "SettingsGear"
 		GearBtn.AnchorPoint = Vector2.new(1, 0.5)
 		GearBtn.Position = UDim2.new(1, -10, 0.5, 0)
-		GearBtn.Size = UDim2.new(0, 28, 0, 28)
+		GearBtn.Size = UDim2.new(0, 34, 0, 34)
 		GearBtn.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
 		GearBtn.BorderSizePixel = 0
 		GearBtn.Text = ""
@@ -2776,7 +2775,7 @@ function Astral:MakeWindow(config)
 		GearIcon.BackgroundTransparency = 1
 		GearIcon.AnchorPoint = Vector2.new(0.5, 0.5)
 		GearIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-		GearIcon.Size = UDim2.new(0, 16, 0, 16)
+		GearIcon.Size = UDim2.new(0, 20, 0, 20)
 		Astral.ApplyIcon(GearIcon, parseIcon("Badge Gear"))
 		GearIcon.ImageColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
 		GearIcon.ScaleType = Enum.ScaleType.Fit
@@ -2802,7 +2801,7 @@ function Astral:MakeWindow(config)
 					pcall(function() Window:RefreshAll() end)
 				end })
 				local themeSub = STab:AddSubTab({ Name = "Themes", Icon = "Chromatic Key1" })
-				themeSub:AddSelector({ Title = "Theme", Description = "Recolor the whole UI live.", Options = { "Dark", "Midnight", "Purple", "Crimson", "Forest", "Ocean", "Sunset", "Rose", "Slate", "Coffee", "Light" }, Icon = "Chromatic Key1", Callback = function(v)
+				themeSub:AddSelector({ Title = "Theme", Description = "Recolor the whole UI live.", Options = { "Dark", "Midnight", "Purple", "Crimson", "Forest", "Ocean", "Sunset", "Rose", "Slate", "Coffee" }, Icon = "Chromatic Key1", Callback = function(v)
 					pcall(function() Window:SetTheme(v) end)
 				end })
 				themeSub:AddColorpicker({ Title = "Accent", Description = "Your highlight color.", Default = AccentColor, Icon = "Chromatic Key1", Callback = function(c)
@@ -7848,8 +7847,6 @@ function Astral:MakeWindow(config)
 			BackgroundImage.Image = urlOrId
 			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
-		if BgDim.BackgroundTransparency >= 1 then
-			BgDim.BackgroundTransparency = 0.35
 		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
