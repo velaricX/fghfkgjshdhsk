@@ -6667,11 +6667,12 @@ function Astral:MakeWindow(config)
 			ViewBtn.AnchorPoint = Vector2.new(1, 0)
 			ViewBtn.Position = UDim2.new(1, -10, 0, 5)
 			ViewBtn.Size = UDim2.new(0, 26, 0, 26)
-			ViewBtn.BackgroundColor3 = themeColorFor("0,120,215", CurrentThemeName or "Dark")
+			ViewBtn.BackgroundColor3 = AccentColor
 			ViewBtn.BorderSizePixel = 0
 			ViewBtn.Text = ""
 			ViewBtn.AutoButtonColor = false
 			ViewBtn.Parent = Header
+			onAccentChange(function(c) pcall(function() ViewBtn.BackgroundColor3 = c end) end)
 
 			local ViewBtnCorner = Instance.new("UICorner")
 			ViewBtnCorner.CornerRadius = UDim.new(0, 6)
@@ -6783,11 +6784,12 @@ function Astral:MakeWindow(config)
 			local function paintSelected()
 				for uid, refs in pairs(cardRefs) do
 					local on = isOn(uid)
+					local th = CurrentThemeName or "Dark"
 					pcall(function()
-						refs.Stroke.Color = on and AccentColor or themeColorFor("50,50,55", CurrentThemeName or "Dark")
+						refs.Stroke.Color = on and AccentColor or themeColorFor("50,50,55", th)
 						refs.Stroke.Transparency = on and 0 or 0.45
 						refs.Stroke.Thickness = on and 2 or 1.5
-						refs.Frame.BackgroundColor3 = on and SEL_BG or refs.Base
+						refs.Frame.BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th)
 					end)
 				end
 			end
@@ -6876,6 +6878,17 @@ function Astral:MakeWindow(config)
 
 			-- (per-player options button removed; use row click + Callback)
 
+			local rank = Instance.new("TextLabel")
+			rank.BackgroundTransparency = 1
+			rank.Position = UDim2.new(0, 8, 0, 5)
+			rank.Size = UDim2.new(0, 34, 0, 14)
+			rank.Font = Enum.Font.GothamBold
+			rank.Text = "#" .. tostring(idx)
+			rank.TextColor3 = themeColorFor("120,120,130", CurrentThemeName or "Dark")
+			mTS(rank, 10)
+			rank.TextXAlignment = Enum.TextXAlignment.Left
+			rank.Parent = cell
+
 			local av = Instance.new("ImageLabel")
 			av.Name = "Avatar"
 			av.AnchorPoint = Vector2.new(0.5, 0)
@@ -6915,13 +6928,19 @@ function Astral:MakeWindow(config)
 
 			cell.MouseEnter:Connect(function()
 				TweenService:Create(cell, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
+				TweenService:Create(cellStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
 			end)
 			cell.MouseLeave:Connect(function()
 				local on = isOn(plr.UserId)
-				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or themeColorFor("30,30,37", CurrentThemeName or "Dark") }):Play()
+				local th = CurrentThemeName or "Dark"
+				TweenService:Create(cell, TweenInfo.new(0.2), { BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th) }):Play()
+				TweenService:Create(cellStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.45 }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark")}
+			local cellScale = Instance.new("UIScale")
+			cellScale.Scale = 1
+			cellScale.Parent = cell
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = cellScale}
 				cell.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
@@ -6930,6 +6949,13 @@ function Astral:MakeWindow(config)
 					end
 					paintSelected()
 					task.spawn(callback, plr)
+					local sc = cardRefs[plr.UserId] and cardRefs[plr.UserId].Scale
+					if sc then
+						TweenService:Create(sc, TweenInfo.new(0.09), { Scale = 0.94 }):Play()
+						task.delay(0.09, function()
+							pcall(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1 }):Play() end)
+						end)
+					end
 				end)
 			end
 
@@ -7014,15 +7040,32 @@ function Astral:MakeWindow(config)
 			meta.Parent = chip
 
 			-- (per-player options button removed; use row click + Callback)
+			local rank = Instance.new("TextLabel")
+			rank.BackgroundTransparency = 1
+			rank.AnchorPoint = Vector2.new(1, 0.5)
+			rank.Position = UDim2.new(1, -10, 0.5, 0)
+			rank.Size = UDim2.new(0, 34, 0, 14)
+			rank.Font = Enum.Font.GothamBold
+			rank.Text = "#" .. tostring(idx or 0)
+			rank.TextColor3 = themeColorFor("120,120,130", CurrentThemeName or "Dark")
+			mTS(rank, 10)
+			rank.TextXAlignment = Enum.TextXAlignment.Right
+			rank.Parent = chip
 			chip.MouseEnter:Connect(function()
 				TweenService:Create(chip, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
+				TweenService:Create(chipStroke, TweenInfo.new(0.15), { Transparency = 0.15 }):Play()
 			end)
 			chip.MouseLeave:Connect(function()
 				local on = isOn(plr.UserId)
-				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and SEL_BG or themeColorFor("30,30,37", CurrentThemeName or "Dark") }):Play()
+				local th = CurrentThemeName or "Dark"
+				TweenService:Create(chip, TweenInfo.new(0.2), { BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th) }):Play()
+				TweenService:Create(chipStroke, TweenInfo.new(0.2), { Transparency = on and 0 or 0.45 }):Play()
 			end)
 
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark")}
+			local chipScale = Instance.new("UIScale")
+			chipScale.Scale = 1
+			chipScale.Parent = chip
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = chipScale}
 				chip.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
@@ -7031,8 +7074,27 @@ function Astral:MakeWindow(config)
 					end
 					paintSelected()
 					task.spawn(callback, plr)
+					local sc = cardRefs[plr.UserId] and cardRefs[plr.UserId].Scale
+					if sc then
+						TweenService:Create(sc, TweenInfo.new(0.09), { Scale = 0.96 }):Play()
+						task.delay(0.09, function()
+							pcall(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1 }):Play() end)
+						end)
+					end
 				end)
 			end
+
+			local EmptyLabel = Instance.new("TextLabel")
+			EmptyLabel.Name = "EmptyState"
+			EmptyLabel.BackgroundTransparency = 1
+			EmptyLabel.Position = UDim2.new(0, 12, 0, 90)
+			EmptyLabel.Size = UDim2.new(1, -24, 0, 30)
+			EmptyLabel.Font = Enum.Font.Gotham
+			tr(EmptyLabel, "No players found")
+			EmptyLabel.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
+			mTS(EmptyLabel, 12)
+			EmptyLabel.Visible = false
+			EmptyLabel.Parent = Card
 
 			populate = function()
 				if not Card.Parent then return end
@@ -7068,6 +7130,7 @@ function Astral:MakeWindow(config)
 				GridScroll.Visible = (mode == "Grid")
 				RowScroll.Visible = (mode == "Row")
 				paintSelected()
+				pcall(function() EmptyLabel.Visible = (shown == 0) end)
 			end
 
 			SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
