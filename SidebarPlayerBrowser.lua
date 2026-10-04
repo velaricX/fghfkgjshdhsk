@@ -944,7 +944,7 @@ function Astral:MakeWindow(config)
 	BgDim.Size = UDim2.fromScale(1, 1)
 	BgDim.Position = UDim2.fromScale(0, 0)
 	BgDim.BackgroundColor3 = themeColorFor("0,0,0", CurrentThemeName or "Dark")
-	BgDim.BackgroundTransparency = tonumber(config.BackgroundDim) or 0.35
+	BgDim.BackgroundTransparency = tonumber(config.BackgroundDim) or ((config.BackgroundImage and config.BackgroundImage ~= "") and 0.35 or 1)
 	BgDim.BorderSizePixel = 0
 	BgDim.ZIndex = 1
 	BgDim.Parent = MainFrame
@@ -6553,7 +6553,7 @@ function Astral:MakeWindow(config)
 		function TabObject:AddPlayerBrowser(config)
 			config = config or {}
 			local title = config.Title or "Players Section"
-			local mode = (config.Mode == "Row") and "Row" or "Grid"
+			local mode = (config.Mode == "Grid") and "Grid" or "Row"
 			local showSearch = config.Search
 			if showSearch == nil then showSearch = true end
 			local callback = config.Callback or function() end
@@ -6683,6 +6683,7 @@ function Astral:MakeWindow(config)
 			gridGlyph.BackgroundTransparency = 1
 			gridGlyph.Size = UDim2.new(1, 0, 1, 0)
 			gridGlyph.Parent = ViewBtn
+			gridGlyph.Visible = (mode == "Grid")
 			for r = 0, 1 do
 				for c = 0, 1 do
 					local sq = Instance.new("Frame")
@@ -6700,7 +6701,7 @@ function Astral:MakeWindow(config)
 			rowGlyph.Name = "RowGlyph"
 			rowGlyph.BackgroundTransparency = 1
 			rowGlyph.Size = UDim2.new(1, 0, 1, 0)
-			rowGlyph.Visible = false
+			rowGlyph.Visible = (mode == "Row")
 			rowGlyph.Parent = ViewBtn
 			for r = 0, 2 do
 				local bar = Instance.new("Frame")
@@ -6790,6 +6791,10 @@ function Astral:MakeWindow(config)
 						refs.Stroke.Transparency = on and 0 or 0.3
 						refs.Stroke.Thickness = on and 3 or 2
 						refs.Frame.BackgroundColor3 = on and themeColorFor("38,38,50", th) or themeColorFor("30,30,37", th)
+						if refs.Halo then
+							refs.Halo.BackgroundColor3 = AccentColor
+							refs.Halo.BackgroundTransparency = on and 0.55 or 0.92
+						end
 					end)
 				end
 			end
@@ -6924,6 +6929,24 @@ function Astral:MakeWindow(config)
 			local avCorner = Instance.new("UICorner")
 			avCorner.CornerRadius = UDim.new(1, 0)
 			avCorner.Parent = av
+			local avRing = Instance.new("UIStroke")
+			avRing.Color = themeColorFor("70,70,80", CurrentThemeName or "Dark")
+			avRing.Thickness = 1.5
+			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			avRing.Parent = av
+			local halo = Instance.new("Frame")
+			halo.Name = "Halo"
+			halo.AnchorPoint = Vector2.new(0.5, 0)
+			halo.Position = UDim2.new(0.5, 0, 0, 9)
+			halo.Size = UDim2.new(0, 58, 0, 58)
+			halo.BackgroundColor3 = AccentColor
+			halo.BackgroundTransparency = 0.92
+			halo.BorderSizePixel = 0
+			halo.ZIndex = -1
+			halo.Parent = cell
+			local haloCorner = Instance.new("UICorner")
+			haloCorner.CornerRadius = UDim.new(1, 0)
+			haloCorner.Parent = halo
 			makeAvatarThumb(av, plr)
 
 			local dn = Instance.new("TextLabel")
@@ -6962,12 +6985,12 @@ function Astral:MakeWindow(config)
 			local cellScale = Instance.new("UIScale")
 			cellScale.Scale = 1
 			cellScale.Parent = cell
-			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = cellScale}
+			cardRefs[plr.UserId] = {Frame = cell, Stroke = cellStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = cellScale, Halo = halo}
 				cell.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
 					else
-						selectedPlayer = plr
+						if selectedPlayer == plr then selectedPlayer = nil else selectedPlayer = plr end
 					end
 					paintSelected()
 					task.spawn(callback, plr)
@@ -7021,6 +7044,24 @@ function Astral:MakeWindow(config)
 			local avCorner = Instance.new("UICorner")
 			avCorner.CornerRadius = UDim.new(1, 0)
 			avCorner.Parent = av
+			local avRing = Instance.new("UIStroke")
+			avRing.Color = themeColorFor("70,70,80", CurrentThemeName or "Dark")
+			avRing.Thickness = 1.5
+			avRing.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			avRing.Parent = av
+			local halo = Instance.new("Frame")
+			halo.Name = "Halo"
+			halo.AnchorPoint = Vector2.new(0, 0.5)
+			halo.Position = UDim2.new(0, 3, 0.5, 0)
+			halo.Size = UDim2.new(0, 40, 0, 40)
+			halo.BackgroundColor3 = AccentColor
+			halo.BackgroundTransparency = 0.92
+			halo.BorderSizePixel = 0
+			halo.ZIndex = -1
+			halo.Parent = chip
+			local haloCorner = Instance.new("UICorner")
+			haloCorner.CornerRadius = UDim.new(1, 0)
+			haloCorner.Parent = halo
 			makeAvatarThumb(av, plr)
 
 			local dn = Instance.new("TextLabel")
@@ -7109,12 +7150,12 @@ function Astral:MakeWindow(config)
 			local chipScale = Instance.new("UIScale")
 			chipScale.Scale = 1
 			chipScale.Parent = chip
-			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = chipScale}
+			cardRefs[plr.UserId] = {Frame = chip, Stroke = chipStroke, Base = themeColorFor("30,30,37", CurrentThemeName or "Dark"), Scale = chipScale, Halo = halo}
 				chip.MouseButton1Click:Connect(function()
 					if multiSelect then
 						if selectedSet[plr.UserId] then selectedSet[plr.UserId] = nil else selectedSet[plr.UserId] = plr end
 					else
-						selectedPlayer = plr
+						if selectedPlayer == plr then selectedPlayer = nil else selectedPlayer = plr end
 					end
 					paintSelected()
 					task.spawn(callback, plr)
@@ -7733,6 +7774,9 @@ function Astral:MakeWindow(config)
 			BackgroundImage.Image = urlOrId
 			BackgroundImage.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 		end
+		if BgDim.BackgroundTransparency >= 1 then
+			BgDim.BackgroundTransparency = 0.35
+		end
 	end
 	-- alias kept for old scripts: downloads the URL then applies it
 	function Window:LoadBackgroundFromUrl(url)
@@ -7743,10 +7787,20 @@ function Astral:MakeWindow(config)
 		if not t then return end
 		BgDim.BackgroundTransparency = math.clamp(t, 0, 1)
 	end
+	function Window:SetTransparency(t)
+		t = math.clamp(tonumber(t) or 0, 0, 0.75)
+		pcall(function() MainFrame.BackgroundTransparency = t end)
+		pcall(function()
+			Sidebar.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
+			SidebarFillerTop.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
+			SidebarFillerRight.BackgroundTransparency = math.clamp(0.12 + t, 0, 0.9)
+		end)
+	end
 
 	function Window:ResetBackground()
 		BackgroundImage.Image = ""
 		BackgroundImage.ImageColor3 = themeColorFor("58,58,64", CurrentThemeName or "Dark")
+		BgDim.BackgroundTransparency = 1
 	end
 	-- Manual window size override (preview PC vs mobile sizes live)
 	function Window:SetWindowSize(w, h)
@@ -8654,7 +8708,7 @@ function Astral:MakeWindow(config)
 			ValueLabel.Size = UDim2.new(0.42, 0, 1, 0)
 			ValueLabel.Font = Enum.Font.GothamBold
 			ValueLabel.Text = tostring(value or "--")
-			ValueLabel.TextSize = IsMobile and 12 or 14
+			ValueLabel.TextSize = IsMobile and 12 or 13
 			ValueLabel.TextColor3 = colorOverride or AccentColor
 			ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
 			ValueLabel.TextTruncate = Enum.TextTruncate.None
