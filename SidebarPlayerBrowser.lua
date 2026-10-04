@@ -2589,6 +2589,105 @@ function Astral:MakeWindow(config)
 		return CategoryHeader
 	end
 
+	-- Always-on Settings gear (top-right) + auto Settings tab.
+	-- Disable with CreateWindow({ SettingsTab = false }).
+	-- Wrapped in do-end so its locals reuse registers (200 local limit).
+	do
+	if config.SettingsTab ~= false then
+		local GearBtn = Instance.new("TextButton")
+		GearBtn.Name = "SettingsGear"
+		GearBtn.AnchorPoint = Vector2.new(1, 0.5)
+		GearBtn.Position = UDim2.new(1, -10, 0.5, 0)
+		GearBtn.Size = UDim2.new(0, 28, 0, 28)
+		GearBtn.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
+		GearBtn.BorderSizePixel = 0
+		GearBtn.Text = ""
+		GearBtn.AutoButtonColor = false
+		GearBtn.ZIndex = 5
+		GearBtn.Parent = TopBar
+		local GearCorner = Instance.new("UICorner")
+		GearCorner.CornerRadius = UDim.new(0, 8)
+		GearCorner.Parent = GearBtn
+		local GearStroke = Instance.new("UIStroke")
+		GearStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+		GearStroke.Thickness = 1
+		GearStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		GearStroke.Parent = GearBtn
+		local GearIcon = Instance.new("ImageLabel")
+		GearIcon.Name = "GearIcon"
+		GearIcon.BackgroundTransparency = 1
+		GearIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		GearIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		GearIcon.Size = UDim2.new(0, 16, 0, 16)
+		Astral.ApplyIcon(GearIcon, parseIcon("Badge Gear"))
+		GearIcon.ImageColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
+		GearIcon.ScaleType = Enum.ScaleType.Fit
+		GearIcon.ZIndex = 6
+		GearIcon.Parent = GearBtn
+		GearBtn.MouseEnter:Connect(function()
+			TweenService:Create(GearBtn, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("54,54,64", CurrentThemeName or "Dark") }):Play()
+		end)
+		GearBtn.MouseLeave:Connect(function()
+			TweenService:Create(GearBtn, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark") }):Play()
+		end)
+		local settingsTabData = nil
+		GearBtn.MouseButton1Click:Connect(function()
+			if pickerOpen or selectorOpen then return end
+			if not settingsTabData then
+				local STab = Window:MakeTab({ "Settings", "Badge Gear" })
+				local aboutSub = STab:AddSubTab({ Name = "About", Icon = "Home" })
+				aboutSub:AddLabel({ Title = "Lumu UI", Description = "Themes, background, status & info live here.", Icon = "Home" })
+				aboutSub:AddButton({ Title = "Reset UI positions", Icon = "Badge Gear", Callback = function()
+					pcall(function() Window:ResetUIPositions() end)
+				end })
+				aboutSub:AddButton({ Title = "Refresh UI", Icon = "Checkmark", Callback = function()
+					pcall(function() Window:RefreshAll() end)
+				end })
+				local themeSub = STab:AddSubTab({ Name = "Themes", Icon = "Chromatic Key1" })
+				themeSub:AddSelector({ Title = "Theme", Description = "Recolor the whole UI live.", Options = { "Dark", "Midnight", "Purple", "Crimson", "Forest", "Ocean", "Sunset", "Rose", "Slate", "Coffee", "Light" }, Icon = "Chromatic Key1", Callback = function(v)
+					pcall(function() Window:SetTheme(v) end)
+				end })
+				themeSub:AddColorpicker({ Title = "Accent", Description = "Your highlight color.", Default = AccentColor, Icon = "Chromatic Key1", Callback = function(c)
+					pcall(function() Window:SetAccent(c) end)
+				end })
+				themeSub:AddButton({ Title = "Custom theme", Icon = "Badge Gear", Callback = function()
+					pcall(function() Window:SetCustomTheme({ Background = Color3.fromRGB(10, 10, 14), Card = Color3.fromRGB(20, 22, 34), Accent = Color3.fromRGB(138, 90, 255) }) end)
+				end })
+				local bgSub = STab:AddSubTab({ Name = "Background", Icon = "Home" })
+				bgSub:AddButton({ Title = "BG image 1", Icon = "Checkmark", Callback = function()
+					pcall(function() Window:SetBackground("rbxassetid://138732103165145") end)
+				end })
+				bgSub:AddButton({ Title = "BG image 2", Icon = "Checkmark", Callback = function()
+					pcall(function() Window:SetBackground("rbxassetid://74936679753141") end)
+				end })
+				bgSub:AddSlider({ Title = "BG dim", Min = 0, Max = 100, Default = 35, Icon = "Badge Gear", Callback = function(v)
+					pcall(function() Window:SetBackgroundDim(v / 100) end)
+				end })
+				bgSub:AddSlider({ Title = "UI transparency", Min = 0, Max = 70, Default = 0, Icon = "Badge Gear", Callback = function(v)
+					pcall(function() Window:SetTransparency(v / 100) end)
+				end })
+				bgSub:AddButton({ Title = "Reset BG", Icon = "Close", Callback = function()
+					pcall(function() Window:ResetBackground() end)
+				end })
+				local statusSub = STab:AddSubTab({ Name = "Status", Icon = "timer" })
+				statusSub:AddToggle({ Title = "Show status panels", Default = true, Icon = "timer", Callback = function(s)
+					for _, sp in ipairs(statusPanels) do
+						pcall(function() sp.Panel.Visible = s end)
+					end
+				end })
+				statusSub:AddButton({ Title = "Reset panel positions", Icon = "Badge Gear", Callback = function()
+					for _, sp in ipairs(statusPanels) do
+						pcall(function() sp.Panel.Position = sp.DefaultPos end)
+					end
+				end })
+				settingsTabData = tabs[#tabs]
+			end
+			if settingsTabData then
+				pcall(function() switchTab(settingsTabData) end)
+			end
+		end)
+	end
+	end
 	function Window:MakeTab(tabConfig)
 		local tabName = "Tab"
 		local tabIcon = nil

@@ -90,3 +90,12 @@ Window:SetCustomTheme({
 - Recolors the whole UI live: cards, text, borders, gradients, scrollbars.
 - Your accent color is never touched by themes.
 - Every element built afterwards also follows the active theme.
+
+## Built-in Settings (top-right gear, always on)
+
+Every window gets a gear button top-right (disable with
+`CreateWindow({ SettingsTab = false })`). First click builds a Settings
+tab with sub-tabs: **About** (version, reset positions, refresh),
+**Themes** (all presets + accent picker + custom theme),
+**Background** (images, dim, UI transparency), **Status**
+(show/hide + reset game-status panels).
