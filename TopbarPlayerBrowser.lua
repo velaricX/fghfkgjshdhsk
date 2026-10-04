@@ -3076,10 +3076,12 @@ function Astral:MakeWindow(config)
 		RightLayout.Padding = UDim.new(0, 10)
 		RightLayout.Parent = RightColumn
 
-		local elements = {}
-		-- Forced layout mode: "Auto" follows width, "OneColumn"/"TwoColumn" force it
-		local function isSingleColumnNow()
-			if layoutMode == "OneColumn" then return true end
+			local elements = {}
+			local forceSingleColumn = false
+			-- Forced layout mode: "Auto" follows width, "OneColumn"/"TwoColumn" force it
+			local function isSingleColumnNow()
+				if forceSingleColumn then return true end
+				if layoutMode == "OneColumn" then return true end
 			if layoutMode == "TwoColumn" then return false end
 			-- Invisible tabs report 0 width during build: fall back to the real
 			-- window width so columns never collapse to zero and hide content.
@@ -5427,8 +5429,15 @@ function Astral:MakeWindow(config)
 		-- DISCORD INVITE CARD (FROM MAIN UI)
 		-- =========================================================================
 		function TabObject:AddDiscordCard(config)
+			config = config or {}
 			local data = config.ServerData or {}
 			local inviteCode = data.InviteCode or "RhQa6kZu9A"
+			if config.FullWidth then
+				forceSingleColumn = true
+				pcall(refreshTabColumns)
+				pcall(distributeElements)
+				pcall(updateCanvas)
+			end
 
 
 
