@@ -7041,6 +7041,256 @@ function Astral:MakeWindow(config)
 		--     Multi = true, -- pick several players at once (GetSelected returns a list)
 		--   })
 		--   pb:SetMode("Row"); pb:Refresh(); pb:GetSelected()
+		-- =========================================================================
+		-- SKILL SELECTOR (fight-game skills: key rows with cooldowns).
+		-- Press the key (or tap the row) to fire; row greys out with a
+		-- countdown until it can be used again. Hold box edits per-skill hold.
+		--   Tab:AddSkillSelector({
+		--     Skills = { { Key = "Z", Hold = 0.5, Cooldown = 3 } },
+		--     Callback = function(key, hold) print(key, hold) end,
+		--   })
+		-- =========================================================================
+		function TabObject:AddSkillSelector(skillConfig)
+			skillConfig = skillConfig or {}
+			local callback = skillConfig.Callback or function() end
+			local skills = {}
+			for _, s in ipairs(skillConfig.Skills or {}) do
+				if type(s) == "table" and s.Key then
+					local kc = nil
+					pcall(function() kc = Enum.KeyCode[tostring(s.Key)] end)
+					table.insert(skills, {
+						Key = tostring(s.Key):upper(),
+						Code = kc,
+						Hold = tonumber(s.Hold) or 0.5,
+						Cooldown = tonumber(s.Cooldown) or 3,
+						cdUntil = 0,
+					})
+				end
+			end
+			if #skills == 0 then
+				table.insert(skills, { Key = "Z", Code = Enum.KeyCode.Z, Hold = 0.5, Cooldown = 3, cdUntil = 0 })
+			end
+
+			local rowH = 46
+			local gap = 6
+			local pad = 8
+			local calculatedHeight = pad * 2 + #skills * rowH + (#skills - 1) * gap
+
+			local SkillCard = Instance.new("Frame")
+			SkillCard.Name = "SkillSelector"
+			SkillCard.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
+			SkillCard.BorderSizePixel = 0
+
+			local SkillCorner = Instance.new("UICorner")
+			SkillCorner.CornerRadius = UDim.new(0, 10)
+			SkillCorner.Parent = SkillCard
+
+			local SkillStroke = Instance.new("UIStroke")
+			SkillStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+			SkillStroke.Thickness = 1.2
+			SkillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			SkillStroke.Parent = SkillCard
+
+			local accentBars = {}
+			local keyLabels = {}
+			local function paintSkillAccent(c)
+				for _, b in ipairs(accentBars) do pcall(function() b.BackgroundColor3 = c end) end
+				for _, l in ipairs(keyLabels) do pcall(function() l.TextColor3 = c end) end
+			end
+			onAccentChange(function(c) paintSkillAccent(c) end)
+
+			local function triggerSkill(st)
+				if not st then return end
+				if os.clock() < (st.cdUntil or 0) then return end
+				st.cdUntil = os.clock() + (tonumber(st.Cooldown) or 0)
+				task.spawn(callback, st.Key, st.Hold)
+			end
+
+			for i, st in ipairs(skills) do
+				local Row = Instance.new("TextButton")
+				Row.Name = "Skill_" .. st.Key
+				Row.BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark")
+				Row.BorderSizePixel = 0
+				Row.Position = UDim2.new(0, pad, 0, pad + (i - 1) * (rowH + gap))
+				Row.Size = UDim2.new(1, -pad * 2, 0, rowH)
+				Row.Text = ""
+				Row.AutoButtonColor = false
+				Row.Parent = SkillCard
+
+				local RowCorner = Instance.new("UICorner")
+				RowCorner.CornerRadius = UDim.new(0, 8)
+				RowCorner.Parent = Row
+
+				local RowStroke = Instance.new("UIStroke")
+				RowStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+				RowStroke.Transparency = 0.45
+				RowStroke.Thickness = 1.2
+				RowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				RowStroke.Parent = Row
+
+				local Bar = Instance.new("Frame")
+				Bar.AnchorPoint = Vector2.new(0, 0.5)
+				Bar.Position = UDim2.new(0, 10, 0.5, 0)
+				Bar.Size = UDim2.new(0, 3, 0, 22)
+				Bar.BackgroundColor3 = AccentColor
+				Bar.BorderSizePixel = 0
+				Bar.Parent = Row
+				local BarCorner = Instance.new("UICorner")
+				BarCorner.CornerRadius = UDim.new(1, 0)
+				BarCorner.Parent = Bar
+				table.insert(accentBars, Bar)
+
+				local KeyLabel = Instance.new("TextLabel")
+				KeyLabel.BackgroundTransparency = 1
+				KeyLabel.Position = UDim2.new(0, 22, 0, 0)
+				KeyLabel.Size = UDim2.new(0, 30, 1, 0)
+				KeyLabel.Font = Enum.Font.GothamBold
+				KeyLabel.Text = st.Key
+				KeyLabel.TextColor3 = AccentColor
+				mTS(KeyLabel, 16)
+				KeyLabel.TextXAlignment = Enum.TextXAlignment.Left
+				KeyLabel.Parent = Row
+				table.insert(keyLabels, KeyLabel)
+
+				local HoldBox = Instance.new("Frame")
+				HoldBox.AnchorPoint = Vector2.new(1, 0.5)
+				HoldBox.Position = UDim2.new(1, -10, 0.5, 0)
+				HoldBox.Size = UDim2.new(0, 92, 0, 26)
+				HoldBox.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
+				HoldBox.BorderSizePixel = 0
+				HoldBox.Parent = Row
+				local HoldCorner = Instance.new("UICorner")
+				HoldCorner.CornerRadius = UDim.new(0, 6)
+				HoldCorner.Parent = HoldBox
+
+				local HoldCap = Instance.new("TextLabel")
+				HoldCap.BackgroundTransparency = 1
+				HoldCap.Position = UDim2.new(0, 8, 0, 0)
+				HoldCap.Size = UDim2.new(0, 40, 1, 0)
+				HoldCap.Font = Enum.Font.Gotham
+				HoldCap.Text = "Hold:"
+				HoldCap.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
+				mTS(HoldCap, 11)
+				HoldCap.TextXAlignment = Enum.TextXAlignment.Left
+				HoldCap.Parent = HoldBox
+
+				local HoldInput = Instance.new("TextBox")
+				HoldInput.BackgroundTransparency = 1
+				HoldInput.AnchorPoint = Vector2.new(1, 0)
+				HoldInput.Position = UDim2.new(1, -6, 0, 0)
+				HoldInput.Size = UDim2.new(0.5, 0, 1, 0)
+				HoldInput.Font = Enum.Font.GothamBold
+				HoldInput.Text = tostring(st.Hold)
+				HoldInput.PlaceholderText = "0.5"
+				HoldInput.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+				HoldInput.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				mTS(HoldInput, 12)
+				HoldInput.TextXAlignment = Enum.TextXAlignment.Right
+				HoldInput.ClearTextOnFocus = false
+				HoldInput.Parent = HoldBox
+				HoldInput.FocusLost:Connect(function()
+					local v = tonumber(HoldInput.Text)
+					if v and v > 0 then
+						st.Hold = math.clamp(v, 0.05, 30)
+					end
+					HoldInput.Text = tostring(st.Hold)
+				end)
+
+				local CdCover = Instance.new("Frame")
+				CdCover.Name = "Cooldown"
+				CdCover.Size = UDim2.new(1, 0, 1, 0)
+				CdCover.BackgroundColor3 = themeColorFor("12,12,14", CurrentThemeName or "Dark")
+				CdCover.BackgroundTransparency = 0.45
+				CdCover.BorderSizePixel = 0
+				CdCover.Visible = false
+				CdCover.Parent = Row
+				local CdCorner = Instance.new("UICorner")
+				CdCorner.CornerRadius = UDim.new(0, 8)
+				CdCorner.Parent = CdCover
+				local CdLabel = Instance.new("TextLabel")
+				CdLabel.BackgroundTransparency = 1
+				CdLabel.AnchorPoint = Vector2.new(1, 0.5)
+				CdLabel.Position = UDim2.new(1, -12, 0.5, 0)
+				CdLabel.Size = UDim2.new(0, 60, 0, 18)
+				CdLabel.Font = Enum.Font.GothamBold
+				CdLabel.Text = ""
+				CdLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				mTS(CdLabel, 13)
+				CdLabel.TextXAlignment = Enum.TextXAlignment.Right
+				CdLabel.Parent = CdCover
+				st.Cover = CdCover
+				st.Count = CdLabel
+
+				Row.MouseEnter:Connect(function()
+					TweenService:Create(Row, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
+				end)
+				Row.MouseLeave:Connect(function()
+					TweenService:Create(Row, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark") }):Play()
+				end)
+				Row.MouseButton1Click:Connect(function()
+					if pickerOpen or selectorOpen then return end
+					triggerSkill(st)
+				end)
+			end
+			paintSkillAccent(AccentColor)
+
+			UserInputService.InputBegan:Connect(function(input, gpe)
+				if gpe then return end
+				if pickerOpen or selectorOpen then return end
+				if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+				for _, st in ipairs(skills) do
+					if st.Code and input.KeyCode == st.Code then
+						triggerSkill(st)
+						break
+					end
+				end
+			end)
+
+			task.spawn(function()
+				while SkillCard.Parent ~= nil do
+					task.wait(0.1)
+					local now = os.clock()
+					for _, st in ipairs(skills) do
+						local left = (st.cdUntil or 0) - now
+						pcall(function()
+							if st.Cover then st.Cover.Visible = left > 0 end
+							if st.Count and left > 0 then st.Count.Text = string.format("%.1f", left) end
+						end)
+					end
+				end
+			end)
+
+			registerElement(SkillCard, calculatedHeight, skillConfig.Position)
+
+			local SkillController = {}
+			function SkillController:GetSkills()
+				local out = {}
+				for _, st in ipairs(skills) do
+					out[st.Key] = { Hold = st.Hold, Cooldown = st.Cooldown }
+				end
+				return out
+			end
+			function SkillController:SetHold(key, v)
+				for _, st in ipairs(skills) do
+					if st.Key == tostring(key):upper() and tonumber(v) then
+						st.Hold = math.clamp(tonumber(v), 0.05, 30)
+					end
+				end
+			end
+			function SkillController:SetCooldown(key, v)
+				for _, st in ipairs(skills) do
+					if st.Key == tostring(key):upper() and tonumber(v) then
+						st.Cooldown = math.max(0, tonumber(v))
+					end
+				end
+			end
+			function SkillController:Trigger(key)
+				for _, st in ipairs(skills) do
+					if st.Key == tostring(key):upper() then triggerSkill(st) return end
+				end
+			end
+			return SkillController
+		end
 		function TabObject:AddPlayerBrowser(config)
 			config = config or {}
 			local title = config.Title or "Players Section"
