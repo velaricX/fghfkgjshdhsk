@@ -733,11 +733,11 @@ local function clampPanelOnScreen(pos, w, hEst)
 	if not cam then return pos end
 	local vp = cam.ViewportSize
 	if not vp or vp.X < 10 then return pos end
-	local x = pos.X.Offset
-	local y = pos.Y.Offset
+	local x = pos.X.Scale * vp.X + pos.X.Offset
+	local y = pos.Y.Scale * vp.Y + pos.Y.Offset
 	x = math.clamp(x, 8, math.max(8, vp.X - (w or 280) - 8))
 	y = math.clamp(y, 8, math.max(8, vp.Y - (hEst or 220) - 8))
-	return UDim2.new(pos.X.Scale, x, pos.Y.Scale, y)
+	return UDim2.new(0, x, 0, y)
 end
 local LUMU_RAW = "https://raw.githubusercontent.com/velaricX/fghfkgjshdhsk/main/"
 local DESIGN_URLS = {
@@ -2837,7 +2837,70 @@ function Astral:MakeWindow(config)
 						pcall(function() sp.Panel.Position = sp.DefaultPos end)
 					end
 				end })
+				statusSub:AddSlider({ Title = "Panel size", Min = 70, Max = 130, Default = 100, Icon = "timer", Callback = function(v)
+					pcall(function() Window:SetStatusScale(v / 100) end)
+				end })
+				local displaySub = STab:AddSubTab({ Name = "Display", Icon = "Badge Gear" })
+				displaySub:AddSlider({ Title = "UI size", Min = 70, Max = 130, Default = 100, Icon = "Badge Gear", Callback = function(v)
+					pcall(function() Window:SetUIScale(v / 100) end)
+				end })
+				displaySub:AddSelector({ Title = "Grid columns", Description = "Layout for wide windows.", Options = { "Auto", "1 column", "2 columns" }, Icon = "Badge Gear", Callback = function(v)
+					pcall(function()
+						if v == "1 column" then Window:SetLayoutMode("OneColumn")
+						elseif v == "2 columns" then Window:SetLayoutMode("TwoColumn")
+						else Window:SetLayoutMode("Auto") end
+					end)
+				end })
+				displaySub:AddSlider({ Title = "UI transparency", Min = 0, Max = 70, Default = 0, Icon = "Badge Gear", Callback = function(v)
+					pcall(function() Window:SetTransparency(v / 100) end)
+				end })
+				displaySub:AddButton({ Title = "Replay intro", Icon = "Checkmark", Callback = function()
+					pcall(function() Window:PlayIntro() end)
+				end })
+				local configSub = STab:AddSubTab({ Name = "Configs", Icon = "Home" })
+				local cfgName = "lumu_config.json"
+				configSub:AddTextbox({ Title = "Config name", Placeholder = "lumu_config.json", Callback = function(t)
+					if t and t ~= "" then cfgName = tostring(t) end
+				end })
+				configSub:AddButton({ Title = "Save config", Icon = "Checkmark", Callback = function()
+					local ok2 = false
+					pcall(function() ok2 = Window:SaveConfig(cfgName) end)
+					pcall(function() Window:Notify({ Type = ok2 and "good" or "warning", Title = ok2 and "Saved" or "Save failed", Message = tostring(cfgName), Duration = 3 }) end)
+				end })
+				configSub:AddButton({ Title = "Load config", Icon = "Badge Gear", Callback = function()
+					local ok2 = false
+					pcall(function() ok2 = Window:LoadConfig(cfgName) end)
+					pcall(function() Window:Notify({ Type = ok2 and "good" or "warning", Title = ok2 and "Loaded" or "Load failed", Message = tostring(cfgName), Duration = 3 }) end)
+				end })
+				do
+					local files = {}
+					pcall(function()
+						if listfiles then
+							for _, f in ipairs(listfiles("")) do
+								if type(f) == "string" and f:match("%.json$") then
+									table.insert(files, f)
+								end
+							end
+						end
+					end)
+					if #files > 0 then
+						configSub:AddSelector({ Title = "Load file", Description = "Pick a saved json.", Options = files, Icon = "Home", Callback = function(v)
+							pcall(function()
+								if Window:LoadConfig(v) then
+									Window:Notify({ Type = "good", Title = "Loaded", Message = tostring(v), Duration = 3 })
+								end
+							end)
+						end })
+					end
+				end
 				settingsTabData = tabs[#tabs]
+				pcall(function()
+					local tb = tabs[#tabs]
+					if tb and tb.Button then
+						tb.Button.Visible = false
+						tb.Button.Size = UDim2.new(1, 0, 0, 0)
+					end
+				end)
 			end
 			if settingsTabData then
 				pcall(function() switchTab(settingsTabData) end)
@@ -7824,6 +7887,14 @@ function Astral:MakeWindow(config)
 		if not t then return end
 		BgDim.BackgroundTransparency = math.clamp(t, 0, 1)
 	end
+	function Window:SetStatusScale(s)
+		s = math.clamp(tonumber(s) or 1, 0.7, 1.3)
+		for _, p in ipairs(statusPanels) do
+			pcall(function()
+				if p.Scale then p.Scale.Scale = s end
+			end)
+		end
+	end
 	function Window:SetTransparency(t)
 		t = math.clamp(tonumber(t) or 0, 0, 0.75)
 		Window._TransparencyCurrent = t
@@ -7848,6 +7919,24 @@ function Astral:MakeWindow(config)
 		BgDim.BackgroundTransparency = 1
 	end
 	-- Manual window size override (preview PC vs mobile sizes live)
+	function Window:SetUIScale(p)
+		p = math.clamp(tonumber(p) or 1, 0.7, 1.3)
+		Window._BaseRefW = Window._BaseRefW or refW
+		Window._BaseRefH = Window._BaseRefH or refH
+		refW, refH = math.floor(Window._BaseRefW * p), math.floor(Window._BaseRefH * p)
+		pcall(updateWindowSize)
+	end
+	function Window:PlayIntro()
+		pcall(function()
+			MainFrame.Size = UDim2.new(0, math.floor(refW * 0.7), 0, math.floor(refH * 0.7))
+			TweenService:Create(MainFrame, TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+				Size = UDim2.new(0, refW, 0, refH),
+			}):Play()
+		end)
+	end
+	if config.OpenAnimation ~= false then
+		task.delay(0.05, function() pcall(function() Window:PlayIntro() end) end)
+	end
 	function Window:SetWindowSize(w, h)
 		if type(w) == "number" and w >= 200 then refW = w end
 		if type(h) == "number" and h >= 140 then refH = h end

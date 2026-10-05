@@ -92,11 +92,20 @@ Window:SetCustomTheme({
 - Your accent color is never touched by themes.
 - Every element built afterwards also follows the active theme.
 
-## Built-in Settings (top-right gear, always on)
+## Built-in Settings (top-right gear, summons panel)
 
 Every window gets a gear button top-right (disable with
-`CreateWindow({ SettingsTab = false })`). First click builds a Settings
-tab with sub-tabs: **About** (version, reset positions, refresh),
-**Themes** (all presets + accent picker + custom theme),
-**Background** (images, dim, UI transparency), **Status**
-(show/hide + reset game-status panels).
+`CreateWindow({ SettingsTab = false })`). Clicking it opens a hidden
+Settings tab (no sidebar entry) with sub-tabs: **About** (version,
+reset positions, refresh), **Themes** (all presets + accent picker +
+custom theme), **Background** (images, dim, reset), **Status**
+(show/hide + reset positions + panel size), **Display** (UI size,
+grid 1/2/Auto columns, transparency, replay intro), **Configs**
+(save/load named json configs + file picker).
+
+Extra window APIs used by it (all callable yourself too):
+`Window:SetUIScale(0.7-1.3)`, `Window:SetLayoutMode("Auto"/"OneColumn"/"TwoColumn")`,
+`Window:SetStatusScale(0.7-1.3)`, `Window:PlayIntro()`,
+`Window:SaveConfig(name)`, `Window:LoadConfig(name)`,
+`Window:SaveUIPositions()/ResetUIPositions()`,
+`AddDiscordCard({ FullWidth = true, ... })` for full-width cards.
