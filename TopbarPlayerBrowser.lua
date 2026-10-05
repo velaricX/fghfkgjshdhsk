@@ -3827,6 +3827,27 @@ function Astral:MakeWindow(config)
 
 			registerElement(ButtonFrame, calculatedHeight, buttonConfig.Position)
 
+			task.defer(function()
+				pcall(function()
+					local availW = math.max(40, TextContainer.AbsoluteSize.X - 4)
+					local bound = game:GetService("TextService"):GetTextSize(TitleLabel.Text, 11, Enum.Font.GothamBold, Vector2.new(availW, 10000))
+					local lines = math.max(1, math.ceil(bound.Y / 14))
+					if lines > 1 then
+						lines = math.min(lines, 3)
+						TitleLabel.TextWrapped = true
+						TitleLabel.TextTruncate = Enum.TextTruncate.None
+						TitleLabel.Size = UDim2.new(1, 0, 0, 14 * lines)
+						local newH = calculatedHeight + 14 * (lines - 1)
+						ButtonFrame.Size = UDim2.new(1, 0, 0, newH)
+						for _, el in ipairs(elements) do
+							if el.Frame == ButtonFrame then el.Height = newH break end
+						end
+						distributeElements()
+						updateCanvas()
+					end
+				end)
+			end)
+
 			local ButtonController = {}
 			function ButtonController:SetLocked(state)
 				locked = not not state
@@ -7863,7 +7884,12 @@ function Astral:MakeWindow(config)
 			end
 
 			SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-				populate()
+				if SearchBox:GetAttribute("SearchDeb") then return end
+				SearchBox:SetAttribute("SearchDeb", true)
+				task.delay(0.3, function()
+					pcall(function() SearchBox:SetAttribute("SearchDeb", nil) end)
+					pcall(populate)
+				end)
 			end)
 
 			ViewBtn.MouseButton1Click:Connect(function()
@@ -8241,7 +8267,7 @@ function Astral:MakeWindow(config)
 	--   local stop = Window:AddStopButton({ Text = "STOP", ToggleList = { myToggle }, Callback = function() end })
 	function Window:AddStopButton(cfg)
 		cfg = cfg or {}
-		local text = cfg.Text or "Stop\nFarm"
+		local text = cfg.Text or "Stop"
 		local toggles = cfg.ToggleList or {}
 		local cb = cfg.Callback or function() end
 		local hasCb = cfg.Callback ~= nil
@@ -8293,8 +8319,14 @@ function Astral:MakeWindow(config)
 		UserInputService.InputEnded:Connect(function(input)
 			if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
 			if not dragging then return end
+			local moved = false
+			pcall(function()
+				local d = input.Position - dragStart
+				if math.abs(d.X) + math.abs(d.Y) > 8 then moved = true end
+			end)
 			dragging = false
 			TweenService:Create(sc, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			if moved then return end
 			for _, tg in ipairs(toggles) do
 				pcall(function()
 					if tg and tg.Set then tg:Set(false)
