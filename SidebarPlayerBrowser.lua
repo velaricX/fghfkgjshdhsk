@@ -5643,20 +5643,20 @@ function Astral:MakeWindow(config)
 			ActionButton.Name = "JoinButton"
 			ActionButton.Size = UDim2.new(0, 110, 0, 36)
 			ActionButton.Position = UDim2.new(1, -124, 1, -50)
-			ActionButton.BackgroundColor3 = Color3.fromRGB(53, 163, 94)
+			ActionButton.BackgroundColor3 = Color3.fromRGB(35, 165, 90)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
-			mTS(ActionButton, 14)
+			mTS(ActionButton, 15)
 			ActionButton.TextColor3 = Color3.fromHex("#ffffff")
 			ActionButton.AutoButtonColor = false
 			ActionButton.Parent = MainFrame
 
 			local ButtonCorner = Instance.new("UICorner")
-			ButtonCorner.CornerRadius = UDim.new(0, 8)
+			ButtonCorner.CornerRadius = UDim.new(0, 6)
 			ButtonCorner.Parent = ActionButton
 
-			local baseColor = Color3.fromRGB(53, 163, 94)
+			local baseColor = Color3.fromRGB(35, 165, 90)
 			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
@@ -5701,8 +5701,8 @@ function Astral:MakeWindow(config)
 					end
 				end)
 
-				ActionButton.Text = "Opened!"
-				ActionButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+				ActionButton.Text = "Copied!"
+				ActionButton.BackgroundColor3 = Color3.fromRGB(65, 65, 70)
 				task.wait(2)
 				ActionButton.Text = "Join"
 				ActionButton.BackgroundColor3 = baseColor
@@ -8031,7 +8031,7 @@ function Astral:MakeWindow(config)
 	--   local stop = Window:AddStopButton({ Text = "STOP", ToggleList = { myToggle }, Callback = function() end })
 	function Window:AddStopButton(cfg)
 		cfg = cfg or {}
-		local text = cfg.Text or "Stop Farm"
+		local text = cfg.Text or "Stop\nFarm"
 		local toggles = cfg.ToggleList or {}
 		local cb = cfg.Callback or function() end
 		local hasCb = cfg.Callback ~= nil
