@@ -5783,7 +5783,7 @@ function Astral:MakeWindow(config)
 			ActionButton.Name = "JoinButton"
 			ActionButton.Size = UDim2.new(0, 110, 0, 36)
 			ActionButton.Position = UDim2.new(1, -124, 1, -50)
-			ActionButton.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+			ActionButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
@@ -5796,7 +5796,7 @@ function Astral:MakeWindow(config)
 			ButtonCorner.CornerRadius = UDim.new(0, 8)
 			ButtonCorner.Parent = ActionButton
 
-			local baseColor = Color3.fromRGB(46, 204, 113)
+			local baseColor = Color3.fromRGB(87, 242, 135)
 			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
@@ -8062,11 +8062,12 @@ function Astral:MakeWindow(config)
 	-- Manual window size override (preview PC vs mobile sizes live)
 	function Window:SetUIScale(p)
 		p = math.clamp(tonumber(p) or 1, 0.7, 1.3)
+		p = math.floor(p / 0.05 + 0.5) * 0.05
 		Window._UIScalePending = p
 		if Window._UIScaleBusy then return end
 		Window._UIScaleBusy = true
 		task.spawn(function()
-			task.wait(0.15)
+			task.wait(0.3)
 			local fp = Window._UIScalePending
 			Window._UIScaleBusy = false
 			if fp == nil then return end
