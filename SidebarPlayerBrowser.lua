@@ -2699,6 +2699,12 @@ function Astral:MakeWindow(config)
 				displaySub:AddSlider({ Title = "UI transparency", Min = 0, Max = 70, Default = 0, Icon = "Badge Gear", Callback = function(v)
 					pcall(function() Window:SetTransparency(v / 100) end)
 				end })
+				displaySub:AddToggle({ Title = "Stop button", Description = "Floating stop button.", Default = true, Icon = "Badge Gear", Callback = function(s)
+					pcall(function()
+						local sb = Window._AutoStop
+						if sb and sb.Button then sb.Button.Visible = s end
+					end)
+				end })
 				displaySub:AddButton({ Title = "Replay intro", Icon = "Checkmark", Callback = function()
 					pcall(function() Window:PlayIntro() end)
 				end })
@@ -8028,6 +8034,7 @@ function Astral:MakeWindow(config)
 		local text = cfg.Text or "Stop Farm"
 		local toggles = cfg.ToggleList or {}
 		local cb = cfg.Callback or function() end
+		local hasCb = cfg.Callback ~= nil
 		local SZ = 72
 		local btn = Instance.new("TextButton")
 		btn.Name = "StopButton"
@@ -8063,9 +8070,6 @@ function Astral:MakeWindow(config)
 				dragStart = input.Position
 				startPos = btn.Position
 				TweenService:Create(sc, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 0.85 }):Play()
-				input.Changed:Connect(function()
-					if input.UserInputState == Enum.UserInputState.End then dragging = false end
-				end)
 			end
 		end)
 		UserInputService.InputChanged:Connect(function(input)
@@ -8085,6 +8089,15 @@ function Astral:MakeWindow(config)
 				pcall(function()
 					if tg and tg.Set then tg:Set(false)
 					elseif tg and tg.SetState then tg:SetState(false) end
+				end)
+			end
+			if (not hasCb) and (#toggles == 0) then
+				pcall(function()
+					for _, item in ipairs(configFlags or {}) do
+						if item.Kind == "toggle" or item.Kind == "tick" then
+							pcall(item.Set, false)
+						end
+					end
 				end)
 			end
 			task.spawn(cb)
@@ -9347,6 +9360,13 @@ function Astral:MakeWindow(config)
 	-- SetDesign is an alias of SwitchDesign (persist + switch live)
 	function Window:SetDesign(design)
 		return Window:SwitchDesign(design)
+	end
+
+	-- Auto floating STOP button unless opted out (no script code needed).
+	if config.StopButton ~= false then
+		pcall(function()
+			Window._AutoStop = Window:AddStopButton({ Text = "Stop Farm" })
+		end)
 	end
 
 
