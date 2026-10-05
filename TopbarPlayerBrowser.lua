@@ -2932,6 +2932,219 @@ function Astral:MakeWindow(config)
 		end)
 	end
 	end
+	-- Global element search (Ctrl+K): type anything, jump to any button.
+	-- Zero outer locals (do-end) for the 200-local limit.
+	do
+	if true then
+		local SearchBox = Instance.new("TextBox")
+		SearchBox.Name = "GlobalSearch"
+		SearchBox.AnchorPoint = Vector2.new(0.5, 0.5)
+		SearchBox.Position = UDim2.new(0.5, 0, 0.5, 0)
+		SearchBox.Size = UDim2.new(0, IsMobile and 170 or 280, 0, IsMobile and 28 or 30)
+		SearchBox.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
+		SearchBox.BorderSizePixel = 0
+		SearchBox.Font = Enum.Font.Gotham
+		SearchBox.Text = ""
+		SearchBox.PlaceholderText = "Search..."
+		SearchBox.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+		SearchBox.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+		SearchBox.TextSize = IsMobile and 11 or 12
+		SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+		SearchBox.ClearTextOnFocus = false
+		SearchBox.ZIndex = 5
+		SearchBox.Parent = TopBar
+		local SearchCorner = Instance.new("UICorner")
+		SearchCorner.CornerRadius = UDim.new(0, 8)
+		SearchCorner.Parent = SearchBox
+		local SearchStroke = Instance.new("UIStroke")
+		SearchStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+		SearchStroke.Thickness = 1
+		SearchStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		SearchStroke.Parent = SearchBox
+		local SearchPad = Instance.new("UIPadding")
+		SearchPad.PaddingLeft = UDim.new(0, 10)
+		SearchPad.PaddingRight = UDim.new(0, 56)
+		SearchPad.Parent = SearchBox
+		local CtrlBadge = Instance.new("TextButton")
+		CtrlBadge.Name = "CtrlBadge"
+		CtrlBadge.AnchorPoint = Vector2.new(1, 0.5)
+		CtrlBadge.Position = UDim2.new(1, -6, 0.5, 0)
+		CtrlBadge.Size = UDim2.new(0, 44, 0, 18)
+		CtrlBadge.BackgroundColor3 = themeColorFor("60,60,70", CurrentThemeName or "Dark")
+		CtrlBadge.BorderSizePixel = 0
+		CtrlBadge.Font = Enum.Font.GothamBold
+		CtrlBadge.Text = "Ctrl K"
+		CtrlBadge.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
+		CtrlBadge.TextSize = 10
+		CtrlBadge.AutoButtonColor = false
+		CtrlBadge.ZIndex = 6
+		CtrlBadge.Parent = SearchBox
+		local CtrlCorner = Instance.new("UICorner")
+		CtrlCorner.CornerRadius = UDim.new(0, 4)
+		CtrlCorner.Parent = CtrlBadge
+		SearchBox.Focused:Connect(function()
+			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("95,95,110", CurrentThemeName or "Dark") }):Play()
+		end)
+		SearchBox.FocusLost:Connect(function()
+			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("50,50,55", CurrentThemeName or "Dark") }):Play()
+		end)
+
+		local Results = Instance.new("Frame")
+		Results.Name = "SearchResults"
+		Results.AnchorPoint = Vector2.new(0.5, 0)
+		Results.Position = UDim2.new(0.5, 0, 0, 56)
+		Results.Size = UDim2.new(0, IsMobile and 170 or 280, 0, 8)
+		Results.BackgroundColor3 = themeColorFor("30,30,37", CurrentThemeName or "Dark")
+		Results.BorderSizePixel = 0
+		Results.Visible = false
+		Results.ZIndex = 60
+		Results.Parent = MainFrame
+		local ResultsCorner = Instance.new("UICorner")
+		ResultsCorner.CornerRadius = UDim.new(0, 8)
+		ResultsCorner.Parent = Results
+		local ResultsStroke = Instance.new("UIStroke")
+		ResultsStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+		ResultsStroke.Thickness = 1
+		ResultsStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		ResultsStroke.Parent = Results
+		local ResultsPad = Instance.new("UIPadding")
+		ResultsPad.PaddingLeft = UDim.new(0, 4)
+		ResultsPad.PaddingRight = UDim.new(0, 4)
+		ResultsPad.PaddingTop = UDim.new(0, 4)
+		ResultsPad.PaddingBottom = UDim.new(0, 4)
+		ResultsPad.Parent = Results
+		local ResultsLayout = Instance.new("UIListLayout")
+		ResultsLayout.FillDirection = Enum.FillDirection.Vertical
+		ResultsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		ResultsLayout.Padding = UDim.new(0, 2)
+		ResultsLayout.Parent = Results
+
+		local function hideResults()
+			Results.Visible = false
+		end
+
+		local function collectMatches(q)
+			local out = {}
+			if q == "" then return out end
+			for _, td in ipairs(tabs) do
+				local tname = ""
+				pcall(function() tname = (td.ButtonText and td.ButtonText.Text) or "" end)
+				local els = td.Elements
+				if type(els) == "table" then
+					for _, el in ipairs(els) do
+						local okEl, fr = pcall(function() return el.Frame or el end)
+						if okEl and typeof(fr) == "Instance" and fr:IsA("GuiObject") then
+							local label = fr.Name
+							pcall(function()
+								local tl = fr:FindFirstChild("Title", true)
+								if tl and tostring(tl.Text or "") ~= "" then label = tostring(tl.Text) end
+							end)
+							if string.find(string.lower(label), q, 1, true) then
+								table.insert(out, { tab = td, frame = fr, sub = el.SubTabIdx or 0, title = label, tabName = tname })
+								if #out >= 40 then return out end
+							end
+						end
+					end
+				end
+			end
+			return out
+		end
+
+		local function jumpTo(m)
+			hideResults()
+			pcall(function() SearchBox:ReleaseFocus() end)
+			pcall(function() switchTab(m.tab) end)
+			task.spawn(function()
+				task.wait(0.2)
+				pcall(function()
+					if m.sub and m.sub ~= 0 and m.tab.SwitchSubTab then m.tab.SwitchSubTab(m.sub) end
+				end)
+				task.wait(0.15)
+				pcall(function()
+					local sc = m.tab.PageScroll
+					local y = m.frame.AbsolutePosition.Y - sc.AbsolutePosition.Y + sc.CanvasPosition.Y - 80
+					TweenService:Create(sc, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { CanvasPosition = Vector2.new(0, math.max(0, y)) }):Play()
+					local c0 = m.frame.BackgroundColor3
+					TweenService:Create(m.frame, TweenInfo.new(0.18), { BackgroundColor3 = AccentColor }):Play()
+					task.delay(0.55, function()
+						pcall(function() TweenService:Create(m.frame, TweenInfo.new(0.25), { BackgroundColor3 = c0 }):Play() end)
+					end)
+				end)
+			end)
+		end
+
+		local function refreshResults()
+			for _, c in ipairs(Results:GetChildren()) do
+				if c:IsA("GuiObject") and not c:IsA("UIListLayout") and not c:IsA("UIPadding") then pcall(function() c:Destroy() end) end
+			end
+			local q = string.lower(string.match(SearchBox.Text or "", "^%s*(.-)%s*$") or "")
+			if q == "" then hideResults() return end
+			local matches = collectMatches(q)
+			if #matches == 0 then hideResults() return end
+			for i = 1, math.min(8, #matches) do
+				local m = matches[i]
+				local row = Instance.new("TextButton")
+				row.BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark")
+				row.BorderSizePixel = 0
+				row.Size = UDim2.new(1, 0, 0, 30)
+				row.Text = ""
+				row.AutoButtonColor = false
+				row.LayoutOrder = i
+				row.Parent = Results
+				local rowc = Instance.new("UICorner")
+				rowc.CornerRadius = UDim.new(0, 6)
+				rowc.Parent = row
+				local rt = Instance.new("TextLabel")
+				rt.BackgroundTransparency = 1
+				rt.Position = UDim2.new(0, 8, 0, 0)
+				rt.Size = UDim2.new(1, -110, 1, 0)
+				rt.Font = Enum.Font.GothamBold
+				rt.Text = m.title
+				rt.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				rt.TextSize = 12
+				rt.TextXAlignment = Enum.TextXAlignment.Left
+				rt.TextTruncate = Enum.TextTruncate.AtEnd
+				rt.Parent = row
+				local rp = Instance.new("TextLabel")
+				rp.BackgroundTransparency = 1
+				rp.AnchorPoint = Vector2.new(1, 0.5)
+				rp.Position = UDim2.new(1, -8, 0.5, 0)
+				rp.Size = UDim2.new(0, 96, 0, 14)
+				rp.Font = Enum.Font.Gotham
+				rp.Text = m.tabName
+				rp.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
+				rp.TextSize = 10
+				rp.TextXAlignment = Enum.TextXAlignment.Right
+				rp.TextTruncate = Enum.TextTruncate.AtEnd
+				rp.Parent = row
+				row.MouseEnter:Connect(function()
+					TweenService:Create(row, TweenInfo.new(0.12), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
+				end)
+				row.MouseLeave:Connect(function()
+					TweenService:Create(row, TweenInfo.new(0.12), { BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark") }):Play()
+				end)
+				row.MouseButton1Click:Connect(function() jumpTo(m) end)
+			end
+			Results.Size = UDim2.new(0, IsMobile and 170 or 280, 0, math.min(8, #matches) * 32 + 8)
+			Results.Visible = true
+		end
+		SearchBox:GetPropertyChangedSignal("Text"):Connect(refreshResults)
+		SearchBox.Focused:Connect(function() refreshResults() end)
+		SearchBox.FocusLost:Connect(function()
+			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("50,50,55", CurrentThemeName or "Dark") }):Play()
+			task.delay(0.2, hideResults)
+		end)
+		CtrlBadge.MouseButton1Click:Connect(function() pcall(function() SearchBox:CaptureFocus() end) end)
+		UserInputService.InputBegan:Connect(function(input, gpe)
+			if gpe then return end
+			if input.KeyCode == Enum.KeyCode.K then
+				local ctrl = false
+				pcall(function() ctrl = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl) end)
+				if ctrl then pcall(function() SearchBox:CaptureFocus() end) end
+			end
+		end)
+	end
+	end
 	function Window:MakeTab(tabConfig)
 		local tabName = "Tab"
 		local tabIcon = nil
@@ -3296,6 +3509,7 @@ function Astral:MakeWindow(config)
 			Stroke = TabStroke,
 			Gradient = TabGradient,
 			ButtonText = ButtonText,
+			SwitchSubTab = switchSubTab,
 			Indicator = Indicator,
 			IconLabel = IconLabel,
 			FallbackLabel = FallbackLabel,
@@ -9319,6 +9533,9 @@ CountPillStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 	-- Auto floating STOP button unless opted out (no script code needed).
 	if config.StopButton ~= false then
 		pcall(function()
+			for _, g in ipairs(ScreenGui:GetChildren()) do
+				if g.Name == "StopButton" then pcall(function() g:Destroy() end) end
+			end
 			Window._AutoStop = Window:AddStopButton({ Text = "Stop Farm" })
 		end)
 	end
