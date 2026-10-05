@@ -2368,8 +2368,9 @@ function Astral:MakeWindow(config)
 
 				local nb = numberBoxes and numberBoxes[optionStr] or nil
 				if nb then
-					OptionLabel.Size = UDim2.new(1, -84, 1, 0)
+					OptionLabel.Size = UDim2.new(1, -92, 1, 0)
 					local NumBox = Instance.new("TextBox")
+					NumBox.LayoutOrder = 3
 					NumBox.AnchorPoint = Vector2.new(1, 0.5)
 					NumBox.Position = UDim2.new(1, -8, 0.5, 0)
 					NumBox.Size = UDim2.new(0, 56, 0, 26)
