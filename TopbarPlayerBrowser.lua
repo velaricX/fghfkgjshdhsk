@@ -5579,7 +5579,7 @@ function Astral:MakeWindow(config)
 			local MainFrame = Instance.new("Frame")
 			MainFrame.Name = "DiscordInvite"
 			MainFrame.Size = UDim2.new(1, 0, 0, 260)
-			MainFrame.BackgroundColor3 = Color3.fromHex("#141416")
+			MainFrame.BackgroundColor3 = themeColorFor("30,30,36", CurrentThemeName or "Dark")
 			MainFrame.BorderSizePixel = 0
 			MainFrame.ClipsDescendants = true
 
@@ -5590,7 +5590,7 @@ function Astral:MakeWindow(config)
 			local BgHighlight = Instance.new("Frame")
 			BgHighlight.Name = "BgHighlight"
 			BgHighlight.Size = UDim2.new(1, 0, 1, 0)
-			BgHighlight.BackgroundColor3 = Color3.fromHex("#ffffff")
+			BgHighlight.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BgHighlight.BackgroundTransparency = 1
 			BgHighlight.ZIndex = 0
 			BgHighlight.Parent = MainFrame
@@ -5601,7 +5601,7 @@ function Astral:MakeWindow(config)
 
 			local Banner = Instance.new("ImageLabel")
 			Banner.Name = "Banner"
-			Banner.Size = UDim2.new(1, 0, 0, 70)
+			Banner.Size = UDim2.new(1, 0, 0, 110)
 			Banner.Position = UDim2.new(0, 0, 0, 0)
 			Banner.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 			Banner.Image = data.BackgroundBannerId or "rbxassetid://127861212431489"
@@ -5617,10 +5617,10 @@ function Astral:MakeWindow(config)
 
 			local ServerIcon = Instance.new("ImageLabel")
 			ServerIcon.Name = "ServerIcon"
-			ServerIcon.Size = UDim2.new(0, 48, 0, 48)
-			ServerIcon.Position = UDim2.new(0, 14, 0, 46)
+			ServerIcon.Size = UDim2.new(0, 64, 0, 64)
+			ServerIcon.Position = UDim2.new(0, 14, 0, 78)
 			ServerIcon.Image = data.ServerIconId or "rbxassetid://106987676739927"
-			ServerIcon.BackgroundColor3 = Color3.fromHex("#1e1f22")
+			ServerIcon.BackgroundColor3 = themeColorFor("30,30,36", CurrentThemeName or "Dark")
 			ServerIcon.BorderSizePixel = 0
 			ServerIcon.ZIndex = 2
 			ServerIcon.Parent = MainFrame
@@ -5630,14 +5630,14 @@ function Astral:MakeWindow(config)
 			IconCorner.Parent = ServerIcon
 
 			local IconStroke = Instance.new("UIStroke")
-			IconStroke.Color = Color3.fromHex("#1e1f22")
+			IconStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			IconStroke.Thickness = 3
 			IconStroke.Parent = ServerIcon
 
 			local InfoHolder = Instance.new("Frame")
 			InfoHolder.Name = "InfoHolder"
-			InfoHolder.Size = UDim2.new(1, -86, 0, 54)
-			InfoHolder.Position = UDim2.new(0, 72, 0, 72)
+			InfoHolder.Size = UDim2.new(1, -100, 0, 60)
+			InfoHolder.Position = UDim2.new(0, 86, 0, 114)
 			InfoHolder.BackgroundTransparency = 1
 			InfoHolder.Parent = MainFrame
 
@@ -5666,7 +5666,7 @@ function Astral:MakeWindow(config)
 			ServerName.Text = data.ServerName or "LumuHub"
 			ServerName.Font = Enum.Font.GothamBold
 			mTS(ServerName, 17)
-			ServerName.TextColor3 = Color3.fromHex("#ffffff")
+			ServerName.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			ServerName.TextXAlignment = Enum.TextXAlignment.Left
 			ServerName.BackgroundTransparency = 1
 			ServerName.LayoutOrder = 1
@@ -5675,7 +5675,7 @@ function Astral:MakeWindow(config)
 			local BadgeIcon = Instance.new("ImageLabel")
 			BadgeIcon.Size = UDim2.new(0, 14, 0, 14)
 			BadgeIcon.Image = "rbxassetid://75143132170494"
-			BadgeIcon.ImageColor3 = Color3.fromHex("#ffffff")
+			BadgeIcon.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BadgeIcon.BackgroundTransparency = 1
 			BadgeIcon.LayoutOrder = 2
 			BadgeIcon.Parent = NameFrame
@@ -5711,7 +5711,7 @@ function Astral:MakeWindow(config)
 			OnlineLabel.Text = tostring(data.OnlineCount or 46) .. " Online"
 			OnlineLabel.Font = Enum.Font.GothamMedium
 			mTS(OnlineLabel, 12)
-			OnlineLabel.TextColor3 = Color3.fromHex("#949ba4")
+			OnlineLabel.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
 			OnlineLabel.BackgroundTransparency = 1
 			OnlineLabel.LayoutOrder = 2
 			OnlineLabel.Parent = MetricsFrame
@@ -5740,7 +5740,7 @@ function Astral:MakeWindow(config)
 			MemberLabel.Text = tostring(data.MemberCount or 593) .. " Members"
 			MemberLabel.Font = Enum.Font.GothamMedium
 			mTS(MemberLabel, 12)
-			MemberLabel.TextColor3 = Color3.fromHex("#949ba4")
+			MemberLabel.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
 			MemberLabel.BackgroundTransparency = 1
 			MemberLabel.LayoutOrder = 5
 			MemberLabel.Parent = MetricsFrame
@@ -5777,7 +5777,7 @@ function Astral:MakeWindow(config)
 			DescLabel.Text = data.Description or "Official LumuHub Community"
 			DescLabel.Font = Enum.Font.GothamMedium
 			regText(DescLabel, 12)
-			DescLabel.TextColor3 = Color3.fromHex("#dbdee1")
+			DescLabel.TextColor3 = themeColorFor("220,220,228", CurrentThemeName or "Dark")
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
@@ -5787,7 +5787,7 @@ function Astral:MakeWindow(config)
 
 			local GameActivityFrame = Instance.new("Frame")
 			GameActivityFrame.Size = UDim2.new(1, -28, 0, 20)
-			GameActivityFrame.Position = UDim2.new(0, 14, 0, 130)
+			GameActivityFrame.Position = UDim2.new(0, 14, 0, 178)
 			GameActivityFrame.BackgroundTransparency = 1
 			GameActivityFrame.Parent = MainFrame
 
@@ -5812,7 +5812,7 @@ function Astral:MakeWindow(config)
 			GameLabel.Text = data.GameLabel or "ROBLOX"
 			GameLabel.Font = Enum.Font.GothamBold
 			mTS(GameLabel, 12)
-			GameLabel.TextColor3 = Color3.fromHex("#ffffff")
+			GameLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			GameLabel.TextXAlignment = Enum.TextXAlignment.Left
 			GameLabel.BackgroundTransparency = 1
 			GameLabel.Parent = GameActivityFrame
@@ -5826,7 +5826,7 @@ function Astral:MakeWindow(config)
 			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
 			mTS(ActionButton, 15)
-			ActionButton.TextColor3 = Color3.fromHex("#ffffff")
+			ActionButton.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			ActionButton.AutoButtonColor = false
 			ActionButton.Parent = MainFrame
 
@@ -5894,7 +5894,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
 			end)
 
-			registerElement(MainFrame, 200, config.Position)
+			registerElement(MainFrame, 240, config.Position)
 
 		end
 		-- =========================================================================
