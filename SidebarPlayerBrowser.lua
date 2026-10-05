@@ -2787,7 +2787,7 @@ function Astral:MakeWindow(config)
 		SearchBox.AnchorPoint = Vector2.new(1, 0.5)
 		SearchBox.Position = UDim2.new(1, -48, 0.5, 0)
 		SearchBox.Size = UDim2.new(0, IsMobile and 140 or 220, 0, IsMobile and 28 or 30)
-		SearchBox.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
+		SearchBox.BackgroundColor3 = themeColorFor("18,18,22", CurrentThemeName or "Dark")
 		SearchBox.BorderSizePixel = 0
 		SearchBox.Font = Enum.Font.Gotham
 		SearchBox.Text = ""
@@ -2799,9 +2799,9 @@ function Astral:MakeWindow(config)
 		SearchBox.ClearTextOnFocus = false
 		SearchBox.ZIndex = 5
 		SearchBox.Parent = TopBar
-		local SearchCorner = Instance.new("UICorner")
-		SearchCorner.CornerRadius = UDim.new(0, 8)
-		SearchCorner.Parent = SearchBox
+			local SearchCorner = Instance.new("UICorner")
+			SearchCorner.CornerRadius = UDim.new(0, 4)
+			SearchCorner.Parent = SearchBox
 		local SearchStroke = Instance.new("UIStroke")
 		SearchStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 		SearchStroke.Thickness = 1
@@ -2809,25 +2809,9 @@ function Astral:MakeWindow(config)
 		SearchStroke.Parent = SearchBox
 		local SearchPad = Instance.new("UIPadding")
 		SearchPad.PaddingLeft = UDim.new(0, 10)
-		SearchPad.PaddingRight = UDim.new(0, 56)
+		SearchPad.PaddingRight = UDim.new(0, 10)
 		SearchPad.Parent = SearchBox
-		local CtrlBadge = Instance.new("TextButton")
-		CtrlBadge.Name = "CtrlBadge"
-		CtrlBadge.AnchorPoint = Vector2.new(1, 0.5)
-		CtrlBadge.Position = UDim2.new(1, -6, 0.5, 0)
-		CtrlBadge.Size = UDim2.new(0, 44, 0, 18)
-		CtrlBadge.BackgroundColor3 = themeColorFor("60,60,70", CurrentThemeName or "Dark")
-		CtrlBadge.BorderSizePixel = 0
-		CtrlBadge.Font = Enum.Font.GothamBold
-		CtrlBadge.Text = "Ctrl K"
-		CtrlBadge.TextColor3 = themeColorFor("200,200,208", CurrentThemeName or "Dark")
-		CtrlBadge.TextSize = 10
-		CtrlBadge.AutoButtonColor = false
-		CtrlBadge.ZIndex = 6
-		CtrlBadge.Parent = SearchBox
-		local CtrlCorner = Instance.new("UICorner")
-		CtrlCorner.CornerRadius = UDim.new(0, 4)
-		CtrlCorner.Parent = CtrlBadge
+		-- (Ctrl+K hint badge removed; shortcut still works)
 		SearchBox.Focused:Connect(function()
 			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("95,95,110", CurrentThemeName or "Dark") }):Play()
 		end)
@@ -2835,13 +2819,18 @@ function Astral:MakeWindow(config)
 			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("50,50,55", CurrentThemeName or "Dark") }):Play()
 		end)
 
-		local Results = Instance.new("Frame")
+		local Results = Instance.new("ScrollingFrame")
 		Results.Name = "SearchResults"
 		Results.AnchorPoint = Vector2.new(1, 0)
 		Results.Position = UDim2.new(1, -48, 0, 56)
 		Results.Size = UDim2.new(0, IsMobile and 140 or 220, 0, 8)
 		Results.BackgroundColor3 = themeColorFor("30,30,37", CurrentThemeName or "Dark")
 		Results.BorderSizePixel = 0
+		Results.CanvasSize = UDim2.new(0, 0, 0, 0)
+		Results.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		Results.ScrollBarThickness = 3
+		Results.ScrollBarImageColor3 = themeColorFor("80,80,90", CurrentThemeName or "Dark")
+		Results.ScrollBarImageTransparency = 0.4
 		Results.Visible = false
 		Results.ZIndex = 60
 		Results.Parent = MainFrame
@@ -2942,6 +2931,17 @@ function Astral:MakeWindow(config)
 				local rowc = Instance.new("UICorner")
 				rowc.CornerRadius = UDim.new(0, 6)
 				rowc.Parent = row
+				local rbar = Instance.new("Frame")
+				rbar.AnchorPoint = Vector2.new(0, 0.5)
+				rbar.Position = UDim2.new(0, 0, 0.5, 0)
+				rbar.Size = UDim2.new(0, 3, 0, 18)
+				rbar.BackgroundColor3 = AccentColor
+				rbar.BackgroundTransparency = 1
+				rbar.BorderSizePixel = 0
+				rbar.Parent = row
+				local rbarc = Instance.new("UICorner")
+				rbarc.CornerRadius = UDim.new(1, 0)
+				rbarc.Parent = rbar
 				local rt = Instance.new("TextLabel")
 				rt.BackgroundTransparency = 1
 				rt.Position = UDim2.new(0, 8, 0, 0)
@@ -2967,9 +2967,11 @@ function Astral:MakeWindow(config)
 				rp.Parent = row
 				row.MouseEnter:Connect(function()
 					TweenService:Create(row, TweenInfo.new(0.12), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
+					TweenService:Create(rbar, TweenInfo.new(0.12), { BackgroundTransparency = 0 }):Play()
 				end)
 				row.MouseLeave:Connect(function()
 					TweenService:Create(row, TweenInfo.new(0.12), { BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark") }):Play()
+					TweenService:Create(rbar, TweenInfo.new(0.12), { BackgroundTransparency = 1 }):Play()
 				end)
 				row.MouseButton1Click:Connect(function() jumpTo(m) end)
 			end
@@ -2982,7 +2984,6 @@ function Astral:MakeWindow(config)
 			TweenService:Create(SearchStroke, TweenInfo.new(0.15), { Color = themeColorFor("50,50,55", CurrentThemeName or "Dark") }):Play()
 			task.delay(0.2, hideResults)
 		end)
-		CtrlBadge.MouseButton1Click:Connect(function() pcall(function() SearchBox:CaptureFocus() end) end)
 		UserInputService.InputBegan:Connect(function(input, gpe)
 			local focused = false
 			pcall(function() focused = UserInputService:GetFocusedTextBox() == SearchBox end)
