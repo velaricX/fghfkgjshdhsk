@@ -7050,39 +7050,58 @@ function Astral:MakeWindow(config)
 		--     Callback = function(key, hold) print(key, hold) end,
 		--   })
 		-- =========================================================================
+		-- =========================================================================
+		-- SKILL SELECTOR (dropdown like AddSelector + number boxes).
+		-- Pick the skill in the slide-in panel, set its Cooldown/Hold in
+		-- the small boxes. Press the key (or :Trigger) to fire; cooldown
+		-- is enforced per skill, early presses are ignored.
+		--   Tab:AddSkillSelector({
+		--     Title = "Skill",
+		--     Skills = { { Key = "Z", Hold = 0.5, Cooldown = 3 } },
+		--     Callback = function(key, hold) print(key, hold) end,
+		--   })
+		-- =========================================================================
 		function TabObject:AddSkillSelector(skillConfig)
 			skillConfig = skillConfig or {}
 			local callback = skillConfig.Callback or function() end
+			local title = skillConfig.Title or "Skill"
 			local skills = {}
+			local order = {}
 			for _, s in ipairs(skillConfig.Skills or {}) do
 				if type(s) == "table" and s.Key then
 					local kc = nil
 					pcall(function() kc = Enum.KeyCode[tostring(s.Key)] end)
+					local k = tostring(s.Key):upper()
 					table.insert(skills, {
-						Key = tostring(s.Key):upper(),
+						Key = k,
 						Code = kc,
 						Hold = tonumber(s.Hold) or 0.5,
 						Cooldown = tonumber(s.Cooldown) or 3,
 						cdUntil = 0,
 					})
+					table.insert(order, k)
 				end
 			end
 			if #skills == 0 then
 				table.insert(skills, { Key = "Z", Code = Enum.KeyCode.Z, Hold = 0.5, Cooldown = 3, cdUntil = 0 })
+				table.insert(order, "Z")
+			end
+			local selectedKey = skillConfig.Default or skills[1].Key
+			local function findSkill(k)
+				for _, st in ipairs(skills) do
+					if st.Key == k then return st end
+				end
+				return skills[1]
 			end
 
-			local rowH = 46
-			local gap = 6
-			local pad = 8
-			local calculatedHeight = pad * 2 + #skills * rowH + (#skills - 1) * gap
-
+			local cardH = 142
 			local SkillCard = Instance.new("Frame")
-			SkillCard.Name = "SkillSelector"
+			SkillCard.Name = title .. "_SkillSelector"
 			SkillCard.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			SkillCard.BorderSizePixel = 0
 
 			local SkillCorner = Instance.new("UICorner")
-			SkillCorner.CornerRadius = UDim.new(0, 10)
+			SkillCorner.CornerRadius = UDim.new(0, 12)
 			SkillCorner.Parent = SkillCard
 
 			local SkillStroke = Instance.new("UIStroke")
@@ -7091,13 +7110,120 @@ function Astral:MakeWindow(config)
 			SkillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			SkillStroke.Parent = SkillCard
 
-			local accentBars = {}
-			local keyLabels = {}
-			local function paintSkillAccent(c)
-				for _, b in ipairs(accentBars) do pcall(function() b.BackgroundColor3 = c end) end
-				for _, l in ipairs(keyLabels) do pcall(function() l.TextColor3 = c end) end
+			local TitleLabel = Instance.new("TextLabel")
+			TitleLabel.Name = "Title"
+			TitleLabel.BackgroundTransparency = 1
+			TitleLabel.Position = UDim2.new(0, 12, 0, 8)
+			TitleLabel.Size = UDim2.new(1, -24, 0, 16)
+			TitleLabel.Font = Enum.Font.GothamBold
+			tr(TitleLabel, title)
+			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+			mTS(TitleLabel, 12)
+			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			TitleLabel.Parent = SkillCard
+
+			local ValueBox = Instance.new("TextButton")
+			ValueBox.Name = "ValueBox"
+			ValueBox.BackgroundColor3 = themeColorFor("32,32,36", CurrentThemeName or "Dark")
+			ValueBox.BorderSizePixel = 0
+			ValueBox.Position = UDim2.new(0, 12, 0, 28)
+			ValueBox.Size = UDim2.new(1, -24, 0, 30)
+			ValueBox.Text = ""
+			ValueBox.AutoButtonColor = false
+			ValueBox.Parent = SkillCard
+
+			local ValueCorner = Instance.new("UICorner")
+			ValueCorner.CornerRadius = UDim.new(0, 6)
+			ValueCorner.Parent = ValueBox
+
+			local ValueLabel = Instance.new("TextLabel")
+			ValueLabel.BackgroundTransparency = 1
+			ValueLabel.Position = UDim2.new(0, 10, 0, 0)
+			ValueLabel.Size = UDim2.new(1, -40, 1, 0)
+			ValueLabel.Font = Enum.Font.GothamBold
+			ValueLabel.Text = ""
+			ValueLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+			mTS(ValueLabel, 12)
+			ValueLabel.TextXAlignment = Enum.TextXAlignment.Left
+			ValueLabel.Parent = ValueBox
+
+			local DropIcon = Instance.new("ImageLabel")
+			DropIcon.BackgroundTransparency = 1
+			DropIcon.AnchorPoint = Vector2.new(1, 0.5)
+			DropIcon.Position = UDim2.new(1, -10, 0.5, 0)
+			DropIcon.Size = UDim2.new(0, 12, 0, 12)
+			DropIcon.Image = Astral.Icons.down_arrow
+			DropIcon.ImageColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
+			DropIcon.ScaleType = Enum.ScaleType.Fit
+			DropIcon.Parent = ValueBox
+
+			local CdInput, HoldInput = nil, nil
+			local function doRefresh()
+				local st = findSkill(selectedKey)
+				pcall(function()
+					ValueLabel.Text = st.Key .. "  ·  " .. tostring(st.Cooldown) .. "s"
+					if CdInput then CdInput.Text = tostring(st.Cooldown) end
+					if HoldInput then HoldInput.Text = tostring(st.Hold) end
+				end)
 			end
-			onAccentChange(function(c) paintSkillAccent(c) end)
+
+			local function numRow(name, y, get, set)
+				local Cap = Instance.new("TextLabel")
+				Cap.BackgroundTransparency = 1
+				Cap.Position = UDim2.new(0, 12, 0, y)
+				Cap.Size = UDim2.new(0, 90, 0, 28)
+				Cap.Font = Enum.Font.Gotham
+				Cap.Text = name
+				Cap.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
+				mTS(Cap, 11)
+				Cap.TextXAlignment = Enum.TextXAlignment.Left
+				Cap.Parent = SkillCard
+
+				local Box = Instance.new("Frame")
+				Box.AnchorPoint = Vector2.new(1, 0)
+				Box.Position = UDim2.new(1, -12, 0, y)
+				Box.Size = UDim2.new(0, 92, 0, 28)
+				Box.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
+				Box.BorderSizePixel = 0
+				Box.Parent = SkillCard
+				local BoxCorner = Instance.new("UICorner")
+				BoxCorner.CornerRadius = UDim.new(0, 6)
+				BoxCorner.Parent = Box
+
+				local Input = Instance.new("TextBox")
+				Input.BackgroundTransparency = 1
+				Input.Size = UDim2.new(1, -8, 1, 0)
+				Input.Position = UDim2.new(0, 4, 0, 0)
+				Input.Font = Enum.Font.GothamBold
+				Input.Text = tostring(get())
+				Input.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+				Input.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				mTS(Input, 12)
+				Input.TextXAlignment = Enum.TextXAlignment.Right
+				Input.ClearTextOnFocus = false
+				Input.Parent = Box
+				Input.FocusLost:Connect(function()
+					local v = tonumber(Input.Text)
+					if v and v > 0 then set(v) end
+					Input.Text = tostring(get())
+					doRefresh()
+				end)
+				return Input
+			end
+
+			CdInput = numRow("Cooldown", 66, function()
+				return findSkill(selectedKey).Cooldown
+			end, function(v)
+				local st = findSkill(selectedKey)
+				st.Cooldown = math.max(0, tonumber(v) or st.Cooldown)
+			end)
+			HoldInput = numRow("Hold", 100, function()
+				return findSkill(selectedKey).Hold
+			end, function(v)
+				local st = findSkill(selectedKey)
+				st.Hold = math.clamp(tonumber(v) or st.Hold, 0.05, 30)
+			end)
 
 			local function triggerSkill(st)
 				if not st then return end
@@ -7106,133 +7232,16 @@ function Astral:MakeWindow(config)
 				task.spawn(callback, st.Key, st.Hold)
 			end
 
-			for i, st in ipairs(skills) do
-				local Row = Instance.new("TextButton")
-				Row.Name = "Skill_" .. st.Key
-				Row.BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark")
-				Row.BorderSizePixel = 0
-				Row.Position = UDim2.new(0, pad, 0, pad + (i - 1) * (rowH + gap))
-				Row.Size = UDim2.new(1, -pad * 2, 0, rowH)
-				Row.Text = ""
-				Row.AutoButtonColor = false
-				Row.Parent = SkillCard
-
-				local RowCorner = Instance.new("UICorner")
-				RowCorner.CornerRadius = UDim.new(0, 8)
-				RowCorner.Parent = Row
-
-				local RowStroke = Instance.new("UIStroke")
-				RowStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
-				RowStroke.Transparency = 0.45
-				RowStroke.Thickness = 1.2
-				RowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-				RowStroke.Parent = Row
-
-				local Bar = Instance.new("Frame")
-				Bar.AnchorPoint = Vector2.new(0, 0.5)
-				Bar.Position = UDim2.new(0, 10, 0.5, 0)
-				Bar.Size = UDim2.new(0, 3, 0, 22)
-				Bar.BackgroundColor3 = AccentColor
-				Bar.BorderSizePixel = 0
-				Bar.Parent = Row
-				local BarCorner = Instance.new("UICorner")
-				BarCorner.CornerRadius = UDim.new(1, 0)
-				BarCorner.Parent = Bar
-				table.insert(accentBars, Bar)
-
-				local KeyLabel = Instance.new("TextLabel")
-				KeyLabel.BackgroundTransparency = 1
-				KeyLabel.Position = UDim2.new(0, 22, 0, 0)
-				KeyLabel.Size = UDim2.new(0, 30, 1, 0)
-				KeyLabel.Font = Enum.Font.GothamBold
-				KeyLabel.Text = st.Key
-				KeyLabel.TextColor3 = AccentColor
-				mTS(KeyLabel, 16)
-				KeyLabel.TextXAlignment = Enum.TextXAlignment.Left
-				KeyLabel.Parent = Row
-				table.insert(keyLabels, KeyLabel)
-
-				local HoldBox = Instance.new("Frame")
-				HoldBox.AnchorPoint = Vector2.new(1, 0.5)
-				HoldBox.Position = UDim2.new(1, -10, 0.5, 0)
-				HoldBox.Size = UDim2.new(0, 92, 0, 26)
-				HoldBox.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
-				HoldBox.BorderSizePixel = 0
-				HoldBox.Parent = Row
-				local HoldCorner = Instance.new("UICorner")
-				HoldCorner.CornerRadius = UDim.new(0, 6)
-				HoldCorner.Parent = HoldBox
-
-				local HoldCap = Instance.new("TextLabel")
-				HoldCap.BackgroundTransparency = 1
-				HoldCap.Position = UDim2.new(0, 8, 0, 0)
-				HoldCap.Size = UDim2.new(0, 40, 1, 0)
-				HoldCap.Font = Enum.Font.Gotham
-				HoldCap.Text = "Hold:"
-				HoldCap.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
-				mTS(HoldCap, 11)
-				HoldCap.TextXAlignment = Enum.TextXAlignment.Left
-				HoldCap.Parent = HoldBox
-
-				local HoldInput = Instance.new("TextBox")
-				HoldInput.BackgroundTransparency = 1
-				HoldInput.AnchorPoint = Vector2.new(1, 0)
-				HoldInput.Position = UDim2.new(1, -6, 0, 0)
-				HoldInput.Size = UDim2.new(0.5, 0, 1, 0)
-				HoldInput.Font = Enum.Font.GothamBold
-				HoldInput.Text = tostring(st.Hold)
-				HoldInput.PlaceholderText = "0.5"
-				HoldInput.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
-				HoldInput.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-				mTS(HoldInput, 12)
-				HoldInput.TextXAlignment = Enum.TextXAlignment.Right
-				HoldInput.ClearTextOnFocus = false
-				HoldInput.Parent = HoldBox
-				HoldInput.FocusLost:Connect(function()
-					local v = tonumber(HoldInput.Text)
-					if v and v > 0 then
-						st.Hold = math.clamp(v, 0.05, 30)
+			ValueBox.MouseButton1Click:Connect(function()
+				if pickerOpen or selectorOpen then return end
+				openSelector(title, order, selectedKey, false, function(pick)
+					if pick ~= nil and tostring(pick) ~= "" and tostring(pick) ~= "None" then
+						selectedKey = tostring(pick):upper()
+						doRefresh()
 					end
-					HoldInput.Text = tostring(st.Hold)
-				end)
-
-				local CdCover = Instance.new("Frame")
-				CdCover.Name = "Cooldown"
-				CdCover.Size = UDim2.new(1, 0, 1, 0)
-				CdCover.BackgroundColor3 = themeColorFor("12,12,14", CurrentThemeName or "Dark")
-				CdCover.BackgroundTransparency = 0.45
-				CdCover.BorderSizePixel = 0
-				CdCover.Visible = false
-				CdCover.Parent = Row
-				local CdCorner = Instance.new("UICorner")
-				CdCorner.CornerRadius = UDim.new(0, 8)
-				CdCorner.Parent = CdCover
-				local CdLabel = Instance.new("TextLabel")
-				CdLabel.BackgroundTransparency = 1
-				CdLabel.AnchorPoint = Vector2.new(1, 0.5)
-				CdLabel.Position = UDim2.new(1, -12, 0.5, 0)
-				CdLabel.Size = UDim2.new(0, 60, 0, 18)
-				CdLabel.Font = Enum.Font.GothamBold
-				CdLabel.Text = ""
-				CdLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-				mTS(CdLabel, 13)
-				CdLabel.TextXAlignment = Enum.TextXAlignment.Right
-				CdLabel.Parent = CdCover
-				st.Cover = CdCover
-				st.Count = CdLabel
-
-				Row.MouseEnter:Connect(function()
-					TweenService:Create(Row, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("37,37,45", CurrentThemeName or "Dark") }):Play()
-				end)
-				Row.MouseLeave:Connect(function()
-					TweenService:Create(Row, TweenInfo.new(0.15), { BackgroundColor3 = themeColorFor("32,32,40", CurrentThemeName or "Dark") }):Play()
-				end)
-				Row.MouseButton1Click:Connect(function()
-					if pickerOpen or selectorOpen then return end
-					triggerSkill(st)
-				end)
-			end
-			paintSkillAccent(AccentColor)
+				end, ValueLabel, false)
+			end)
+			doRefresh()
 
 			UserInputService.InputBegan:Connect(function(input, gpe)
 				if gpe then return end
@@ -7246,21 +7255,7 @@ function Astral:MakeWindow(config)
 				end
 			end)
 
-			task.spawn(function()
-				while SkillCard.Parent ~= nil do
-					task.wait(0.1)
-					local now = os.clock()
-					for _, st in ipairs(skills) do
-						local left = (st.cdUntil or 0) - now
-						pcall(function()
-							if st.Cover then st.Cover.Visible = left > 0 end
-							if st.Count and left > 0 then st.Count.Text = string.format("%.1f", left) end
-						end)
-					end
-				end
-			end)
-
-			registerElement(SkillCard, calculatedHeight, skillConfig.Position)
+			registerElement(SkillCard, cardH, skillConfig.Position)
 
 			local SkillController = {}
 			function SkillController:GetSkills()
@@ -7270,12 +7265,26 @@ function Astral:MakeWindow(config)
 				end
 				return out
 			end
+			function SkillController:GetSelected()
+				return selectedKey
+			end
+			function SkillController:SetSelected(key)
+				for _, st in ipairs(skills) do
+					if st.Key == tostring(key):upper() then
+						selectedKey = st.Key
+						doRefresh()
+						return true
+					end
+				end
+				return false
+			end
 			function SkillController:SetHold(key, v)
 				for _, st in ipairs(skills) do
 					if st.Key == tostring(key):upper() and tonumber(v) then
 						st.Hold = math.clamp(tonumber(v), 0.05, 30)
 					end
 				end
+				doRefresh()
 			end
 			function SkillController:SetCooldown(key, v)
 				for _, st in ipairs(skills) do
@@ -7283,6 +7292,7 @@ function Astral:MakeWindow(config)
 						st.Cooldown = math.max(0, tonumber(v))
 					end
 				end
+				doRefresh()
 			end
 			function SkillController:Trigger(key)
 				for _, st in ipairs(skills) do
@@ -7291,6 +7301,8 @@ function Astral:MakeWindow(config)
 			end
 			return SkillController
 		end
+
+
 		function TabObject:AddPlayerBrowser(config)
 			config = config or {}
 			local title = config.Title or "Players Section"

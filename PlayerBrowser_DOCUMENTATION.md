@@ -27,29 +27,29 @@ stop:SetText("HOLD") -- stop:Destroy() removes it
 Circular, draggable, accent ring, press bounce. ToggleList entries need
 a `:Set` method (all Lumu toggles/ticks have it).
 
-## Skill selector (fight-game skills with cooldowns)
+## Skill selector (dropdown + per-skill numbers)
 
 ```lua
 local sk = Tab:AddSkillSelector({
+  Title = "Skill",
   Skills = {
     { Key = "Z", Hold = 0.5, Cooldown = 3 },
     { Key = "X", Hold = 0.5, Cooldown = 5 },
-    { Key = "C", Hold = 0.5, Cooldown = 8 },
-    { Key = "V", Hold = 1.0, Cooldown = 12 },
   },
   Callback = function(key, hold)
     print("fire", key, "hold", hold)
   end,
 })
-sk:GetSkills()      -- { Z = { Hold = 0.5, Cooldown = 3 }, ... }
-sk:SetHold("Z", 1)  -- sk:SetCooldown("Z", 4)
-sk:Trigger("X")      -- fire from code (mobile buttons)
+sk:GetSelected()       -- "X"
+sk:SetSelected("Z")
+sk:GetSkills()         -- { Z = { Hold = 0.5, Cooldown = 3 }, ... }
+sk:SetHold("Z", 1)     -- sk:SetCooldown("Z", 4)
+sk:Trigger("X")        -- fire from code (mobile buttons)
 ```
 
-- Press the key (or tap the row) to fire. Row greys out with a live
-  countdown while cooling down; early presses are ignored.
-- The `Hold:` box is editable in-UI per skill.
-- Accent bar + key letter follow your skin.
+- Pick the skill in the slide-in dropdown, type its Cooldown/Hold in
+  the small boxes. Press the key (or tap via `:Trigger`) to fire.
+- Firing starts that skill's cooldown; early presses are ignored.
 
 ## Player browser
 
