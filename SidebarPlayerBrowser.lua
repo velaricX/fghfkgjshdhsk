@@ -2717,7 +2717,15 @@ function Astral:MakeWindow(config)
 					pcall(function() ok2 = Window:LoadConfig(cfgName) end)
 					pcall(function() Window:Notify({ Type = ok2 and "good" or "warning", Title = ok2 and "Loaded" or "Load failed", Message = tostring(cfgName), Duration = 3 }) end)
 				end })
-				do
+				local refreshFileList
+				configSub:AddButton({ Title = "Delete config", Icon = "Close", Callback = function()
+					local ok2 = false
+					pcall(function() if delfile then delfile(cfgName); ok2 = true end end)
+					pcall(function() Window:Notify({ Type = ok2 and "good" or "warning", Title = ok2 and "Deleted" or "Delete failed", Message = tostring(cfgName), Duration = 3 }) end)
+					pcall(refreshFileList)
+				end })
+				local fileSel = nil
+				refreshFileList = function()
 					local files = {}
 					pcall(function()
 						if listfiles then
@@ -2728,8 +2736,10 @@ function Astral:MakeWindow(config)
 							end
 						end
 					end)
-					if #files > 0 then
-						configSub:AddSelector({ Title = "Load file", Description = "Pick a saved json.", Options = files, Icon = "Home", Callback = function(v)
+					if fileSel then
+						pcall(function() fileSel:SetOptions(files) end)
+					elseif #files > 0 then
+						fileSel = configSub:AddSelector({ Title = "Load file", Description = "Pick a saved json.", Options = files, Icon = "Home", Callback = function(v)
 							pcall(function()
 								if Window:LoadConfig(v) then
 									Window:Notify({ Type = "good", Title = "Loaded", Message = tostring(v), Duration = 3 })
@@ -2738,6 +2748,11 @@ function Astral:MakeWindow(config)
 						end })
 					end
 				end
+				refreshFileList()
+				configSub:AddButton({ Title = "Rescan files", Icon = "Badge Gear", Callback = function()
+					pcall(refreshFileList)
+					pcall(function() Window:Notify({ Type = "good", Title = "Rescanned", Message = "Config list updated.", Duration = 2 }) end)
+				end })
 				settingsTabData = tabs[#tabs]
 				pcall(function()
 					local tb = tabs[#tabs]
@@ -5121,6 +5136,54 @@ function Astral:MakeWindow(config)
 				if ic then Astral.ApplyIcon(ic, parseIcon(iconInput)) end
 			end
 			return SectionController
+		end
+		-- =========================================================================
+		-- CONTENT SECTION (classic style: left title + underline).
+		-- Second flavor next to AddSection — use whichever fits the tab.
+		--   local C = Tab:AddContentSection({ Title = "Farming & Combat" })
+		--   C:SetTitle("Bosses")
+		-- =========================================================================
+		function TabObject:AddContentSection(sectionConfig)
+			sectionConfig = sectionConfig or {}
+			local title = sectionConfig.Title or sectionConfig.Name or "Section"
+			local h = IsMobile and 40 or 45
+
+			local SecFrame = Instance.new("Frame")
+			SecFrame.Name = title .. "_ContentSection"
+			SecFrame.BackgroundTransparency = 1
+			SecFrame.BorderSizePixel = 0
+
+			local SecLabel = Instance.new("TextLabel")
+			SecLabel.Name = "Title"
+			SecLabel.BackgroundTransparency = 1
+			SecLabel.Position = UDim2.new(0, 2, 0, 6)
+			SecLabel.Size = UDim2.new(1, -4, 0, IsMobile and 20 or 24)
+			SecLabel.Font = Enum.Font.GothamBold
+			tr(SecLabel, title)
+			SecLabel.TextColor3 = themeColorFor("220,220,228", CurrentThemeName or "Dark")
+			mTS(SecLabel, IsMobile and 15 or 16)
+			SecLabel.TextXAlignment = Enum.TextXAlignment.Left
+			SecLabel.TextTruncate = Enum.TextTruncate.AtEnd
+			SecLabel.Parent = SecFrame
+
+			local SecLine = Instance.new("Frame")
+			SecLine.Name = "Line"
+			SecLine.AnchorPoint = Vector2.new(0, 1)
+			SecLine.Position = UDim2.new(0, 2, 1, -4)
+			SecLine.Size = UDim2.new(1, -4, 0, 2)
+			SecLine.BackgroundColor3 = themeColorFor("50,50,55", CurrentThemeName or "Dark")
+			SecLine.BackgroundTransparency = 0.3
+			SecLine.BorderSizePixel = 0
+			SecLine.Parent = SecFrame
+
+			registerElement(SecFrame, h, sectionConfig.Position)
+
+			local ContentSectionController = {}
+			function ContentSectionController:SetTitle(t)
+				SecLabel.Text = tostring(t)
+			end
+			ContentSectionController.SetText = ContentSectionController.SetTitle
+			return ContentSectionController
 		end
 		-- =========================================================================
 		-- NEW PARAGRAPH IMPLEMENTATION (PIXEL-PERFECT IMAGE & TEXT CARD)
@@ -7921,6 +7984,81 @@ function Astral:MakeWindow(config)
 				if p.Scale then p.Scale.Scale = s end
 			end)
 		end
+	end
+	-- Floating circular STOP button (lives outside the window, draggable).
+	-- Turns the given toggles off (needs their :Set) then fires Callback.
+	--   local stop = Window:AddStopButton({ Text = "STOP", ToggleList = { myToggle }, Callback = function() end })
+	function Window:AddStopButton(cfg)
+		cfg = cfg or {}
+		local text = cfg.Text or "STOP"
+		local toggles = cfg.ToggleList or {}
+		local cb = cfg.Callback or function() end
+		local SZ = 72
+		local btn = Instance.new("TextButton")
+		btn.Name = "StopButton"
+		btn.Size = UDim2.new(0, SZ, 0, SZ)
+		btn.Position = cfg.Position or UDim2.new(1, -90, 0.5, -36)
+		btn.BackgroundColor3 = themeColorFor("15,15,15", CurrentThemeName or "Dark")
+		btn.Font = Enum.Font.GothamBold
+		btn.Text = tostring(text)
+		btn.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+		btn.TextSize = 13
+		btn.TextWrapped = true
+		btn.AutoButtonColor = false
+		btn.Active = true
+		btn.ZIndex = 450
+		btn.Parent = ScreenGui
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(1, 0)
+		corner.Parent = btn
+		local ring = Instance.new("UIStroke")
+		ring.Color = AccentColor
+		ring.Thickness = 2
+		ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		ring.Parent = btn
+		onAccentChange(function(c) pcall(function() ring.Color = c end) end)
+		local sc = Instance.new("UIScale")
+		sc.Scale = 1
+		sc.Parent = btn
+		local dragging = false
+		local dragStart, startPos = nil, nil
+		btn.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				startPos = btn.Position
+				TweenService:Create(sc, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 0.85 }):Play()
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then dragging = false end
+				end)
+			end
+		end)
+		UserInputService.InputChanged:Connect(function(input)
+			if not dragging then return end
+			if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+				local dx = input.Position.X - dragStart.X
+				local dy = input.Position.Y - dragStart.Y
+				btn.Position = clampPanelOnScreen(UDim2.new(startPos.X.Scale, startPos.X.Offset + dx, startPos.Y.Scale, startPos.Y.Offset + dy), SZ, SZ)
+			end
+		end)
+		UserInputService.InputEnded:Connect(function(input)
+			if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
+			if not dragging then return end
+			dragging = false
+			TweenService:Create(sc, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			for _, tg in ipairs(toggles) do
+				pcall(function()
+					if tg and tg.Set then tg:Set(false)
+					elseif tg and tg.SetState then tg:SetState(false) end
+				end)
+			end
+			task.spawn(cb)
+		end)
+		local StopController = {}
+		function StopController:SetText(t) btn.Text = tostring(t) end
+		function StopController:Destroy() pcall(function() btn:Destroy() end) end
+		StopController.Button = btn
+		return StopController
 	end
 	function Window:SetTransparency(t)
 		t = math.clamp(tonumber(t) or 0, 0, 0.75)

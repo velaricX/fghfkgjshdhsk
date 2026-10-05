@@ -4,6 +4,29 @@ Standalone copies: `SidebarPlayerBrowser.lua`, `TopbarPlayerBrowser.lua`
 (+ `icons_sprites.lua`, call `:RegisterIcons(icons)`). Beta-only — test here
 before anything merges to `main`.
 
+## Sections (two flavors)
+
+```lua
+Tab:AddSection({ Title = "Farming", Icon = "Home" })          -- gradient bars + centered title
+Tab:AddContentSection({ Title = "Farming & Combat" })         -- classic left title + underline
+```
+
+Both return `:SetTitle(t)` (`:SetText` alias); `AddSection` also has `:SetIcon`.
+
+## Floating STOP button
+
+```lua
+local stop = Window:AddStopButton({
+  Text = "STOP",
+  ToggleList = { myToggle }, -- turned off via :Set(false) on press
+  Callback = function() print("stopped") end,
+})
+stop:SetText("HOLD") -- stop:Destroy() removes it
+```
+
+Circular, draggable, accent ring, press bounce. ToggleList entries need
+a `:Set` method (all Lumu toggles/ticks have it).
+
 ## Player browser
 
 ```lua
