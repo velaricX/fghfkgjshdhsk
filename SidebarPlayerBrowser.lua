@@ -5511,7 +5511,7 @@ function Astral:MakeWindow(config)
 
 			local OnlineDot = Instance.new("Frame")
 			OnlineDot.Name = "OnlineDot"
-			OnlineDot.Size = UDim2.new(0, 7, 0, 7)
+			OnlineDot.Size = UDim2.new(0, 8, 0, 8)
 			OnlineDot.BackgroundColor3 = Color3.fromRGB(35, 165, 90)
 			OnlineDot.BorderSizePixel = 0
 			OnlineDot.LayoutOrder = 1
@@ -5540,7 +5540,7 @@ function Astral:MakeWindow(config)
 
 			local MemberDot = Instance.new("Frame")
 			MemberDot.Name = "MemberDot"
-			MemberDot.Size = UDim2.new(0, 7, 0, 7)
+			MemberDot.Size = UDim2.new(0, 8, 0, 8)
 			MemberDot.BackgroundColor3 = Color3.fromRGB(128, 132, 142)
 			MemberDot.BorderSizePixel = 0
 			MemberDot.LayoutOrder = 4
@@ -5601,11 +5601,43 @@ function Astral:MakeWindow(config)
 			DescLabel.LayoutOrder = 2
 			DescLabel.Parent = InfoHolder
 
+			local GameActivityFrame = Instance.new("Frame")
+			GameActivityFrame.Size = UDim2.new(1, -28, 0, 22)
+			GameActivityFrame.Position = UDim2.new(0, 14, 0, 160)
+			GameActivityFrame.BackgroundTransparency = 1
+			GameActivityFrame.Parent = MainFrame
+
+			local GameIcon = Instance.new("ImageLabel")
+			GameIcon.Size = UDim2.new(0, 22, 0, 22)
+			GameIcon.Position = UDim2.new(0, 0, 0.5, -11)
+			GameIcon.Image = "rbxassetid://104079816442680"
+			GameIcon.BackgroundTransparency = 1
+			GameIcon.Parent = GameActivityFrame
+
+			local FlameBadge = Instance.new("ImageLabel")
+			FlameBadge.Size = UDim2.new(0, 10, 0, 10)
+			FlameBadge.Position = UDim2.new(1, -5, 0, -3)
+			FlameBadge.Image = "rbxassetid://10841141110"
+			FlameBadge.ImageColor3 = Color3.fromHex("#ff7324")
+			FlameBadge.BackgroundTransparency = 1
+			FlameBadge.Parent = GameIcon
+
+			local GameLabel = Instance.new("TextLabel")
+			GameLabel.Size = UDim2.new(1, -28, 1, 0)
+			GameLabel.Position = UDim2.new(0, 28, 0, 0)
+			GameLabel.Text = data.GameLabel or "ROBLOX"
+			GameLabel.Font = Enum.Font.GothamBold
+			mTS(GameLabel, 12)
+			GameLabel.TextColor3 = Color3.fromHex("#ffffff")
+			GameLabel.TextXAlignment = Enum.TextXAlignment.Left
+			GameLabel.BackgroundTransparency = 1
+			GameLabel.Parent = GameActivityFrame
+
 			local ActionButton = Instance.new("TextButton")
 			ActionButton.Name = "JoinButton"
 			ActionButton.Size = UDim2.new(0, 110, 0, 36)
 			ActionButton.Position = UDim2.new(1, -124, 1, -50)
-			ActionButton.BackgroundColor3 = Color3.fromRGB(87, 242, 135)
+			ActionButton.BackgroundColor3 = Color3.fromRGB(53, 163, 94)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
@@ -5618,7 +5650,7 @@ function Astral:MakeWindow(config)
 			ButtonCorner.CornerRadius = UDim.new(0, 8)
 			ButtonCorner.Parent = ActionButton
 
-			local baseColor = Color3.fromRGB(87, 242, 135)
+			local baseColor = Color3.fromRGB(53, 163, 94)
 			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
@@ -5678,7 +5710,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
 			end)
 
-			registerElement(MainFrame, 215, config.Position)
+			registerElement(MainFrame, 245, config.Position)
 
 		end
 		-- =========================================================================
