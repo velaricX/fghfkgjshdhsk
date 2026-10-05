@@ -5491,7 +5491,7 @@ function Astral:MakeWindow(config)
 			ServerIcon.Parent = MainFrame
 
 			local IconCorner = Instance.new("UICorner")
-			IconCorner.CornerRadius = UDim.new(1, 0)
+			IconCorner.CornerRadius = UDim.new(0, 16)
 			IconCorner.Parent = ServerIcon
 
 			local IconStroke = Instance.new("UIStroke")
