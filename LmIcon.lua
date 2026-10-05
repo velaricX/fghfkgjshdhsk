@@ -1771,7 +1771,6 @@ local SPI = {
 	["Zebra Cap2"] = { Image = "rbxassetid://71981840929411", ImageRectOffset = Vector2.new(457, 305), ImageRectSize = Vector2.new(150, 150) },
 	["Zombie Bass1"] = { Image = "rbxassetid://108470975610095", ImageRectOffset = Vector2.new(609, 305), ImageRectSize = Vector2.new(150, 150) },
 	["Zombie Bass2"] = { Image = "rbxassetid://108470975610095", ImageRectOffset = Vector2.new(609, 457), ImageRectSize = Vector2.new(150, 150) },
-	["[P] Dark Blade1"] = { Image = "rbxassetid://74936679753141", ImageRectOffset = Vector2.new(305, 609), ImageRectSize = Vector2.new(150, 150) },
 	["bandit-village-s1"] = { Image = "rbxassetid://106909739896381", ImageRectOffset = Vector2.new(253, 1), ImageRectSize = Vector2.new(250, 250) },
 	["bandit-village-s1-front"] = { Image = "rbxassetid://98058255976414", ImageRectOffset = Vector2.new(513, 1), ImageRectSize = Vector2.new(250, 250) },
 	["bandit-village-s1-outline"] = { Image = "rbxassetid://106909739896381", ImageRectOffset = Vector2.new(1, 1), ImageRectSize = Vector2.new(250, 250) },
