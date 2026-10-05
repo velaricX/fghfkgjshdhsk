@@ -2780,12 +2780,13 @@ function Astral:MakeWindow(config)
 	-- Global element search (Ctrl+K): type anything, jump to any button.
 	-- Zero outer locals (do-end) for the 200-local limit.
 	do
-	if true then
+	if config.SearchBar ~= false then
+		local searchFlashTime = tonumber(config.SearchFlashTime) or 5
 		local SearchBox = Instance.new("TextBox")
 		SearchBox.Name = "GlobalSearch"
-		SearchBox.AnchorPoint = Vector2.new(0.5, 0.5)
-		SearchBox.Position = UDim2.new(0.5, 0, 0.5, 0)
-		SearchBox.Size = UDim2.new(0, IsMobile and 170 or 280, 0, IsMobile and 28 or 30)
+		SearchBox.AnchorPoint = Vector2.new(1, 0.5)
+		SearchBox.Position = UDim2.new(1, -48, 0.5, 0)
+		SearchBox.Size = UDim2.new(0, IsMobile and 140 or 220, 0, IsMobile and 28 or 30)
 		SearchBox.BackgroundColor3 = themeColorFor("40,40,50", CurrentThemeName or "Dark")
 		SearchBox.BorderSizePixel = 0
 		SearchBox.Font = Enum.Font.Gotham
@@ -2836,9 +2837,9 @@ function Astral:MakeWindow(config)
 
 		local Results = Instance.new("Frame")
 		Results.Name = "SearchResults"
-		Results.AnchorPoint = Vector2.new(0.5, 0)
-		Results.Position = UDim2.new(0.5, 0, 0, 56)
-		Results.Size = UDim2.new(0, IsMobile and 170 or 280, 0, 8)
+		Results.AnchorPoint = Vector2.new(1, 0)
+		Results.Position = UDim2.new(1, -48, 0, 56)
+		Results.Size = UDim2.new(0, IsMobile and 140 or 220, 0, 8)
 		Results.BackgroundColor3 = themeColorFor("30,30,37", CurrentThemeName or "Dark")
 		Results.BorderSizePixel = 0
 		Results.Visible = false
@@ -2867,6 +2868,7 @@ function Astral:MakeWindow(config)
 		local function hideResults()
 			Results.Visible = false
 		end
+		local lastMatches = {}
 
 		local function collectMatches(q)
 			local out = {}
@@ -2911,7 +2913,7 @@ function Astral:MakeWindow(config)
 					TweenService:Create(sc, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { CanvasPosition = Vector2.new(0, math.max(0, y)) }):Play()
 					local c0 = m.frame.BackgroundColor3
 					TweenService:Create(m.frame, TweenInfo.new(0.18), { BackgroundColor3 = AccentColor }):Play()
-					task.delay(0.55, function()
+					task.delay(searchFlashTime, function()
 						pcall(function() TweenService:Create(m.frame, TweenInfo.new(0.25), { BackgroundColor3 = c0 }):Play() end)
 					end)
 				end)
@@ -2925,6 +2927,7 @@ function Astral:MakeWindow(config)
 			local q = string.lower(string.match(SearchBox.Text or "", "^%s*(.-)%s*$") or "")
 			if q == "" then hideResults() return end
 			local matches = collectMatches(q)
+			lastMatches = matches
 			if #matches == 0 then hideResults() return end
 			for i = 1, math.min(8, #matches) do
 				local m = matches[i]
@@ -2970,7 +2973,7 @@ function Astral:MakeWindow(config)
 				end)
 				row.MouseButton1Click:Connect(function() jumpTo(m) end)
 			end
-			Results.Size = UDim2.new(0, IsMobile and 170 or 280, 0, math.min(8, #matches) * 32 + 8)
+			Results.Size = UDim2.new(0, IsMobile and 140 or 220, 0, math.min(8, #matches) * 32 + 8)
 			Results.Visible = true
 		end
 		SearchBox:GetPropertyChangedSignal("Text"):Connect(refreshResults)
@@ -2981,6 +2984,17 @@ function Astral:MakeWindow(config)
 		end)
 		CtrlBadge.MouseButton1Click:Connect(function() pcall(function() SearchBox:CaptureFocus() end) end)
 		UserInputService.InputBegan:Connect(function(input, gpe)
+			local focused = false
+			pcall(function() focused = UserInputService:GetFocusedTextBox() == SearchBox end)
+			if input.KeyCode == Enum.KeyCode.Return and focused and #lastMatches > 0 then
+				jumpTo(lastMatches[1])
+				return
+			end
+			if input.KeyCode == Enum.KeyCode.Escape and focused then
+				SearchBox.Text = ""
+				pcall(function() SearchBox:ReleaseFocus() end)
+				return
+			end
 			if gpe then return end
 			if input.KeyCode == Enum.KeyCode.K then
 				local ctrl = false
