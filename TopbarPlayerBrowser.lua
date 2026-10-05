@@ -8059,10 +8059,20 @@ function Astral:MakeWindow(config)
 	-- Manual window size override (preview PC vs mobile sizes live)
 	function Window:SetUIScale(p)
 		p = math.clamp(tonumber(p) or 1, 0.7, 1.3)
-		Window._BaseRefW = Window._BaseRefW or refW
-		Window._BaseRefH = Window._BaseRefH or refH
-		refW, refH = math.floor(Window._BaseRefW * p), math.floor(Window._BaseRefH * p)
-		pcall(updateWindowSize)
+		Window._UIScalePending = p
+		if Window._UIScaleBusy then return end
+		Window._UIScaleBusy = true
+		task.spawn(function()
+			task.wait(0.15)
+			local fp = Window._UIScalePending
+			Window._UIScaleBusy = false
+			if fp == nil then return end
+			Window._UIScalePending = nil
+			Window._BaseRefW = Window._BaseRefW or refW
+			Window._BaseRefH = Window._BaseRefH or refH
+			refW, refH = math.floor(Window._BaseRefW * fp), math.floor(Window._BaseRefH * fp)
+			pcall(updateWindowSize)
+		end)
 	end
 	function Window:PlayIntro()
 		pcall(function()
