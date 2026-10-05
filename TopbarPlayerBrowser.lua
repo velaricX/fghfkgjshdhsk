@@ -2394,7 +2394,7 @@ function Astral:MakeWindow(config)
 	local searchConn = nil
 	local activeSelectorRefresh = nil
 
-	local function openSelector(title, options, current, searchEnabled, callback, buttonTextLabel, isMulti)
+	local function openSelector(title, options, current, searchEnabled, callback, buttonTextLabel, isMulti, numberBoxes)
 		if pickerOpen then closeColorPicker() end
 		
 		SelectorPanelTitle.Text = translateText(title)
@@ -2516,6 +2516,38 @@ function Astral:MakeWindow(config)
 				OptionLabel.LayoutOrder = 2
 				OptionLabel.ZIndex = 204
 				OptionLabel.Parent = OptionBtn
+
+				local nb = numberBoxes and numberBoxes[optionStr] or nil
+				if nb then
+					OptionLabel.Size = UDim2.new(1, -84, 1, 0)
+					local NumBox = Instance.new("TextBox")
+					NumBox.AnchorPoint = Vector2.new(1, 0.5)
+					NumBox.Position = UDim2.new(1, -8, 0.5, 0)
+					NumBox.Size = UDim2.new(0, 56, 0, 26)
+					NumBox.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
+					NumBox.BorderSizePixel = 0
+					NumBox.Font = Enum.Font.GothamBold
+					local initTxt = ""
+					pcall(function() initTxt = tostring(nb.Get and nb.Get() or "") end)
+					NumBox.Text = initTxt
+					NumBox.PlaceholderText = "0"
+					NumBox.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
+					NumBox.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+					NumBox.TextSize = 12
+					NumBox.TextXAlignment = Enum.TextXAlignment.Center
+					NumBox.ClearTextOnFocus = false
+					NumBox.ZIndex = 205
+					NumBox.Parent = OptionBtn
+					local NumCorner = Instance.new("UICorner")
+					NumCorner.CornerRadius = UDim.new(0, 6)
+					NumCorner.Parent = NumBox
+					NumBox.FocusLost:Connect(function()
+						pcall(function()
+							if nb.Set then nb.Set(NumBox.Text) end
+							if nb.Get then NumBox.Text = tostring(nb.Get()) end
+						end)
+					end)
+				end
 
 				OptionBtn.MouseButton1Click:Connect(function()
 					-- FIXED: High-performance subtle flash blue effect on click
@@ -7237,6 +7269,16 @@ function Astral:MakeWindow(config)
 		--     Callback = function(key, hold) print(key, hold) end,
 		--   })
 		-- =========================================================================
+		-- =========================================================================
+		-- SKILL SELECTOR (plain selector look, opens the slide-in panel).
+		-- Each panel row carries a small cooldown box. Press the key
+		-- (or :Trigger) to fire; cooldown is enforced per skill.
+		--   Tab:AddSkillSelector({
+		--     Title = "Skill",
+		--     Skills = { { Key = "Z", Hold = 0.5, Cooldown = 3 } },
+		--     Callback = function(key, hold) print(key, hold) end,
+		--   })
+		-- =========================================================================
 		function TabObject:AddSkillSelector(skillConfig)
 			skillConfig = skillConfig or {}
 			local callback = skillConfig.Callback or function() end
@@ -7270,7 +7312,7 @@ function Astral:MakeWindow(config)
 				return skills[1]
 			end
 
-			local cardH = 142
+			local cardH = 68
 			local SkillCard = Instance.new("Frame")
 			SkillCard.Name = title .. "_SkillSelector"
 			SkillCard.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
@@ -7334,72 +7376,12 @@ function Astral:MakeWindow(config)
 			DropIcon.ScaleType = Enum.ScaleType.Fit
 			DropIcon.Parent = ValueBox
 
-			local CdInput, HoldInput = nil, nil
-			local function doRefresh()
+			local function refreshCard()
 				local st = findSkill(selectedKey)
 				pcall(function()
 					ValueLabel.Text = st.Key .. "  ·  " .. tostring(st.Cooldown) .. "s"
-					if CdInput then CdInput.Text = tostring(st.Cooldown) end
-					if HoldInput then HoldInput.Text = tostring(st.Hold) end
 				end)
 			end
-
-			local function numRow(name, y, get, set)
-				local Cap = Instance.new("TextLabel")
-				Cap.BackgroundTransparency = 1
-				Cap.Position = UDim2.new(0, 12, 0, y)
-				Cap.Size = UDim2.new(0, 90, 0, 28)
-				Cap.Font = Enum.Font.Gotham
-				Cap.Text = name
-				Cap.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
-				mTS(Cap, 11)
-				Cap.TextXAlignment = Enum.TextXAlignment.Left
-				Cap.Parent = SkillCard
-
-				local Box = Instance.new("Frame")
-				Box.AnchorPoint = Vector2.new(1, 0)
-				Box.Position = UDim2.new(1, -12, 0, y)
-				Box.Size = UDim2.new(0, 92, 0, 28)
-				Box.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
-				Box.BorderSizePixel = 0
-				Box.Parent = SkillCard
-				local BoxCorner = Instance.new("UICorner")
-				BoxCorner.CornerRadius = UDim.new(0, 6)
-				BoxCorner.Parent = Box
-
-				local Input = Instance.new("TextBox")
-				Input.BackgroundTransparency = 1
-				Input.Size = UDim2.new(1, -8, 1, 0)
-				Input.Position = UDim2.new(0, 4, 0, 0)
-				Input.Font = Enum.Font.GothamBold
-				Input.Text = tostring(get())
-				Input.PlaceholderColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
-				Input.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-				mTS(Input, 12)
-				Input.TextXAlignment = Enum.TextXAlignment.Right
-				Input.ClearTextOnFocus = false
-				Input.Parent = Box
-				Input.FocusLost:Connect(function()
-					local v = tonumber(Input.Text)
-					if v and v > 0 then set(v) end
-					Input.Text = tostring(get())
-					doRefresh()
-				end)
-				return Input
-			end
-
-			CdInput = numRow("Cooldown", 66, function()
-				return findSkill(selectedKey).Cooldown
-			end, function(v)
-				local st = findSkill(selectedKey)
-				st.Cooldown = math.max(0, tonumber(v) or st.Cooldown)
-			end)
-			HoldInput = numRow("Hold", 100, function()
-				return findSkill(selectedKey).Hold
-			end, function(v)
-				local st = findSkill(selectedKey)
-				st.Hold = math.clamp(tonumber(v) or st.Hold, 0.05, 30)
-			end)
 
 			local function triggerSkill(st)
 				if not st then return end
@@ -7410,14 +7392,28 @@ function Astral:MakeWindow(config)
 
 			ValueBox.MouseButton1Click:Connect(function()
 				if pickerOpen or selectorOpen then return end
+				local boxes = {}
+				for _, st in ipairs(skills) do
+					local sk = st
+					boxes[sk.Key] = {
+						Get = function() return sk.Cooldown end,
+						Set = function(t)
+							local v = tonumber(t)
+							if v then
+								sk.Cooldown = math.max(0, v)
+								refreshCard()
+							end
+						end,
+					}
+				end
 				openSelector(title, order, selectedKey, false, function(pick)
 					if pick ~= nil and tostring(pick) ~= "" and tostring(pick) ~= "None" then
 						selectedKey = tostring(pick):upper()
-						doRefresh()
+						refreshCard()
 					end
-				end, ValueLabel, false)
+				end, ValueLabel, false, boxes)
 			end)
-			doRefresh()
+			refreshCard()
 
 			UserInputService.InputBegan:Connect(function(input, gpe)
 				if gpe then return end
@@ -7448,7 +7444,7 @@ function Astral:MakeWindow(config)
 				for _, st in ipairs(skills) do
 					if st.Key == tostring(key):upper() then
 						selectedKey = st.Key
-						doRefresh()
+						refreshCard()
 						return true
 					end
 				end
@@ -7460,15 +7456,14 @@ function Astral:MakeWindow(config)
 						st.Hold = math.clamp(tonumber(v), 0.05, 30)
 					end
 				end
-				doRefresh()
 			end
 			function SkillController:SetCooldown(key, v)
 				for _, st in ipairs(skills) do
 					if st.Key == tostring(key):upper() and tonumber(v) then
 						st.Cooldown = math.max(0, tonumber(v))
+						refreshCard()
 					end
 				end
-				doRefresh()
 			end
 			function SkillController:Trigger(key)
 				for _, st in ipairs(skills) do

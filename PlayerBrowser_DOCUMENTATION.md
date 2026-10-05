@@ -27,7 +27,7 @@ stop:SetText("HOLD") -- stop:Destroy() removes it
 Circular, draggable, accent ring, press bounce. ToggleList entries need
 a `:Set` method (all Lumu toggles/ticks have it).
 
-## Skill selector (dropdown + per-skill numbers)
+## Skill selector (dropdown + per-skill cooldown box)
 
 ```lua
 local sk = Tab:AddSkillSelector({
