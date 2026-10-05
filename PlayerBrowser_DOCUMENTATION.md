@@ -47,8 +47,8 @@ sk:SetHold("Z", 1)     -- sk:SetCooldown("Z", 4)
 sk:Trigger("X")        -- fire from code (mobile buttons)
 ```
 
-- Pick the skill in the slide-in dropdown, type its Cooldown/Hold in
-  the small boxes. Press the key (or tap via `:Trigger`) to fire.
+- Pick the skill in the slide-in dropdown, type its Cooldown in
+  the small box on each row. Press the key to fire.
 - Firing starts that skill's cooldown; early presses are ignored.
 
 ## Player browser
