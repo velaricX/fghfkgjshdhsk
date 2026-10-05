@@ -5401,7 +5401,7 @@ function Astral:MakeWindow(config)
 			local MainFrame = Instance.new("Frame")
 			MainFrame.Name = "DiscordInvite"
 			MainFrame.Size = UDim2.new(1, 0, 0, 260)
-			MainFrame.BackgroundColor3 = Color3.fromHex("#1e1f22")
+			MainFrame.BackgroundColor3 = Color3.fromHex("#141416")
 			MainFrame.BorderSizePixel = 0
 			MainFrame.ClipsDescendants = true
 
@@ -5423,7 +5423,7 @@ function Astral:MakeWindow(config)
 
 			local Banner = Instance.new("ImageLabel")
 			Banner.Name = "Banner"
-			Banner.Size = UDim2.new(1, 0, 0, 84)
+			Banner.Size = UDim2.new(1, 0, 0, 70)
 			Banner.Position = UDim2.new(0, 0, 0, 0)
 			Banner.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
 			Banner.Image = data.BackgroundBannerId or "rbxassetid://127861212431489"
@@ -5439,8 +5439,8 @@ function Astral:MakeWindow(config)
 
 			local ServerIcon = Instance.new("ImageLabel")
 			ServerIcon.Name = "ServerIcon"
-			ServerIcon.Size = UDim2.new(0, 52, 0, 52)
-			ServerIcon.Position = UDim2.new(0, 14, 0, 58)
+			ServerIcon.Size = UDim2.new(0, 48, 0, 48)
+			ServerIcon.Position = UDim2.new(0, 14, 0, 46)
 			ServerIcon.Image = data.ServerIconId or "rbxassetid://106987676739927"
 			ServerIcon.BackgroundColor3 = Color3.fromHex("#1e1f22")
 			ServerIcon.BorderSizePixel = 0
@@ -5458,8 +5458,8 @@ function Astral:MakeWindow(config)
 
 			local InfoHolder = Instance.new("Frame")
 			InfoHolder.Name = "InfoHolder"
-			InfoHolder.Size = UDim2.new(1, -100, 0, 60)
-			InfoHolder.Position = UDim2.new(0, 86, 0, 92)
+			InfoHolder.Size = UDim2.new(1, -86, 0, 54)
+			InfoHolder.Position = UDim2.new(0, 72, 0, 72)
 			InfoHolder.BackgroundTransparency = 1
 			InfoHolder.Parent = MainFrame
 
@@ -5504,7 +5504,7 @@ function Astral:MakeWindow(config)
 
 			local MetricsFrame = Instance.new("Frame")
 			MetricsFrame.Size = UDim2.new(0.5, 0, 0, 16)
-			MetricsFrame.Position = UDim2.new(0, 14, 1, -54)
+			MetricsFrame.Position = UDim2.new(0, 14, 1, -48)
 			MetricsFrame.BackgroundTransparency = 1
 			MetricsFrame.Parent = MainFrame
 
@@ -5608,14 +5608,14 @@ function Astral:MakeWindow(config)
 			DescLabel.Parent = InfoHolder
 
 			local GameActivityFrame = Instance.new("Frame")
-			GameActivityFrame.Size = UDim2.new(1, -28, 0, 22)
-			GameActivityFrame.Position = UDim2.new(0, 14, 0, 160)
+			GameActivityFrame.Size = UDim2.new(1, -28, 0, 20)
+			GameActivityFrame.Position = UDim2.new(0, 14, 0, 130)
 			GameActivityFrame.BackgroundTransparency = 1
 			GameActivityFrame.Parent = MainFrame
 
 			local GameIcon = Instance.new("ImageLabel")
-			GameIcon.Size = UDim2.new(0, 22, 0, 22)
-			GameIcon.Position = UDim2.new(0, 0, 0.5, -11)
+			GameIcon.Size = UDim2.new(0, 18, 0, 18)
+			GameIcon.Position = UDim2.new(0, 0, 0.5, -9)
 			GameIcon.Image = "rbxassetid://104079816442680"
 			GameIcon.BackgroundTransparency = 1
 			GameIcon.Parent = GameActivityFrame
@@ -5641,8 +5641,8 @@ function Astral:MakeWindow(config)
 
 			local ActionButton = Instance.new("TextButton")
 			ActionButton.Name = "JoinButton"
-			ActionButton.Size = UDim2.new(0, 110, 0, 36)
-			ActionButton.Position = UDim2.new(1, -124, 1, -50)
+			ActionButton.Size = UDim2.new(0, 104, 0, 34)
+			ActionButton.Position = UDim2.new(1, -118, 1, -50)
 			ActionButton.BackgroundColor3 = Color3.fromRGB(35, 165, 90)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join"
@@ -5716,7 +5716,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
 			end)
 
-			registerElement(MainFrame, 245, config.Position)
+			registerElement(MainFrame, 200, config.Position)
 
 		end
 		-- =========================================================================
