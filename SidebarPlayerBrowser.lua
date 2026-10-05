@@ -2368,12 +2368,23 @@ function Astral:MakeWindow(config)
 
 				local nb = numberBoxes and numberBoxes[optionStr] or nil
 				if nb then
-					OptionLabel.Size = UDim2.new(1, -92, 1, 0)
+					OptionLabel.Size = UDim2.new(1, -108, 1, 0)
+					local NumWrap = Instance.new("Frame")
+					NumWrap.Name = "NumWrap"
+					NumWrap.BackgroundTransparency = 1
+					NumWrap.BorderSizePixel = 0
+					NumWrap.Size = UDim2.new(0, 72, 1, 0)
+					NumWrap.LayoutOrder = 3
+					NumWrap.Parent = OptionBtn
+					local NumLayout = Instance.new("UIListLayout")
+					NumLayout.FillDirection = Enum.FillDirection.Horizontal
+					NumLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+					NumLayout.SortOrder = Enum.SortOrder.LayoutOrder
+					NumLayout.Padding = UDim.new(0, 4)
+					NumLayout.Parent = NumWrap
 					local NumBox = Instance.new("TextBox")
-					NumBox.LayoutOrder = 3
-					NumBox.AnchorPoint = Vector2.new(1, 0.5)
-					NumBox.Position = UDim2.new(1, -8, 0.5, 0)
-					NumBox.Size = UDim2.new(0, 56, 0, 26)
+					NumBox.LayoutOrder = 1
+					NumBox.Size = UDim2.new(0, 52, 0, 26)
 					NumBox.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
 					NumBox.BorderSizePixel = 0
 					NumBox.Font = Enum.Font.GothamBold
@@ -2387,7 +2398,7 @@ function Astral:MakeWindow(config)
 					NumBox.TextXAlignment = Enum.TextXAlignment.Center
 					NumBox.ClearTextOnFocus = false
 					NumBox.ZIndex = 205
-					NumBox.Parent = OptionBtn
+					NumBox.Parent = NumWrap
 					local NumCorner = Instance.new("UICorner")
 					NumCorner.CornerRadius = UDim.new(0, 6)
 					NumCorner.Parent = NumBox
@@ -2397,6 +2408,16 @@ function Astral:MakeWindow(config)
 							if nb.Get then NumBox.Text = tostring(nb.Get()) end
 						end)
 					end)
+					local SecLbl = Instance.new("TextLabel")
+					SecLbl.BackgroundTransparency = 1
+					SecLbl.LayoutOrder = 2
+					SecLbl.Size = UDim2.new(0, 12, 0, 26)
+					SecLbl.Font = Enum.Font.Gotham
+					SecLbl.Text = "s"
+					SecLbl.TextColor3 = themeColorFor("140,140,145", CurrentThemeName or "Dark")
+					SecLbl.TextSize = 11
+					SecLbl.TextXAlignment = Enum.TextXAlignment.Left
+					SecLbl.Parent = NumWrap
 				end
 
 				OptionBtn.MouseButton1Click:Connect(function()
