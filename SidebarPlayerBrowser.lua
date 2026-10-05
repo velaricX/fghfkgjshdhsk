@@ -2875,7 +2875,14 @@ function Astral:MakeWindow(config)
 								local tl = fr:FindFirstChild("Title", true)
 								if tl and tostring(tl.Text or "") ~= "" then label = tostring(tl.Text) end
 							end)
-							if string.find(string.lower(label), q, 1, true) then
+							local ll = string.lower(label)
+							local hit = string.find(ll, q, 1, true) ~= nil
+							if not hit then
+								for w in string.gmatch(ll, "%S+") do
+									if string.sub(w, 1, #q) == q or string.sub(q, 1, #w) == w then hit = true break end
+								end
+							end
+							if hit then
 								table.insert(out, { tab = td, frame = fr, sub = el.SubTabIdx or 0, title = label, tabName = tname })
 								if #out >= 40 then return out end
 							end
@@ -2901,7 +2908,8 @@ function Astral:MakeWindow(config)
 					local y = m.frame.AbsolutePosition.Y - sc.AbsolutePosition.Y + sc.CanvasPosition.Y - 80
 					TweenService:Create(sc, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { CanvasPosition = Vector2.new(0, math.max(0, y)) }):Play()
 					local c0 = m.frame.BackgroundColor3
-					TweenService:Create(m.frame, TweenInfo.new(0.18), { BackgroundColor3 = AccentColor }):Play()
+					local flashCol = c0:Lerp(AccentColor, 0.35)
+					TweenService:Create(m.frame, TweenInfo.new(0.18), { BackgroundColor3 = flashCol }):Play()
 					task.delay(searchFlashTime, function()
 						pcall(function() TweenService:Create(m.frame, TweenInfo.new(0.25), { BackgroundColor3 = c0 }):Play() end)
 					end)
@@ -5733,7 +5741,7 @@ function Astral:MakeWindow(config)
 
 			local MetricsFrame = Instance.new("Frame")
 			MetricsFrame.Size = UDim2.new(0.5, 0, 0, 16)
-			MetricsFrame.Position = UDim2.new(0, 14, 1, -48)
+			MetricsFrame.Position = UDim2.new(0, 14, 1, -41)
 			MetricsFrame.BackgroundTransparency = 1
 			MetricsFrame.Parent = MainFrame
 
@@ -5872,7 +5880,7 @@ function Astral:MakeWindow(config)
 			ActionButton.Name = "JoinButton"
 			ActionButton.Size = UDim2.new(0, 104, 0, 34)
 			ActionButton.Position = UDim2.new(1, -118, 1, -50)
-			ActionButton.BackgroundColor3 = Color3.fromRGB(35, 165, 90)
+			ActionButton.BackgroundColor3 = Color3.fromRGB(30, 140, 78)
 			ActionButton.BorderSizePixel = 0
 			ActionButton.Text = "Join"
 			ActionButton.Font = Enum.Font.GothamBold
@@ -5885,7 +5893,7 @@ function Astral:MakeWindow(config)
 			ButtonCorner.CornerRadius = UDim.new(0, 6)
 			ButtonCorner.Parent = ActionButton
 
-			local baseColor = Color3.fromRGB(35, 165, 90)
+			local baseColor = Color3.fromRGB(30, 140, 78)
 			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
 			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
 
