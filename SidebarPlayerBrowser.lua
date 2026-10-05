@@ -2730,8 +2730,11 @@ function Astral:MakeWindow(config)
 					pcall(function()
 						if listfiles then
 							for _, f in ipairs(listfiles("")) do
-								if type(f) == "string" and f:match("%.json$") then
-									table.insert(files, f)
+								if type(f) == "string" then
+									local short = f:match("([^/\\]+)$") or f
+									if short:match("^lumu_.*%.json$") then
+										table.insert(files, f)
+									end
 								end
 							end
 						end
@@ -7990,7 +7993,7 @@ function Astral:MakeWindow(config)
 	--   local stop = Window:AddStopButton({ Text = "STOP", ToggleList = { myToggle }, Callback = function() end })
 	function Window:AddStopButton(cfg)
 		cfg = cfg or {}
-		local text = cfg.Text or "STOP"
+		local text = cfg.Text or "Stop Farm"
 		local toggles = cfg.ToggleList or {}
 		local cb = cfg.Callback or function() end
 		local SZ = 72
