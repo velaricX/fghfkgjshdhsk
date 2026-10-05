@@ -2519,12 +2519,12 @@ function Astral:MakeWindow(config)
 
 				local nb = numberBoxes and numberBoxes[optionStr] or nil
 				if nb then
-					OptionLabel.Size = UDim2.new(1, -108, 1, 0)
+					OptionLabel.Size = UDim2.new(1, -104, 1, 0)
 					local NumWrap = Instance.new("Frame")
 					NumWrap.Name = "NumWrap"
 					NumWrap.BackgroundTransparency = 1
 					NumWrap.BorderSizePixel = 0
-					NumWrap.Size = UDim2.new(0, 72, 1, 0)
+					NumWrap.Size = UDim2.new(0, 68, 1, 0)
 					NumWrap.LayoutOrder = 3
 					NumWrap.Parent = OptionBtn
 					local NumLayout = Instance.new("UIListLayout")
@@ -2535,8 +2535,8 @@ function Astral:MakeWindow(config)
 					NumLayout.Parent = NumWrap
 					local NumBox = Instance.new("TextBox")
 					NumBox.LayoutOrder = 1
-					NumBox.Size = UDim2.new(0, 52, 0, 26)
-					NumBox.BackgroundColor3 = themeColorFor("22,22,26", CurrentThemeName or "Dark")
+					NumBox.Size = UDim2.new(0, 64, 0, 26)
+					NumBox.BackgroundColor3 = themeColorFor("48,48,54", CurrentThemeName or "Dark")
 					NumBox.BorderSizePixel = 0
 					NumBox.Font = Enum.Font.GothamBold
 					local initTxt = ""
@@ -2559,16 +2559,11 @@ function Astral:MakeWindow(config)
 							if nb.Get then NumBox.Text = tostring(nb.Get()) end
 						end)
 					end)
-					local SecLbl = Instance.new("TextLabel")
-					SecLbl.BackgroundTransparency = 1
-					SecLbl.LayoutOrder = 2
-					SecLbl.Size = UDim2.new(0, 12, 0, 26)
-					SecLbl.Font = Enum.Font.Gotham
-					SecLbl.Text = "s"
-					SecLbl.TextColor3 = themeColorFor("140,140,145", CurrentThemeName or "Dark")
-					SecLbl.TextSize = 11
-					SecLbl.TextXAlignment = Enum.TextXAlignment.Left
-					SecLbl.Parent = NumWrap
+					local NumStroke = Instance.new("UIStroke")
+					NumStroke.Color = themeColorFor("120,120,130", CurrentThemeName or "Dark")
+					NumStroke.Thickness = 1
+					NumStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+					NumStroke.Parent = NumBox
 				end
 
 				OptionBtn.MouseButton1Click:Connect(function()
