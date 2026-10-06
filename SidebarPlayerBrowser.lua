@@ -8570,7 +8570,7 @@ function Astral:MakeWindow(config)
 	--   local stop = Window:AddStopButton({ Text = "STOP", ToggleList = { myToggle }, Callback = function() end })
 	function Window:AddStopButton(cfg)
 		cfg = cfg or {}
-		local text = cfg.Text or "Stop"
+		local text = cfg.Text or "Stop Farm"
 		local toggles = cfg.ToggleList or {}
 		local cb = cfg.Callback or function() end
 		local hasCb = cfg.Callback ~= nil
@@ -8578,7 +8578,7 @@ function Astral:MakeWindow(config)
 		local btn = Instance.new("TextButton")
 		btn.Name = "StopButton"
 		btn.Size = UDim2.new(0, SZ, 0, SZ)
-		btn.Position = cfg.Position or UDim2.new(1, -90, 0.5, -36)
+		btn.Position = cfg.Position or UDim2.new(0.05, -2, 0.32, -8)
 		btn.BackgroundColor3 = themeColorFor("15,15,15", CurrentThemeName or "Dark")
 		btn.Font = Enum.Font.GothamBold
 		btn.Text = tostring(text)
