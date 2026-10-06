@@ -228,7 +228,7 @@ Win:SaveUIPositions()  Win:LoadUIPositions()  Win:ResetUIPositions() -- main, lo
 
 ## 6. Built-in Settings tab + search
 
-Gear button (top-right, auto-added unless `SettingsTab = false`) opens a hidden tab: About / Themes / Background / Status / Display / Configs — theme picker, UI scale, columns, transparency, intro replay, stop-button toggle, `lumu_*.json` config save/load/delete/rescan.
+Gear button (top-right, auto-added unless `SettingsTab = false`) opens a hidden tab with 8 sub-tabs in order: **Info** (about + owners + Discord invite copy button), **Translation** (language picker), **Themes** (presets + accent + custom + BG images + BG dim + transparency + reset), **UI** (Sidebar/TopBar choice — saved only, loads on NEXT execute, never live), **Status**, **Display** (UI size, columns, transparency, stop-button toggle, intro), **Debug** (reset positions, refresh, debug info), **Configs** (`lumu_*.json` save/load/delete/rescan).
 
 Global search (right-side box unless `SearchBar = false`): fuzzy match across every element, Enter jumps + accent-flashes the card for `SearchFlashTime` (default 5s), Esc clears, `Ctrl+K` focuses.
 
@@ -236,8 +236,19 @@ Global search (right-side box unless `SearchBar = false`): fuzzy match across ev
 
 ```lua
 Lib:AddTranslations("es", { Farm = "Granja" })  Lib:SetLanguage("es") -- tr() titles refresh live
+Lib:GetLanguages() -- { "Deutsch", "English", "Español", "Français", ... }
 ```
-Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
+Built-ins: English, Español, Français, Deutsch. Translation covers everything including dropdown/panel option text (values stay English internally, so callbacks like `SetTheme` keep working). Add packs BEFORE `CreateWindow` so the settings language list includes them. Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
+
+**Design pick (sidebar vs topbar) across executes:**
+```lua
+local design = "Sidebar"
+pcall(function()
+    local d = Lib.GetSavedDesign and Lib.GetSavedDesign()
+    if d == "Sidebar" or d == "TopBar" then design = d end
+end)
+local Lib2 = (design == "TopBar") and safeLoad("n2_shell.lua") or safeLoad("n1_core.lua")
+```
 
 ## 8. Minimal full example
 
