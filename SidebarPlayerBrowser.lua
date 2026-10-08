@@ -903,8 +903,6 @@ function Astral:MakeWindow(config)
 	-- Main Frame (Responsive Sizing for Mobile & PC)
 	local MainFrame = Instance.new("Frame")
 	local statusPanels = {}
-	local statusAutoRows = {}
-	local addAutoRowToggle = nil
 	local defaultMainPos = UDim2.new(0.5, 15, 0.5, -4)
 	local defaultLogoPos = nil
 	MainFrame.Name = "MainFrame"
@@ -2865,7 +2863,7 @@ function Astral:MakeWindow(config)
 					pcall(function() Window:DebugInfo() end)
 					pcall(function() Window:Notify({ Type = "good", Title = "Debug", Message = "Printed to console (F9).", Duration = 2 }) end)
 				end })
-				addAutoRowToggle = function(entry)
+				Window._AddAutoRowToggle = function(entry)
 					if entry._Toggle then return end
 					local t = dbgSub:AddToggle({ Title = entry.Name, Default = entry.On, Icon = entry.Icon or "timer", Callback = function(s)
 						entry.On = not not s
@@ -2879,7 +2877,7 @@ function Astral:MakeWindow(config)
 					end })
 					entry._Toggle = t
 				end
-				for _, e in ipairs(statusAutoRows) do pcall(function() addAutoRowToggle(e) end) end
+				for _, e in ipairs(Window._AutoRows or {}) do pcall(function() Window._AddAutoRowToggle(e) end) end
 				-- 8) CONFIGS
 				local configSub = STab:AddSubTab({ Name = "Configs", Icon = "Home" })
 				local cfgName = "lumu_config.json"
@@ -9954,7 +9952,8 @@ function Astral:MakeWindow(config)
 				On = (opts.Default ~= false),
 				Panel = GameStatus,
 			}
-			table.insert(statusAutoRows, entry)
+			Window._AutoRows = Window._AutoRows or {}
+			table.insert(Window._AutoRows, entry)
 			local function applyRow()
 				pcall(function()
 					if entry.On then
@@ -9965,7 +9964,7 @@ function Astral:MakeWindow(config)
 				end)
 			end
 			applyRow()
-			pcall(function() if addAutoRowToggle then addAutoRowToggle(entry) end end)
+			pcall(function() if Window._AddAutoRowToggle then Window._AddAutoRowToggle(entry) end end)
 			local C = {}
 			function C:Set(v)
 				entry.On = not not v
