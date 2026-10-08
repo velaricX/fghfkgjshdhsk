@@ -175,7 +175,7 @@ Click a selected row again to deselect. `#1` rank + halo on top player.
 
 ### DiscordCard
 ```lua
-Tab:AddDiscordCard({ FullWidth = true, -- single column, big banner
+Tab:AddDiscordCard({ FullWidth = true, -- single column in Auto; explicit 1/2-column choice overrides it
     ServerData = { InviteCode = "your-code", -- part after discord.gg/
         ServerName = "Name",               -- auto from API if nil
         ServerIconId = "...",              -- auto from API if nil
