@@ -238,7 +238,15 @@ Global search (right-side box unless `SearchBar = false`): fuzzy match across ev
 Lib:AddTranslations("es", { Farm = "Granja" })  Lib:SetLanguage("es") -- tr() titles refresh live
 Lib:GetLanguages() -- { "Deutsch", "English", "Español", "Français", ... }
 ```
-Built-ins: English, Español, Français, Deutsch. Translation covers everything including dropdown/panel option text (values stay English internally, so callbacks like `SetTheme` keep working). Add packs BEFORE `CreateWindow` so the settings language list includes them. Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
+Built-ins: English, Español, Français, Deutsch. Translation covers everything including dropdown/panel option text (values stay English internally, so callbacks like `SetTheme` keep working). Add packs BEFORE `CreateWindow` so the settings language list includes them.
+
+**Custom languages (no Google, all manual):** settings → Translation tab: type a name → Create language → pick it → add words via English word + Translation boxes → Add/update word → Save language (writes `lumu_lang_<Name>.json`, auto-loaded next execute). Delete language removes pack + file. Same from code:
+```lua
+Lib:AddTranslations("Portugues", { Farming = "Agricultura" })
+Lib:SetLanguage("Portugues")
+Lib:SaveLanguage("Portugues")     -- needs writefile; Lib.CountWords("Portugues")
+Lib.DeleteLanguage("Portugues")   -- back to English + deletes file
+``` Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
 
 **Design pick (sidebar vs topbar) across executes:**
 ```lua
