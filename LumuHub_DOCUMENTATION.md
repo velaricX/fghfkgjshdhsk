@@ -246,7 +246,8 @@ Lib:AddTranslations("Portugues", { Farming = "Agricultura" })
 Lib:SetLanguage("Portugues")
 Lib:SaveLanguage("Portugues")     -- needs writefile; Lib.CountWords("Portugues")
 Lib.DeleteLanguage("Portugues")   -- back to English + deletes file
-``` Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
+```
+Pack format: `{ ["English text"] = "translation", ... }` — keys must match element titles EXACTLY (spaces count: `"  Auto Ken"` needs its leading spaces). Empty value `""` = not translated yet, English shows. Special key `"TRANSLATOR" = "name"` credits who translated it (shown in the Translation tab). Mobile is auto (`TouchEnabled` + small viewport): compact sizes, 2-column cap, smaller panels. Test with `IsMobile` paths in mind.
 
 **Design pick (sidebar vs topbar) across executes:**
 ```lua
