@@ -914,6 +914,8 @@ function Astral:MakeWindow(config)
 	-- Main Frame (Responsive Sizing for Mobile & PC)
 	local MainFrame = Instance.new("Frame")
 	local statusPanels = {}
+	local statusAutoRows = {}
+	local addAutoRowToggle = nil
 	local defaultMainPos = UDim2.new(0.5, 15, 0.5, -4)
 	local defaultLogoPos = nil
 	MainFrame.Name = "MainFrame"
@@ -3018,6 +3020,21 @@ function Astral:MakeWindow(config)
 					pcall(function() Window:DebugInfo() end)
 					pcall(function() Window:Notify({ Type = "good", Title = "Debug", Message = "Printed to console (F9).", Duration = 2 }) end)
 				end })
+				addAutoRowToggle = function(entry)
+					if entry._Toggle then return end
+					local t = dbgSub:AddToggle({ Title = entry.Name, Default = entry.On, Icon = entry.Icon or "timer", Callback = function(s)
+						entry.On = not not s
+						pcall(function()
+							if entry.On then
+								entry.Panel:SetRow(entry.Name, { Value = entry.Value, Icon = entry.Icon, Color = entry.Color })
+							else
+								entry.Panel:Remove(entry.Name)
+							end
+						end)
+					end })
+					entry._Toggle = t
+				end
+				for _, e in ipairs(statusAutoRows) do pcall(function() addAutoRowToggle(e) end) end
 				-- 8) CONFIGS
 				local configSub = STab:AddSubTab({ Name = "Configs", Icon = "Home" })
 				local cfgName = "lumu_config.json"
@@ -9877,6 +9894,47 @@ CountPillStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			if not gsMinimized then task.defer(function() resizePanel(false) end) end
 
 		return GameStatus
+		end
+
+		-- AutoRow: declare a row here, get a free toggle in top-right settings > Debug.
+		--   local r = S:AutoRow({ Name = "Island Spawn", Value = "Waiting", Icon = "timer", Color = "gold", Default = true })
+		--   r:SetValue("Spawned!")  r:Set(false)  r:Get()
+		function GameStatus:AutoRow(opts)
+			opts = opts or {}
+			local entry = {
+				Name = tostring(opts.Name or opts.Title or "Row"),
+				Value = opts.Value ~= nil and tostring(opts.Value) or "--",
+				Icon = opts.Icon,
+				Color = opts.Color,
+				On = (opts.Default ~= false),
+				Panel = GameStatus,
+			}
+			table.insert(statusAutoRows, entry)
+			local function applyRow()
+				pcall(function()
+					if entry.On then
+						entry.Panel:SetRow(entry.Name, { Value = entry.Value, Icon = entry.Icon, Color = entry.Color })
+					else
+						entry.Panel:Remove(entry.Name)
+					end
+				end)
+			end
+			applyRow()
+			pcall(function() if addAutoRowToggle then addAutoRowToggle(entry) end end)
+			local C = {}
+			function C:Set(v)
+				entry.On = not not v
+				applyRow()
+				pcall(function() if entry._Toggle then entry._Toggle:Set(entry.On) end end)
+			end
+			function C:Get() return entry.On end
+			function C:SetValue(val)
+				entry.Value = tostring(val ~= nil and val or "--")
+				if entry.On then
+					pcall(function() entry.Panel:SetRow(entry.Name, { Value = entry.Value, Icon = entry.Icon, Color = entry.Color }) end)
+				end
+			end
+			return C
 		end
 
 		function GameStatus:SetRows(list)

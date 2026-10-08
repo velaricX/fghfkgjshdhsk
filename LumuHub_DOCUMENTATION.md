@@ -208,6 +208,15 @@ S:StopCountdown("Moon")
 S:SetTitle("...")  S:SetTitleIcon("star")  S:SetPosition(UDim2.new(...))
 S:Show()  S:Hide()  S:Toggle()  S:IsEnabled()  S:SetEnabled(true)  S:Destroy()
 
+**AutoRow (declare once, toggle appears in settings → Debug by itself):**
+```lua
+local moon = S:AutoRow({ Name = "Island Spawn", Value = "Waiting", Icon = "timer", Color = "gold", Default = true })
+moon:SetValue("Spawned!")  -- live text update (only when visible)
+moon:Set(false)            -- hides row + unticks its settings toggle
+moon:Get()                 -- true/false
+```
+No manual selector needed — the toggle is created for you the moment settings opens (or instantly if already open).
+
 -- Theme / look
 Win:SetTheme("Midnight")  Win:GetTheme()  -- Dark Midnight Purple Crimson Forest Ocean Sunset Rose Slate Coffee
 Win:SetCustomTheme({ Background = Color3.fromRGB(20,20,26), Card = ..., Text = ...,
