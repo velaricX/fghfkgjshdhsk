@@ -2619,12 +2619,12 @@ function Astral:MakeWindow(config)
 		local CategoryHeader = Instance.new("TextLabel")
 		CategoryHeader.Name = name .. "_Header"
 		CategoryHeader.BackgroundTransparency = 1
-		CategoryHeader.Size = UDim2.new(1, 0, 0, 20)
-		CategoryHeader.Font = Enum.Font.GothamBold
+		CategoryHeader.Size = UDim2.new(1, 0, 0, 22)
+		CategoryHeader.Font = Enum.Font.GothamBlack
 		CategoryHeader.Text = string.upper(name)
-		CategoryHeader.TextColor3 = themeColorFor("160,160,165", CurrentThemeName or "Dark")
-		CategoryHeader.TextSize = 10
-		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Left
+		CategoryHeader.TextColor3 = themeColorFor("235,235,240", CurrentThemeName or "Dark")
+		CategoryHeader.TextSize = 12
+		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Center
 		CategoryHeader.TextYAlignment = Enum.TextYAlignment.Center
 		CategoryHeader.LayoutOrder = layoutOrderCounter
 		CategoryHeader.ZIndex = 4
