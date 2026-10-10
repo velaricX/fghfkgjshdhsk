@@ -5586,6 +5586,7 @@ function Astral:MakeWindow(config)
 			SectionFrame.Name = title .. "_Section"
 			SectionFrame.BackgroundTransparency = 1
 			SectionFrame.BorderSizePixel = 0
+			SectionFrame.ClipsDescendants = true
 
 			local RowLayout = Instance.new("UIListLayout")
 			RowLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -5597,7 +5598,7 @@ function Astral:MakeWindow(config)
 
 			local BarL = Instance.new("Frame")
 			BarL.Name = "BarL"
-			BarL.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
+			BarL.Size = UDim2.new(0.2, 0, 0, IsMobile and 14 or 18)
 			BarL.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BarL.BorderSizePixel = 0
 			BarL.LayoutOrder = 1
@@ -5657,7 +5658,7 @@ function Astral:MakeWindow(config)
 
 			local BarR = Instance.new("Frame")
 			BarR.Name = "BarR"
-			BarR.Size = UDim2.new(0, IsMobile and 60 or 110, 0, IsMobile and 14 or 18)
+			BarR.Size = UDim2.new(0.2, 0, 0, IsMobile and 14 or 18)
 			BarR.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
 			BarR.BorderSizePixel = 0
 			BarR.LayoutOrder = 4
