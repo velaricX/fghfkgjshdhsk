@@ -2652,6 +2652,21 @@ function Astral:MakeWindow(config)
 	-- Tab Management System
 	local tabs = {}
 	local layoutMode = "Auto" -- "Auto" | "OneColumn" | "TwoColumn" (Settings grid picker)
+	-- restore saved layout (survives server hop / re-execute)
+	pcall(function()
+		if readfile and isfile then
+			local okE, has = pcall(isfile, "lumu_settings.json")
+			if okE and has then
+				local okR, raw = pcall(readfile, "lumu_settings.json")
+				if okR and type(raw) == "string" and raw ~= "" then
+					local okJ, data = pcall(function() return game:GetService("HttpService"):JSONDecode(raw) end)
+					if okJ and type(data) == "table" and (data.layout == "OneColumn" or data.layout == "TwoColumn") then
+						layoutMode = data.layout
+					end
+				end
+			end
+		end
+	end)
 	-- (Accent engine lives at the top of MakeWindow so panels can hook in during build)
 	-- Saved flags: every element with Flag = "id" registers Get/Set here
 	local configFlags = {}
@@ -2911,7 +2926,7 @@ function Astral:MakeWindow(config)
 				displaySub:AddSlider({ Title = "UI size", Min = 70, Max = 130, Default = 100, Icon = "Badge Gear", Callback = function(v)
 					pcall(function() Window:SetUIScale(v / 100) end)
 				end })
-				displaySub:AddSelector({ Title = "Grid columns", Description = "Layout for wide windows.", Options = { "Auto", "1 column", "2 columns" }, Icon = "Badge Gear", Callback = function(v)
+				displaySub:AddSelector({ Title = "Grid columns", Description = "Layout for wide windows.", Options = { "Auto", "1 column", "2 columns" }, Default = (layoutMode == "OneColumn" and "1 column") or (layoutMode == "TwoColumn" and "2 columns") or "Auto", Icon = "Badge Gear", Callback = function(v)
 					pcall(function()
 						if v == "1 column" then Window:SetLayoutMode("OneColumn")
 						elseif v == "2 columns" then Window:SetLayoutMode("TwoColumn")
@@ -5961,6 +5976,12 @@ function Astral:MakeWindow(config)
 			MainCorner.CornerRadius = UDim.new(0, 16)
 			MainCorner.Parent = MainFrame
 
+			local MainStroke = Instance.new("UIStroke")
+			MainStroke.Color = themeColorFor("55,55,65", CurrentThemeName or "Dark")
+			MainStroke.Thickness = 1.5
+			MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			MainStroke.Parent = MainFrame
+
 			local BgHighlight = Instance.new("Frame")
 			BgHighlight.Name = "BgHighlight"
 			BgHighlight.Size = UDim2.new(1, 0, 1, 0)
@@ -8802,6 +8823,12 @@ function Astral:MakeWindow(config)
 			mode = "Auto"
 		end
 		layoutMode = mode
+		-- persist layout choice (survives server hop / re-execute)
+		pcall(function()
+			if writefile then
+				writefile("lumu_settings.json", game:GetService("HttpService"):JSONEncode({ layout = mode }))
+			end
+		end)
 		print("[Astral] DBG setlayout: " .. tostring(mode) .. " tabs=" .. tostring(#tabs))
 		local n, err0 = 0, nil
 		for _, td in ipairs(tabs) do
