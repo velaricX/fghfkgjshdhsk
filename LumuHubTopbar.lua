@@ -52,166 +52,6 @@ end
 local Astral = {}
 Astral.Registry = {} -- Global registry to track all toggle/tick controllers for easy resetting
 
--- =========================================================================
--- LANGUAGE / TRANSLATION SYSTEM
--- Titles registered with tr() swap instantly via Astral:SetLanguage().
--- Add your own: Astral:AddTranslations("Italiano", { ["Settings"] = "Impostazioni" })
--- =========================================================================
-Astral.Languages = { English = {} }
-Astral.CurrentLanguage = "English"
-local translatableLabels = {}
-local languageRefreshers = {} -- fn() list re-run on SetLanguage (dynamic texts)
-
-local function translateText(key)
-	local lang = Astral.Languages[Astral.CurrentLanguage]
-	if lang and lang[key] ~= nil then
-		return lang[key]
-	end
-	return key
-end
-
--- GET with fallbacks: some executors block game:HttpGet for certain hosts,
--- so try the executor request functions and HttpService before giving up.
-local function webGet(url)
-	local ok, res = pcall(function() return game:HttpGet(url) end)
-	if ok and type(res) == "string" and res ~= "" then return res end
-	local req = (typeof(request) == "function" and request)
-		or (typeof(http_request) == "function" and http_request)
-		or (syn and type(syn.request) == "function" and syn.request)
-		or nil
-	if req then
-		local ok2, r = pcall(function() return req({Url = url, Method = "GET"}) end)
-		if ok2 then
-			if type(r) == "table" then
-				local body = r.Body or r.body
-				if type(body) == "string" and body ~= "" then return body end
-			elseif type(r) == "string" and r ~= "" then
-				return r
-			end
-		end
-	end
-	local ok3, res3 = pcall(function() return HttpService:GetAsync(url) end)
-	if ok3 and type(res3) == "string" and res3 ~= "" then return res3 end
-	return nil
-end
-
-function Astral:AddTranslations(langName, dict)
-	if type(langName) ~= "string" or type(dict) ~= "table" then return end
-	Astral.Languages[langName] = Astral.Languages[langName] or {}
-	for k, v in pairs(dict) do
-		Astral.Languages[langName][k] = v
-	end
-	if Astral.CurrentLanguage == langName then
-		Astral:SetLanguage(langName)
-	end
-end
-
-function Astral:SetLanguage(langName)
-	if not Astral.Languages[langName] then return end
-	Astral.CurrentLanguage = langName
-	for _, item in ipairs(translatableLabels) do
-		pcall(function()
-			if item.Label and item.Label.Parent then
-				item.Label[item.Prop or "Text"] = translateText(item.Key)
-			end
-		end)
-	end
-	for _, fn in ipairs(languageRefreshers) do
-		pcall(fn)
-	end
-	pcall(function()
-		if Astral._OpenSelectorRefresh then Astral._OpenSelectorRefresh() end
-	end)
-end
-
--- Register a label's English text for live translation.
--- Optional prop lets inputs translate other string props too:
--- tr(SearchInput, "Search...", "PlaceholderText")
-local function tr(label, englishText, prop)
-	table.insert(translatableLabels, {Label = label, Key = englishText, Prop = prop})
-	label[prop or "Text"] = translateText(englishText)
-	return label
-end
-
-
--- Starter language packs (titles swap live; add your own words anytime)
-Astral:AddTranslations("Español", {
-	["Settings"] = "Ajustes",
-	["Tests"] = "Pruebas",
-	["Farming"] = "Farmeo",
-	["Combat"] = "Combate",
-	["Dungeons"] = "Mazmorras",
-	["Islands"] = "Islas",
-	["Players"] = "Jugadores",
-	["ESP"] = "ESP",
-	["Shop"] = "Tienda",
-	["Layout Columns"] = "Columnas",
-	["Accent Theme"] = "Tema de acento",
-	["Background Image"] = "Imagen de fondo",
-	["Load Background"] = "Cargar fondo",
-	["Reset Background"] = "Restablecer fondo",
-	["Spam Notifications"] = "Notificaciones spam",
-	["Spam With Actions"] = "Spam con acciones",
-	["Menu Keybind"] = "Tecla de menú",
-	["Status Label"] = "Etiqueta de estado",
-	["Select..."] = "Seleccionar...",
-	["None"] = "Ninguno",
-	["Search..."] = "Buscar...",
-	["Select Option"] = "Seleccionar opción",
-	["(+%d more)"] = "(+%d más)",
-})
-Astral:AddTranslations("Français", {
-	["Settings"] = "Paramètres",
-	["Tests"] = "Tests",
-	["Farming"] = "Farm",
-	["Combat"] = "Combat",
-	["Dungeons"] = "Donjons",
-	["Islands"] = "Îles",
-	["Players"] = "Joueurs",
-	["ESP"] = "ESP",
-	["Shop"] = "Boutique",
-	["Layout Columns"] = "Colonnes",
-	["Accent Theme"] = "Couleur d'accent",
-	["Background Image"] = "Image de fond",
-	["Load Background"] = "Charger le fond",
-	["Reset Background"] = "Réinitialiser le fond",
-	["Spam Notifications"] = "Notifications spam",
-	["Spam With Actions"] = "Spam avec actions",
-	["Menu Keybind"] = "Touche du menu",
-	["Status Label"] = "Étiquette de statut",
-	["Select..."] = "Sélectionner...",
-	["None"] = "Aucun",
-	["Search..."] = "Rechercher...",
-	["Select Option"] = "Choisir une option",
-	["(+%d more)"] = "(+%d autres)",
-})
-Astral:AddTranslations("Deutsch", {
-	["Settings"] = "Einstellungen",
-	["Tests"] = "Tests",
-	["Farming"] = "Farmen",
-	["Combat"] = "Kampf",
-	["Dungeons"] = "Dungeons",
-	["Islands"] = "Inseln",
-	["Players"] = "Spieler",
-	["ESP"] = "ESP",
-	["Shop"] = "Shop",
-	["Layout Columns"] = "Spalten",
-	["Accent Theme"] = "Akzentfarbe",
-	["Background Image"] = "Hintergrundbild",
-	["Load Background"] = "Hintergrund laden",
-	["Reset Background"] = "Hintergrund zurücksetzen",
-	["Spam Notifications"] = "Spam-Benachrichtigungen",
-	["Spam With Actions"] = "Spam mit Aktionen",
-	["Menu Keybind"] = "Menütaste",
-	["Status Label"] = "Statusanzeige",
-	["Select..."] = "Auswählen...",
-	["None"] = "Keine",
-	["Search..."] = "Suchen...",
-	["Select Option"] = "Option wählen",
-	["(+%d more)"] = "(+%d weitere)",
-})
-
-
 -- Comprehensive Icon Dictionary
 Astral.Icons = {
 	Heart = "rbxassetid://10747374161", -- Globe/Home
@@ -1905,7 +1745,7 @@ function Astral:MakeWindow(config)
 	SearchInput.Position = UDim2.new(0, 30, 0, 0)
 	SearchInput.BackgroundTransparency = 1
 	SearchInput.Font = Enum.Font.Gotham
-	tr(SearchInput, "Search...", "PlaceholderText")
+	SearchInput.PlaceholderText = "Search..."
 	SearchInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 125)
 	SearchInput.Text = ""
 	SearchInput.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1978,7 +1818,7 @@ function Astral:MakeWindow(config)
 	local function openSelector(title, options, current, searchEnabled, callback, buttonTextLabel, isMulti)
 		if pickerOpen then closeColorPicker() end
 		
-		SelectorPanelTitle.Text = translateText(title)
+		SelectorPanelTitle.Text = title
 		activeSelectorCallback = callback
 		activeSelectorButtonText = buttonTextLabel
 		activeSelectorOptions = options
@@ -2113,9 +1953,9 @@ function Astral:MakeWindow(config)
 									table.insert(selectedList, optStr)
 								end
 							end
-						local newText = #selectedList > 0 and table.concat(selectedList, ", ") or translateText("None")
+						local newText = #selectedList > 0 and table.concat(selectedList, ", ") or "None"
 						buttonTextLabel.Text = newText
-						SelectorPanelTitle.Text = #selectedList > 0 and (translateText(title) .. " (" .. #selectedList .. ")") or translateText(title)
+						SelectorPanelTitle.Text = #selectedList > 0 and (title .. " (" .. #selectedList .. ")") or title
 							if callback then
 								task.spawn(callback, selectedList)
 							end
@@ -2153,7 +1993,7 @@ function Astral:MakeWindow(config)
 			populate(SearchInput.Text)
 		end
 		Astral._OpenSelectorRefresh = function()
-			SelectorPanelTitle.Text = translateText(title)
+			SelectorPanelTitle.Text = title
 			populate(SearchInput.Text)
 		end
 		populate("")
@@ -2432,7 +2272,7 @@ function Astral:MakeWindow(config)
 		ButtonText.Size = UDim2.new(0, 0, 1, 0)
 		ButtonText.AutomaticSize = Enum.AutomaticSize.X
 		ButtonText.Font = Enum.Font.GothamBold
-		tr(ButtonText, tabName)
+		ButtonText.Text = tabName
 		ButtonText.TextColor3 = Color3.fromRGB(180, 180, 185)
 		mTS(ButtonText, 14)
 		ButtonText.TextXAlignment = Enum.TextXAlignment.Left
@@ -2878,7 +2718,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -2891,7 +2731,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3061,7 +2901,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3074,7 +2914,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 24)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3228,7 +3068,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3243,7 +3083,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3455,7 +3295,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 14)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3469,7 +3309,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 14)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3602,7 +3442,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.Position = icon and UDim2.new(0, textLeft, 0, titleTop) or UDim2.new(0, 12, 0, titleTop)
 			TitleLabel.Size = icon and UDim2.new(1, -(textLeft + 72), 0, 16) or UDim2.new(1, -80, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3792,7 +3632,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3805,7 +3645,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3885,10 +3725,10 @@ function Astral:MakeWindow(config)
 			local function updateValueLabel()
 				local list = selectedList()
 				if #list == 0 then
-					ValueLabel.Text = translateText("Select...")
+					ValueLabel.Text = "Select..."
 					ValueLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				elseif #list > 2 then
-					ValueLabel.Text = string.format("%s, %s " .. translateText("(+%d more)"), list[1], list[2], #list - 2)
+					ValueLabel.Text = string.format("%s, %s " .. "(+%d more)", list[1], list[2], #list - 2)
 					ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				else
 					ValueLabel.Text = table.concat(list, ", ")
@@ -4139,7 +3979,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -4152,7 +3992,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, descSize)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -4416,7 +4256,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, titleSize + 5)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, titleSize)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -4703,7 +4543,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, (icon and -34 or 0), 1, 0)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 16)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -4718,7 +4558,7 @@ function Astral:MakeWindow(config)
 			DescLabel.Size = UDim2.new(1, 0, 0, 0)
 			DescLabel.AutomaticSize = Enum.AutomaticSize.Y
 			DescLabel.Font = Enum.Font.Gotham
-			tr(DescLabel, description)
+			DescLabel.Text = description
 			DescLabel.TextColor3 = Color3.fromRGB(175, 175, 182)
 			regText(DescLabel, 13)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5204,7 +5044,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 16)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 11)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5505,7 +5345,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5518,7 +5358,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5748,7 +5588,7 @@ function Astral:MakeWindow(config)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Size = UDim2.new(1, 0, 0, 18)
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5761,7 +5601,7 @@ function Astral:MakeWindow(config)
 				DescLabel.BackgroundTransparency = 1
 				DescLabel.Size = UDim2.new(1, 0, 0, 16)
 				DescLabel.Font = Enum.Font.Gotham
-				tr(DescLabel, description)
+				DescLabel.Text = description
 				DescLabel.TextColor3 = Color3.fromRGB(160, 160, 165)
 				regText(DescLabel, 10)
 				DescLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5863,7 +5703,7 @@ function Astral:MakeWindow(config)
 					BLabel.Position = UDim2.new(0, bIcon and 38 or 10, 0, 0)
 					BLabel.Size = UDim2.new(1, -(bIcon and 38 or 10) - (IsMobile and 68 or 76), 1, 0)
 					BLabel.Font = Enum.Font.GothamBold
-					tr(BLabel, bTitle)
+					BLabel.Text = bTitle
 					BLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 					BLabel.TextSize = IsMobile and 10 or 12
 					BLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -6039,7 +5879,7 @@ function Astral:MakeWindow(config)
 			StBtnText.Size = UDim2.new(0, 0, 1, 0)
 			StBtnText.AutomaticSize = Enum.AutomaticSize.X
 			StBtnText.Font = Enum.Font.GothamBold
-			tr(StBtnText, stName)
+			StBtnText.Text = stName
 			StBtnText.TextColor3 = Color3.fromRGB(160, 160, 168)
 			mTS(StBtnText, 15)
 			StBtnText.TextXAlignment = Enum.TextXAlignment.Center
@@ -6569,7 +6409,7 @@ TextFrame.Size = UDim2.new(1, IsMobile and -60 or -68, 0, hasActions and 38 or 3
 			TitleLabel.Size = UDim2.new(1, -6, 0, 18)
 			TitleLabel.BackgroundTransparency = 1
 			TitleLabel.Font = Enum.Font.GothamBold
-			tr(TitleLabel, title)
+			TitleLabel.Text = title
 			TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			regText(TitleLabel, IsMobile and 10 or 12)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -6909,7 +6749,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 		TitleLabel.Position = UDim2.new(0, 39, 0.5, 0)
 		TitleLabel.Size = UDim2.new(0, math.max(40, panelW - 39 - 66), 1, 0)
 		TitleLabel.Font = Enum.Font.GothamBold
-		tr(TitleLabel, title)
+		TitleLabel.Text = title
 		TitleLabel.TextSize = IsMobile and 13 or 15
 		TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -7063,7 +6903,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 			NameLabel.Position = UDim2.new(0, 0, 0.5, 0)
 			NameLabel.Size = UDim2.new(0.58, 0, 1, 0)
 			NameLabel.Font = Enum.Font.Gotham
-			tr(NameLabel, tostring(name))
+			NameLabel.Text = tostring(name)
 			NameLabel.TextSize = IsMobile and 12 or 14
 			NameLabel.TextColor3 = Color3.fromRGB(165, 165, 176)
 			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -7125,7 +6965,7 @@ CountPillStroke.Color = Color3.fromRGB(50, 50, 55)
 				row.Value.Text = tostring(opts.Value)
 			end
 			if opts.Name ~= nil then
-				tr(row.Name, tostring(opts.Name))
+				row.Name.Text = tostring(opts.Name)
 			end
 		end
 
