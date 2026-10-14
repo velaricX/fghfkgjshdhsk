@@ -3347,6 +3347,19 @@ function Astral:MakeWindow(config)
 		RightLayout.Padding = UDim.new(0, 10)
 		RightLayout.Parent = RightColumn
 
+		local FullColumn = Instance.new("Frame")
+		FullColumn.Name = "FullColumn"
+		FullColumn.BackgroundTransparency = 1
+		FullColumn.Position = UDim2.new(0, 0, 0, 0)
+		FullColumn.Size = UDim2.new(1, 0, 0, 0)
+		FullColumn.AutomaticSize = Enum.AutomaticSize.Y
+		FullColumn.Parent = PageScroll
+
+		local FullLayout = Instance.new("UIListLayout")
+		FullLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		FullLayout.Padding = UDim.new(0, 10)
+		FullLayout.Parent = FullColumn
+
 			local elements = {}
 			local forceSingleColumn = false
 			-- Forced layout mode: "Auto" follows width, "OneColumn"/"TwoColumn" force it
@@ -3378,6 +3391,11 @@ function Astral:MakeWindow(config)
 					item.Frame.Parent = LeftColumn
 					item.Frame.Size = UDim2.new(1, 0, 0, item.Height)
 				else
+					-- Full-width cards (discord) span the whole row above the columns
+					if item.FullWidth then
+						item.Frame.Parent = FullColumn
+						item.Frame.Size = UDim2.new(1, 0, 0, item.Height)
+					else
 					-- Explicit Left/Right choice wins over auto-balancing
 					local forced = item.ForcedColumn
 					if forced == LeftColumn then
@@ -3397,8 +3415,14 @@ function Astral:MakeWindow(config)
 						item.Frame.Size = UDim2.new(1, 0, 0, item.Height)
 						rightHeight = rightHeight + item.Height + 10
 					end
+					end
 				end
 			end
+			-- push the two columns below any full-width row
+			local fy = FullLayout.AbsoluteContentSize.Y
+			local yOff = (fy and fy > 1) and (fy + 10) or 0
+			LeftColumn.Position = UDim2.new(0, 0, 0, yOff)
+			RightColumn.Position = UDim2.new(0.5, 5, 0, yOff)
 		end
 
 		local canvasDebounce = false
@@ -3407,7 +3431,9 @@ function Astral:MakeWindow(config)
 			canvasDebounce = true
 			task.defer(function()
 				local isSingleColumn = isSingleColumnNow()
-				local maxHeight = isSingleColumn and LeftLayout.AbsoluteContentSize.Y or math.max(LeftLayout.AbsoluteContentSize.Y, RightLayout.AbsoluteContentSize.Y)
+				local fullH = FullLayout.AbsoluteContentSize.Y
+				if fullH < 1 then fullH = 0 else fullH = fullH + 10 end
+				local maxHeight = isSingleColumn and LeftLayout.AbsoluteContentSize.Y or (fullH + math.max(LeftLayout.AbsoluteContentSize.Y, RightLayout.AbsoluteContentSize.Y))
 				PageScroll.CanvasSize = UDim2.new(0, 0, 0, maxHeight + 24)
 				canvasDebounce = false
 			end)
@@ -3430,6 +3456,13 @@ function Astral:MakeWindow(config)
 
 		LeftLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
 		RightLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+		FullLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			local fy2 = FullLayout.AbsoluteContentSize.Y
+			local y2 = (fy2 and fy2 > 1) and (fy2 + 10) or 0
+			LeftColumn.Position = UDim2.new(0, 0, 0, y2)
+			RightColumn.Position = UDim2.new(0.5, 5, 0, y2)
+			updateCanvas()
+		end)
 		PageScroll:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 			refreshTabColumns()
 			distributeElements()
@@ -3560,7 +3593,7 @@ function Astral:MakeWindow(config)
 		local TabObject = {}
 		local elementCounter = 0
 
-		local function registerElement(frame, height, position)
+		local function registerElement(frame, height, position, fullWidth)
 			elementCounter = elementCounter + 1
 			frame.LayoutOrder = elementCounter
 			-- Explicit "Left"/"Right" wins, otherwise auto-balance by count
@@ -3575,7 +3608,7 @@ function Astral:MakeWindow(config)
 			frame.Size = UDim2.new(1,0,0,height)
 			-- 记下所属 sub-tab，切换时按 idx 决定显隐
 			frame:SetAttribute("SubTabIdx", currentBuildSubTab)
-			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced, SubTabIdx = currentBuildSubTab})
+			table.insert(elements, {Frame = frame, Height = height, OriginalColumn = col, ForcedColumn = forced, FullWidth = fullWidth and true or false, SubTabIdx = currentBuildSubTab})
 			table.insert(tabData.Elements, elements[#elements])
 			table.insert(transparencyTargets, {Frame = frame, Base = frame.BackgroundTransparency or 0})
 			if currentTransparency > 0 then
@@ -5778,12 +5811,8 @@ function Astral:MakeWindow(config)
 			config = config or {}
 			local data = config.ServerData or {}
 			local inviteCode = data.InviteCode or "RhQa6kZu9A"
-			if config.FullWidth then
-				forceSingleColumn = true
-				pcall(refreshTabColumns)
-				pcall(distributeElements)
-				pcall(updateCanvas)
-			end
+			-- FullWidth is handled per-element in distributeElements (spans the row,
+			-- tab keeps following 1/2-column mode instead of forcing single column)
 
 
 
@@ -6121,7 +6150,7 @@ function Astral:MakeWindow(config)
 				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
 			end)
 
-			registerElement(MainFrame, 240, config.Position)
+			registerElement(MainFrame, 240, config.Position, config.FullWidth)
 
 		end
 		-- =========================================================================

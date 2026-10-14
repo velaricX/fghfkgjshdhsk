@@ -175,7 +175,7 @@ Click a selected row again to deselect. `#1` rank + halo on top player.
 
 ### DiscordCard
 ```lua
-Tab:AddDiscordCard({ FullWidth = true, -- single column in Auto; explicit 1/2-column choice overrides it
+Tab:AddDiscordCard({ FullWidth = true, -- always spans the full row; tab keeps following 1/2-column mode
     ServerData = { InviteCode = "your-code", -- part after discord.gg/
         ServerName = "Name",               -- auto from API if nil
         ServerIconId = "...",              -- auto from API if nil
@@ -226,6 +226,7 @@ Win:SetBackground("rbxassetid://...")  Win:LoadBackgroundFromUrl("https://...")
 Win:SetBackgroundDim(0.25)  Win:SetTransparency(20)  Win:ResetBackground()
 Win:SetUIScale(100)            -- 70..130 or 0.7..1.3, both accepted
 Win:SetLayoutMode("Auto")      -- "Auto" | "1 column" | "2 columns" (also "OneColumn"/"TwoColumn", "1"/"2")
+                               -- choice auto-saves to lumu_settings.json, restored next execute (survives server hop)
 Win:SetStatusScale(1)          -- 0.7..1.3 game-status size
 Win:SetWindowSize(560, 420)    -- Win:PlayIntro() replays intro, Win:RefreshAll(), Win:DebugInfo()
 
