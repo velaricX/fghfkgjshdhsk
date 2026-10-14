@@ -2776,32 +2776,13 @@ function Astral:MakeWindow(config)
 	local Window = {}
 
 	function Window:AddCategory(name)
-		name = tostring(name or "Category")
+		-- Sidebar-only feature: the topbar has no sidebar strip, so ignore.
+		-- Kept as a safe no-op so shared hub scripts don't error.
 		layoutOrderCounter = layoutOrderCounter + 1
-
-		-- In the topbar design categories are small inline labels in the tab strip
-		local CategoryHeader = Instance.new("TextLabel")
-		CategoryHeader.Name = name .. "_Header"
-		CategoryHeader.BackgroundTransparency = 1
-		CategoryHeader.Size = UDim2.new(0, 0, 1, 0)
-		CategoryHeader.AutomaticSize = Enum.AutomaticSize.X
-		CategoryHeader.Font = Enum.Font.GothamBold
-		CategoryHeader.Text = string.upper(name)
-		CategoryHeader.TextColor3 = themeColorFor("120,120,125", CurrentThemeName or "Dark")
-		CategoryHeader.TextSize = 10
-		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Center
-		CategoryHeader.TextYAlignment = Enum.TextYAlignment.Center
-		CategoryHeader.LayoutOrder = layoutOrderCounter
-		CategoryHeader.ZIndex = 4
-		CategoryHeader.Parent = TabContainer
-
-		local CatPad = Instance.new("UIPadding")
-		CatPad.PaddingLeft = UDim.new(0, 10)
-		CatPad.PaddingRight = UDim.new(0, 4)
-		CatPad.Parent = CategoryHeader
-
-		table.insert(categoryHeaders, CategoryHeader)
-		return CategoryHeader
+		local stub = {}
+		function stub:SetTitle(t) end
+		stub.SetText = stub.SetTitle
+		return stub
 	end
 
 	-- Always-on Settings gear (top-right) + auto Settings tab.
