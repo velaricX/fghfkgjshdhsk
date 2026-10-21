@@ -39,6 +39,31 @@ end
 local Astral = {}
 Astral.Registry = {} -- Global registry to track all toggle/tick controllers for easy resetting
 
+-- Persistent settings store (theme, accent, scale, layout, language).
+-- Survives server hop + re-execute: one small json file.
+local SETTINGS_FILE = "lumu_settings.json"
+local function readSettings()
+	if not (readfile and isfile) then return nil end
+	local okE, has = pcall(isfile, SETTINGS_FILE)
+	if not (okE and has) then return nil end
+	local okR, raw = pcall(readfile, SETTINGS_FILE)
+	if not okR or type(raw) ~= "string" or raw == "" then return nil end
+	local okJ, data = pcall(function() return game:GetService("HttpService"):JSONDecode(raw) end)
+	if okJ and type(data) == "table" then return data end
+	return nil
+end
+local function writeSettings(data)
+	if not writefile then return false end
+	local ok, json = pcall(function() return game:GetService("HttpService"):JSONEncode(data) end)
+	if not ok then return false end
+	return (pcall(writefile, SETTINGS_FILE, json))
+end
+local function updateSetting(key, value)
+	local data = readSettings() or {}
+	data[key] = value
+	writeSettings(data)
+end
+
 -- =========================================================================
 -- LANGUAGE / TRANSLATION SYSTEM
 -- Titles registered with tr() swap instantly via Astral:SetLanguage().
@@ -96,6 +121,8 @@ end
 function Astral:SetLanguage(langName)
 	if not Astral.Languages[langName] then return end
 	Astral.CurrentLanguage = langName
+	-- remember the chosen language across restarts
+	pcall(function() updateSetting("language", langName) end)
 	for _, item in ipairs(translatableLabels) do
 		pcall(function()
 			if item.Label and item.Label.Parent then
@@ -2503,17 +2530,9 @@ function Astral:MakeWindow(config)
 	local layoutMode = "Auto" -- "Auto" | "OneColumn" | "TwoColumn" (Settings grid picker)
 	-- restore saved layout (survives server hop / re-execute)
 	pcall(function()
-		if readfile and isfile then
-			local okE, has = pcall(isfile, "lumu_settings.json")
-			if okE and has then
-				local okR, raw = pcall(readfile, "lumu_settings.json")
-				if okR and type(raw) == "string" and raw ~= "" then
-					local okJ, data = pcall(function() return game:GetService("HttpService"):JSONDecode(raw) end)
-					if okJ and type(data) == "table" and (data.layout == "OneColumn" or data.layout == "TwoColumn") then
-						layoutMode = data.layout
-					end
-				end
-			end
+		local s = readSettings()
+		if type(s) == "table" and (s.layout == "OneColumn" or s.layout == "TwoColumn") then
+			layoutMode = s.layout
 		end
 	end)
 	-- (Accent engine lives at the top of MakeWindow so panels can hook in during build)
@@ -8457,6 +8476,7 @@ function Astral:MakeWindow(config)
 		if p > 10 then p = p / 100 end
 		p = math.clamp(p, 0.7, 1.3)
 		p = math.floor(p / 0.05 + 0.5) * 0.05
+		pcall(function() updateSetting("scale", p) end)
 		Window._UIScalePending = p
 		if Window._UIScaleBusy then return end
 		Window._UIScaleBusy = true
@@ -8519,11 +8539,7 @@ function Astral:MakeWindow(config)
 		end
 		layoutMode = mode
 		-- persist layout choice (survives server hop / re-execute)
-		pcall(function()
-			if writefile then
-				writefile("lumu_settings.json", game:GetService("HttpService"):JSONEncode({ layout = mode }))
-			end
-		end)
+		pcall(function() updateSetting("layout", mode) end)
 		print("[Astral] DBG setlayout: " .. tostring(mode) .. " tabs=" .. tostring(#tabs))
 		local n, err0 = 0, nil
 		for _, td in ipairs(tabs) do
@@ -8670,6 +8686,7 @@ function Astral:MakeWindow(config)
 	function Window:SetAccent(color)
 		if typeof(color) ~= "Color3" then return end
 		AccentColor = color
+		pcall(function() updateSetting("accent", { r = math.floor(color.R * 255), g = math.floor(color.G * 255), b = math.floor(color.B * 255) }) end)
 		for _, fn in ipairs(accentAppliers) do
 			pcall(fn, color)
 		end
@@ -8695,6 +8712,7 @@ function Astral:MakeWindow(config)
 			CurrentThemeName = result
 			local acc = THEME_ACCENT[result]
 			if acc then Window:SetAccent(acc) end
+			pcall(function() updateSetting("theme", result) end)
 			return true
 		end
 		return false
@@ -9699,6 +9717,29 @@ function Astral:MakeWindow(config)
 		local initial = applyThemeToGui(ScreenGui, AccentColor, "Dark", config.Theme)
 		if initial then Window.ThemeName = initial; CurrentThemeName = initial end
 	end
+
+	-- restore saved settings (theme / accent / scale / language).
+	-- Saved choices win over the create-config defaults.
+	pcall(function()
+		local s = readSettings()
+		if type(s) == "table" then
+			if type(s.theme) == "string" and s.theme ~= "" and s.theme ~= Window.ThemeName then
+				pcall(function() Window:SetTheme(s.theme) end)
+			end
+			if type(s.accent) == "table" then
+				local a = s.accent
+				pcall(function()
+					Window:SetAccent(Color3.fromRGB(tonumber(a.r) or 255, tonumber(a.g) or 255, tonumber(a.b) or 255))
+				end)
+			end
+			if tonumber(s.scale) then
+				pcall(function() Window:SetUIScale(tonumber(s.scale)) end)
+			end
+			if type(s.language) == "string" and s.language ~= "" then
+				pcall(function() Astral:SetLanguage(s.language) end)
+			end
+		end
+	end)
 
 	-- restore saved UI positions (main, logo, status panels)
 	pcall(function() Window:LoadUIPositions() end)
