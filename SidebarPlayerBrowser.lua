@@ -2628,25 +2628,13 @@ function Astral:MakeWindow(config)
 	local Window = {}
 
 	function Window:AddCategory(name)
-		name = tostring(name or "Category")
+		-- Category headers in the tab strip looked bad: removed.
+		-- Kept as a safe no-op so shared hub scripts don't error.
 		layoutOrderCounter = layoutOrderCounter + 1
-
-		local CategoryHeader = Instance.new("TextLabel")
-		CategoryHeader.Name = name .. "_Header"
-		CategoryHeader.BackgroundTransparency = 1
-		CategoryHeader.Size = UDim2.new(1, 0, 0, 22)
-		CategoryHeader.Font = Enum.Font.GothamBlack
-		CategoryHeader.Text = string.upper(name)
-		CategoryHeader.TextColor3 = themeColorFor("235,235,240", CurrentThemeName or "Dark")
-		CategoryHeader.TextSize = 12
-		CategoryHeader.TextXAlignment = Enum.TextXAlignment.Center
-		CategoryHeader.TextYAlignment = Enum.TextYAlignment.Center
-		CategoryHeader.LayoutOrder = layoutOrderCounter
-		CategoryHeader.ZIndex = 4
-		CategoryHeader.Parent = TabContainer
-
-		table.insert(categoryHeaders, CategoryHeader)
-		return CategoryHeader
+		local stub = {}
+		function stub:SetTitle(t) end
+		stub.SetText = stub.SetTitle
+		return stub
 	end
 
 	-- Always-on Settings gear (top-right) + auto Settings tab.
