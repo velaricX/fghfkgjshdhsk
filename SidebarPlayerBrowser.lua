@@ -2683,6 +2683,13 @@ function Astral:MakeWindow(config)
 			if pickerOpen or selectorOpen then return end
 			if not settingsTabData then
 				local STab = Window:MakeTab({ "Settings", "Badge Gear" })
+				-- hidden tab: the gear is the only entry point, no button in the tab strip
+				pcall(function()
+					if STab and STab.Button then
+						STab.Button.Visible = false
+						STab.Button.Name = "SettingsGear_TabButton"
+					end
+				end)
 				-- 1) INFO: big discord card
 				local infoSub = STab:AddSubTab({ Name = "Info", Icon = "Home" })
 				infoSub:AddDiscordCard({ FullWidth = true, ServerData = {
@@ -3579,6 +3586,9 @@ function Astral:MakeWindow(config)
 
 		-- Tab Object API
 		local TabObject = {}
+		-- expose the tab button so callers can hide/customise the tab strip entry
+		TabObject.Button = TabButton
+		TabObject.Name = tabName
 		local elementCounter = 0
 
 		local function registerElement(frame, height, position, fullWidth)
