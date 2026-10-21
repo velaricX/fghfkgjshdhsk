@@ -5789,45 +5789,32 @@ function Astral:MakeWindow(config)
 			local description = paraConfig.Description or ""
 			local image = parseIcon(paraConfig.Image)
 			local icon = parseIcon(paraConfig.Icon)
-
 			local hasImage = not not image
-			local calculatedHeight = hasImage and 200 or 75
 
 			local ParaFrame = Instance.new("Frame")
 			ParaFrame.Name = title .. "_Paragraph"
-			ParaFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark") -- FIXED: match other buttons (was 14,14,16 too dark)
+			ParaFrame.BackgroundColor3 = themeColorFor("26,26,30", CurrentThemeName or "Dark")
 			ParaFrame.BorderSizePixel = 0
+			ParaFrame.ClipsDescendants = true
 
 			local ParaCorner = Instance.new("UICorner")
-			ParaCorner.CornerRadius = UDim.new(0, 10)
+			ParaCorner.CornerRadius = UDim.new(0, 12)
 			ParaCorner.Parent = ParaFrame
 
 			local ParaStroke = Instance.new("UIStroke")
-			ParaStroke.Color = themeColorFor("32,32,36", CurrentThemeName or "Dark")
+			ParaStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
 			ParaStroke.Thickness = 1.2
 			ParaStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			ParaStroke.Parent = ParaFrame
 
-			-- Layout
-			local ParaLayout = Instance.new("UIListLayout")
-			ParaLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			ParaLayout.Padding = UDim.new(0, 8)
-			ParaLayout.Parent = ParaFrame
-
-			local ParaPad = Instance.new("UIPadding")
-			ParaPad.PaddingLeft = UDim.new(0, 12)
-			ParaPad.PaddingRight = UDim.new(0, 12)
-			ParaPad.PaddingTop = UDim.new(0, 12)
-			ParaPad.PaddingBottom = UDim.new(0, 12)
-			ParaPad.Parent = ParaFrame
-
-			-- Image (if provided)
+			-- optional banner image on top
+			local bannerBottom = 0
 			if hasImage then
 				local ImageContainer = Instance.new("Frame")
 				ImageContainer.Name = "ImageContainer"
 				ImageContainer.BackgroundTransparency = 1
-				ImageContainer.Size = UDim2.new(1, 0, 0, 130)
-				ImageContainer.LayoutOrder = 1
+				ImageContainer.Position = UDim2.new(0, 8, 0, 8)
+				ImageContainer.Size = UDim2.new(1, -16, 0, 120)
 				ImageContainer.Parent = ParaFrame
 
 				local ImageLabel = Instance.new("ImageLabel")
@@ -5839,66 +5826,77 @@ function Astral:MakeWindow(config)
 				ImageLabel.Parent = ImageContainer
 
 				local ImageCorner = Instance.new("UICorner")
-				ImageCorner.CornerRadius = UDim.new(0, 10)
+				ImageCorner.CornerRadius = UDim.new(0, 8)
 				ImageCorner.Parent = ImageLabel
+
+				bannerBottom = 8 + 120 + 8
 			end
 
-			-- Text Content Container
+			-- icon box: same look as labels / buttons
+			local iconBox = IsMobile and 34 or 44
+			local leftInset = 12
+			if icon then
+				local IconContainer = Instance.new("Frame")
+				IconContainer.Name = "IconContainer"
+				IconContainer.BackgroundColor3 = themeColorFor("36,36,40", CurrentThemeName or "Dark")
+				IconContainer.BorderSizePixel = 0
+				IconContainer.AnchorPoint = Vector2.new(0, 0.5)
+				IconContainer.Position = UDim2.new(0, 12, 0.5, 0)
+				IconContainer.Size = UDim2.new(0, iconBox, 0, iconBox)
+				IconContainer.Parent = ParaFrame
+
+				local IconCorner = Instance.new("UICorner")
+				IconCorner.CornerRadius = UDim.new(0, 8)
+				IconCorner.Parent = IconContainer
+
+				local IconContainerStroke = Instance.new("UIStroke")
+				IconContainerStroke.Color = themeColorFor("70,70,75", CurrentThemeName or "Dark")
+				IconContainerStroke.Thickness = 1.5
+				IconContainerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				IconContainerStroke.Parent = IconContainer
+
+				local IconLabel = Instance.new("ImageLabel")
+				IconLabel.Name = "Icon"
+				IconLabel.BackgroundTransparency = 1
+				IconLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+				IconLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+				IconLabel.Size = UDim2.new(0, IsMobile and 22 or 30, 0, IsMobile and 22 or 30)
+				Astral.ApplyIcon(IconLabel, icon)
+				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
+				IconLabel.ScaleType = Enum.ScaleType.Fit
+				IconLabel.Parent = IconContainer
+
+				leftInset = 12 + iconBox + 12
+			end
+
+			-- text block: title + description, same type sizes as labels
 			local TextContainer = Instance.new("Frame")
 			TextContainer.Name = "TextContainer"
 			TextContainer.BackgroundTransparency = 1
-			TextContainer.Size = UDim2.new(1, 0, 0, 0)
+			TextContainer.Position = UDim2.new(0, leftInset, 0, bannerBottom)
+			TextContainer.Size = UDim2.new(1, -(leftInset + 12), 0, 0)
 			TextContainer.AutomaticSize = Enum.AutomaticSize.Y
-			TextContainer.LayoutOrder = 2
 			TextContainer.Parent = ParaFrame
 
 			local TextLayout = Instance.new("UIListLayout")
 			TextLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			TextLayout.Padding = UDim.new(0, 6)
+			TextLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+			TextLayout.Padding = UDim.new(0, 2)
 			TextLayout.Parent = TextContainer
 
-			-- Title row (optional icon + title on one line)
-			local TitleRow = Instance.new("Frame")
-			TitleRow.Name = "TitleRow"
-			TitleRow.BackgroundTransparency = 1
-			TitleRow.Size = UDim2.new(1, 0, 0, 26)
-			TitleRow.LayoutOrder = 1
-			TitleRow.Parent = TextContainer
-
-			local TitleRowLayout = Instance.new("UIListLayout")
-			TitleRowLayout.FillDirection = Enum.FillDirection.Horizontal
-			TitleRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			TitleRowLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			TitleRowLayout.Padding = UDim.new(0, 8)
-			TitleRowLayout.Parent = TitleRow
-
-			if icon then
-				local IconLabel = Instance.new("ImageLabel")
-				IconLabel.Name = "Icon"
-				IconLabel.BackgroundTransparency = 1
-				IconLabel.Size = UDim2.new(0, 24, 0, 24)
-				IconLabel.LayoutOrder = 1
-				IconLabel.ScaleType = Enum.ScaleType.Fit
-				Astral.ApplyIcon(IconLabel, icon)
-				IconLabel.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-				IconLabel.Parent = TitleRow
-			end
-
-			-- Title
 			local TitleLabel = Instance.new("TextLabel")
 			TitleLabel.Name = "Title"
 			TitleLabel.BackgroundTransparency = 1
-			TitleLabel.Size = UDim2.new(1, (icon and -34 or 0), 1, 0)
+			TitleLabel.Size = UDim2.new(1, 0, 0, 20)
 			TitleLabel.Font = Enum.Font.GothamBold
 			tr(TitleLabel, title)
 			TitleLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			regText(TitleLabel, 16)
+			regText(TitleLabel, 15)
 			TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-			TitleLabel.LayoutOrder = 2
-			TitleLabel.Parent = TitleRow
+			TitleLabel.LayoutOrder = 1
+			TitleLabel.Parent = TextContainer
 
-			-- Description
 			local DescLabel = Instance.new("TextLabel")
 			DescLabel.Name = "Description"
 			DescLabel.BackgroundTransparency = 1
@@ -5911,20 +5909,20 @@ function Astral:MakeWindow(config)
 			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
 			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
 			DescLabel.TextWrapped = true
-			DescLabel.LineHeight = 1.18
+			DescLabel.LineHeight = 1.15
 			DescLabel.LayoutOrder = 2
 			DescLabel.Parent = TextContainer
 
-			-- Adjust frame height dynamically based on text size
+			-- height: banner + text row, minimum 64 so it matches label rows
 			local function adjustHeight()
-				local textHeight = TextLayout.AbsoluteContentSize.Y
-				local imageOffset = hasImage and 162 or 24
-				local totalHeight = imageOffset + textHeight
-				ParaFrame.Size = UDim2.new(1, 0, 0, totalHeight)
-				-- Update masonry layout height
+				local textH = TextLayout.AbsoluteContentSize.Y
+				if textH < 1 then textH = 24 end
+				local rowH = math.max(textH, icon and iconBox or 0)
+				local total = bannerBottom + rowH + 12
+				ParaFrame.Size = UDim2.new(1, 0, 0, total)
 				for _, item in ipairs(elements) do
 					if item.Frame == ParaFrame then
-						item.Height = totalHeight
+						item.Height = total
 						break
 					end
 				end
@@ -5934,20 +5932,18 @@ function Astral:MakeWindow(config)
 			TextLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(adjustHeight)
 			task.spawn(adjustHeight)
 
-			-- hover white effect like toggle (good UI)
+			-- hover
 			ParaFrame.MouseEnter:Connect(function()
 				if pickerOpen or selectorOpen then return end
 				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeHoverBG(Window.ThemeName or "Dark")}):Play()
-				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
-				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0}):Play() end end end)
+				TweenService:Create(ParaStroke, TweenInfo.new(0.15), {Color = themeStrokeHover(Window.ThemeName or "Dark")}):Play()
 			end)
 			ParaFrame.MouseLeave:Connect(function()
 				TweenService:Create(ParaFrame, TweenInfo.new(0.15), {BackgroundColor3 = themeCardBG(Window.ThemeName or "Dark")}):Play()
-				TweenService:Create(ParaFrame:FindFirstChild("UIStroke") or ParaFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.15), {Color = themeCardBG(Window.ThemeName or "Dark")}):Play()
-				pcall(function() local ic=ParaFrame:FindFirstChild("IconContainer",true); if ic then local s=ic:FindFirstChild("UIStroke"); if s then TweenService:Create(s,TweenInfo.new(0.15),{Transparency=0.3}):Play() end end end)
+				TweenService:Create(ParaStroke, TweenInfo.new(0.15), {Color = themeStroke(Window.ThemeName or "Dark")}):Play()
 			end)
 
-			registerElement(ParaFrame, calculatedHeight, paraConfig.Position)
+			registerElement(ParaFrame, 64, paraConfig.Position)
 
 			local ParaController = {}
 			function ParaController:SetTitle(newTitle)
@@ -5962,359 +5958,6 @@ function Astral:MakeWindow(config)
 			return ParaController
 		end
 
-
-		-- =========================================================================
-		-- DISCORD INVITE CARD (FROM MAIN UI)
-		-- =========================================================================
-		function TabObject:AddDiscordCard(config)
-			config = config or {}
-			local data = config.ServerData or {}
-			local inviteCode = data.InviteCode or "RhQa6kZu9A"
-			-- FullWidth is handled per-element in distributeElements (spans the row,
-			-- tab keeps following 1/2-column mode instead of forcing single column)
-
-
-
-			local MainFrame = Instance.new("Frame")
-			MainFrame.Name = "DiscordInvite"
-			MainFrame.Size = UDim2.new(1, 0, 0, 260)
-			MainFrame.BackgroundColor3 = themeColorFor("30,30,36", CurrentThemeName or "Dark")
-			MainFrame.BorderSizePixel = 0
-			MainFrame.ClipsDescendants = true
-
-			local MainCorner = Instance.new("UICorner")
-			MainCorner.CornerRadius = UDim.new(0, 16)
-			MainCorner.Parent = MainFrame
-
-			local MainStroke = Instance.new("UIStroke")
-			MainStroke.Color = themeColorFor("55,55,65", CurrentThemeName or "Dark")
-			MainStroke.Thickness = 1.5
-			MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			MainStroke.Parent = MainFrame
-
-			local BgHighlight = Instance.new("Frame")
-			BgHighlight.Name = "BgHighlight"
-			BgHighlight.Size = UDim2.new(1, 0, 1, 0)
-			BgHighlight.BackgroundColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			BgHighlight.BackgroundTransparency = 1
-			BgHighlight.ZIndex = 0
-			BgHighlight.Parent = MainFrame
-
-			local BgHLCorner = Instance.new("UICorner")
-			BgHLCorner.CornerRadius = UDim.new(0, 16)
-			BgHLCorner.Parent = BgHighlight
-
-			local Banner = Instance.new("ImageLabel")
-			Banner.Name = "Banner"
-			Banner.Size = UDim2.new(1, 0, 0, 110)
-			Banner.Position = UDim2.new(0, 0, 0, 0)
-			Banner.BackgroundColor3 = Color3.fromRGB(26, 26, 30)
-			Banner.Image = data.BackgroundBannerId or "rbxassetid://127861212431489"
-			Banner.ScaleType = Enum.ScaleType.Crop
-			Banner.BorderSizePixel = 0
-			Banner.Parent = MainFrame
-
-			local BannerCorner = Instance.new("UICorner")
-			BannerCorner.CornerRadius = UDim.new(0, 16)
-			BannerCorner.Parent = Banner
-
-			-- (banner art shows true colors, no tint)
-
-			local ServerIcon = Instance.new("ImageLabel")
-			ServerIcon.Name = "ServerIcon"
-			ServerIcon.Size = UDim2.new(0, 64, 0, 64)
-			ServerIcon.Position = UDim2.new(0, 14, 0, 78)
-			ServerIcon.Image = data.ServerIconId or "rbxassetid://106987676739927"
-			ServerIcon.ScaleType = Enum.ScaleType.Crop
-			ServerIcon.BackgroundColor3 = themeColorFor("30,30,36", CurrentThemeName or "Dark")
-			ServerIcon.BorderSizePixel = 0
-			ServerIcon.ZIndex = 2
-			ServerIcon.Parent = MainFrame
-
-			local IconCorner = Instance.new("UICorner")
-			IconCorner.CornerRadius = UDim.new(0, 16)
-			IconCorner.Parent = ServerIcon
-
-			local IconStroke = Instance.new("UIStroke")
-			IconStroke.Color = themeColorFor("50,50,55", CurrentThemeName or "Dark")
-			IconStroke.Thickness = 3
-			IconStroke.Parent = ServerIcon
-
-			local InfoHolder = Instance.new("Frame")
-			InfoHolder.Name = "InfoHolder"
-			InfoHolder.Size = UDim2.new(1, -100, 0, 60)
-			InfoHolder.Position = UDim2.new(0, 86, 0, 114)
-			InfoHolder.BackgroundTransparency = 1
-			InfoHolder.Parent = MainFrame
-
-			local ListLayout = Instance.new("UIListLayout")
-			ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			ListLayout.Padding = UDim.new(0, 3)
-			ListLayout.Parent = InfoHolder
-
-			local NameFrame = Instance.new("Frame")
-			NameFrame.Name = "NameFrame"
-			NameFrame.Size = UDim2.new(1, 0, 0, 22)
-			NameFrame.BackgroundTransparency = 1
-			NameFrame.LayoutOrder = 1
-			NameFrame.Parent = InfoHolder
-
-			local NameListLayout = Instance.new("UIListLayout")
-			NameListLayout.FillDirection = Enum.FillDirection.Horizontal
-			NameListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			NameListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			NameListLayout.Padding = UDim.new(0, 6)
-			NameListLayout.Parent = NameFrame
-
-			local ServerName = Instance.new("TextLabel")
-			ServerName.Size = UDim2.new(0, 0, 1, 0)
-			ServerName.AutomaticSize = Enum.AutomaticSize.X
-			ServerName.Text = data.ServerName or "LumuHub"
-			ServerName.Font = Enum.Font.GothamBold
-			mTS(ServerName, 17)
-			ServerName.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			ServerName.TextXAlignment = Enum.TextXAlignment.Left
-			ServerName.BackgroundTransparency = 1
-			ServerName.LayoutOrder = 1
-			ServerName.Parent = NameFrame
-
-			local BadgeIcon = Instance.new("ImageLabel")
-			BadgeIcon.Size = UDim2.new(0, 14, 0, 14)
-			BadgeIcon.Image = "rbxassetid://75143132170494"
-			BadgeIcon.ImageColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			BadgeIcon.BackgroundTransparency = 1
-			BadgeIcon.LayoutOrder = 2
-			BadgeIcon.Parent = NameFrame
-
-			-- Bottom action bar: counts left, Join right, one container (no float overlap)
-			local BottomBar = Instance.new("Frame")
-			BottomBar.Name = "BottomBar"
-			BottomBar.Size = UDim2.new(1, -28, 0, 44)
-			BottomBar.Position = UDim2.new(0, 14, 1, -48)
-			BottomBar.BackgroundTransparency = 1
-			BottomBar.Parent = MainFrame
-
-			local MetricsFrame = Instance.new("Frame")
-			MetricsFrame.Size = UDim2.new(0.5, 0, 0, 16)
-			MetricsFrame.Position = UDim2.new(0, 0, 0.5, -8)
-			MetricsFrame.BackgroundTransparency = 1
-			MetricsFrame.Parent = BottomBar
-
-			local MetricsLayout = Instance.new("UIListLayout")
-			MetricsLayout.FillDirection = Enum.FillDirection.Horizontal
-			MetricsLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			MetricsLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-			MetricsLayout.Padding = UDim.new(0, 5)
-			MetricsLayout.Parent = MetricsFrame
-
-			local OnlineDot = Instance.new("Frame")
-			OnlineDot.Name = "OnlineDot"
-			OnlineDot.Size = UDim2.new(0, 8, 0, 8)
-			OnlineDot.BackgroundColor3 = Color3.fromRGB(35, 165, 90)
-			OnlineDot.BorderSizePixel = 0
-			OnlineDot.LayoutOrder = 1
-			OnlineDot.Parent = MetricsFrame
-
-			local OnlineDotCorner = Instance.new("UICorner")
-			OnlineDotCorner.CornerRadius = UDim.new(1, 0)
-			OnlineDotCorner.Parent = OnlineDot
-
-			local OnlineLabel = Instance.new("TextLabel")
-			OnlineLabel.Size = UDim2.new(0, 0, 1, 0)
-			OnlineLabel.AutomaticSize = Enum.AutomaticSize.X
-			OnlineLabel.Text = tostring(data.OnlineCount or 46) .. " Online"
-			OnlineLabel.Font = Enum.Font.GothamMedium
-			mTS(OnlineLabel, 12)
-			OnlineLabel.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
-			OnlineLabel.BackgroundTransparency = 1
-			OnlineLabel.LayoutOrder = 2
-			OnlineLabel.Parent = MetricsFrame
-
-			local MetricSpace = Instance.new("Frame")
-			MetricSpace.Size = UDim2.new(0, 4, 1, 0)
-			MetricSpace.BackgroundTransparency = 1
-			MetricSpace.LayoutOrder = 3
-			MetricSpace.Parent = MetricsFrame
-
-			local MemberDot = Instance.new("Frame")
-			MemberDot.Name = "MemberDot"
-			MemberDot.Size = UDim2.new(0, 8, 0, 8)
-			MemberDot.BackgroundColor3 = Color3.fromRGB(128, 132, 142)
-			MemberDot.BorderSizePixel = 0
-			MemberDot.LayoutOrder = 4
-			MemberDot.Parent = MetricsFrame
-
-			local MemberDotCorner = Instance.new("UICorner")
-			MemberDotCorner.CornerRadius = UDim.new(1, 0)
-			MemberDotCorner.Parent = MemberDot
-
-			local MemberLabel = Instance.new("TextLabel")
-			MemberLabel.Size = UDim2.new(0, 0, 1, 0)
-			MemberLabel.AutomaticSize = Enum.AutomaticSize.X
-			MemberLabel.Text = tostring(data.MemberCount or 593) .. " Members"
-			MemberLabel.Font = Enum.Font.GothamMedium
-			mTS(MemberLabel, 12)
-			MemberLabel.TextColor3 = themeColorFor("150,150,160", CurrentThemeName or "Dark")
-			MemberLabel.BackgroundTransparency = 1
-			MemberLabel.LayoutOrder = 5
-			MemberLabel.Parent = MetricsFrame
-
-			-- Live Discord counts: no bot token needed. Just set
-			-- ServerData.InviteCode = "your-code" (the part after discord.gg/)
-			-- and real online/member numbers load from Discord's public
-			-- invite API. Falls back to OnlineCount/MemberCount if offline.
-			task.spawn(function()
-				local res = webGet("https://discord.com/api/v9/invites/" .. inviteCode .. "?with_counts=true")
-				if type(res) ~= "string" or res == "" then return end
-				local ok2, js = pcall(function() return HttpService:JSONDecode(res) end)
-				if not ok2 or type(js) ~= "table" then return end
-				pcall(function()
-					local online = tonumber(js.approximate_presence_count)
-					local members = tonumber(js.approximate_member_count)
-					if online then OnlineLabel.Text = tostring(online) .. " Online" end
-					if members then MemberLabel.Text = tostring(members) .. " Members" end
-					local guild = js.guild
-					if type(guild) == "table" then
-						if data.ServerName == nil and type(guild.name) == "string" and guild.name ~= "" then
-							ServerName.Text = guild.name
-						end
-						if data.ServerIconId == nil and type(guild.id) == "string" and type(guild.icon) == "string" and guild.icon ~= "" then
-							ServerIcon.Image = "https://cdn.discordapp.com/icons/" .. guild.id .. "/" .. guild.icon .. ".png?size=128"
-						end
-					end
-				end)
-			end)
-
-			local DescLabel = Instance.new("TextLabel")
-			DescLabel.Name = "DescLabel"
-			DescLabel.Size = UDim2.new(1, 0, 0, 32)
-			DescLabel.Text = data.Description or "Official LumuHub Community"
-			DescLabel.Font = Enum.Font.GothamMedium
-			regText(DescLabel, 12)
-			DescLabel.TextColor3 = themeColorFor("220,220,228", CurrentThemeName or "Dark")
-			DescLabel.TextXAlignment = Enum.TextXAlignment.Left
-			DescLabel.TextYAlignment = Enum.TextYAlignment.Top
-			DescLabel.TextWrapped = true
-			DescLabel.BackgroundTransparency = 1
-			DescLabel.LayoutOrder = 2
-			DescLabel.Parent = InfoHolder
-
-			local GameActivityFrame = Instance.new("Frame")
-			GameActivityFrame.Size = UDim2.new(1, -28, 0, 20)
-			GameActivityFrame.Position = UDim2.new(0, 14, 0, 178)
-			GameActivityFrame.BackgroundTransparency = 1
-			GameActivityFrame.Parent = MainFrame
-
-			local GameIcon = Instance.new("ImageLabel")
-			GameIcon.Size = UDim2.new(0, 18, 0, 18)
-			GameIcon.Position = UDim2.new(0, 0, 0.5, -9)
-			GameIcon.Image = "rbxassetid://104079816442680"
-			GameIcon.BackgroundTransparency = 1
-			GameIcon.Parent = GameActivityFrame
-
-			local FlameBadge = Instance.new("ImageLabel")
-			FlameBadge.Size = UDim2.new(0, 10, 0, 10)
-			FlameBadge.Position = UDim2.new(1, -5, 0, -3)
-			FlameBadge.Image = "rbxassetid://10841141110"
-			FlameBadge.ImageColor3 = Color3.fromHex("#ff7324")
-			FlameBadge.BackgroundTransparency = 1
-			FlameBadge.Parent = GameIcon
-
-			local GameLabel = Instance.new("TextLabel")
-			GameLabel.Size = UDim2.new(1, -28, 1, 0)
-			GameLabel.Position = UDim2.new(0, 28, 0, 0)
-			GameLabel.Text = data.GameLabel or "ROBLOX"
-			GameLabel.Font = Enum.Font.GothamBold
-			mTS(GameLabel, 12)
-			GameLabel.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			GameLabel.TextXAlignment = Enum.TextXAlignment.Left
-			GameLabel.BackgroundTransparency = 1
-			GameLabel.Parent = GameActivityFrame
-
-			local ActionButton = Instance.new("TextButton")
-			ActionButton.Name = "JoinButton"
-			ActionButton.Size = UDim2.new(0, 104, 0, 34)
-			ActionButton.AnchorPoint = Vector2.new(1, 0.5)
-			ActionButton.Position = UDim2.new(1, 0, 0.5, 0)
-			ActionButton.BackgroundColor3 = Color3.fromRGB(30, 140, 78)
-			ActionButton.BorderSizePixel = 0
-			ActionButton.Text = "Join"
-			ActionButton.Font = Enum.Font.GothamBold
-			mTS(ActionButton, 15)
-			ActionButton.TextColor3 = themeColorFor("255,255,255", CurrentThemeName or "Dark")
-			ActionButton.AutoButtonColor = false
-			ActionButton.Parent = BottomBar
-
-			local ButtonCorner = Instance.new("UICorner")
-			ButtonCorner.CornerRadius = UDim.new(0, 6)
-			ButtonCorner.Parent = ActionButton
-
-			local baseColor = Color3.fromRGB(30, 140, 78)
-			local hoverColor = baseColor:Lerp(Color3.new(1, 1, 1), 0.1)
-			local pressColor = baseColor:Lerp(Color3.new(0, 0, 0), 0.15)
-
-			ActionButton.MouseEnter:Connect(function()
-				if pickerOpen or selectorOpen then return end
-				TweenService:Create(ActionButton, TweenInfo.new(0.12), {BackgroundColor3 = hoverColor}):Play()
-			end)
-			ActionButton.MouseLeave:Connect(function()
-				TweenService:Create(ActionButton, TweenInfo.new(0.12), {BackgroundColor3 = baseColor}):Play()
-			end)
-			ActionButton.MouseButton1Down:Connect(function()
-				TweenService:Create(ActionButton, TweenInfo.new(0.05), {BackgroundColor3 = pressColor}):Play()
-			end)
-
-			ActionButton.MouseButton1Click:Connect(function()
-				local inviteLink = "https://discord.gg/" .. inviteCode
-
-				pcall(function() if setclipboard then setclipboard(inviteLink) end end)
-
-				Window:Notify({
-					Type = "good",
-					Title = "Invite copied",
-					Message = "discord.gg/" .. tostring(inviteCode) .. " is on your clipboard.",
-					Duration = 6,
-				})
-
-				pcall(function()
-					if httpRequest then
-						httpRequest({
-							Url = "http://127.0.0.1:6463/rpc?v=1",
-							Method = "POST",
-							Headers = {
-								["Content-Type"] = "application/json",
-								["Origin"] = "https://discord.com"
-							},
-							Body = HttpService:JSONEncode({
-								cmd = "INVITE_BROWSER",
-								args = { code = inviteCode },
-								nonce = tostring(math.random(100000, 999999))
-							})
-						})
-					end
-				end)
-
-				ActionButton.Text = "Copied!"
-				ActionButton.BackgroundColor3 = Color3.fromRGB(65, 65, 70)
-				task.wait(2)
-				ActionButton.Text = "Join"
-				ActionButton.BackgroundColor3 = baseColor
-			end)
-
-			MainFrame.MouseEnter:Connect(function()
-				if pickerOpen or selectorOpen then return end
-				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 0.95}):Play()
-			end)
-			MainFrame.MouseLeave:Connect(function()
-				TweenService:Create(BgHighlight, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
-			end)
-
-			registerElement(MainFrame, 240, config.Position, config.FullWidth)
-
-		end
-		-- =========================================================================
-		-- NEW KEYBIND IMPLEMENTATION (MATCHES REFERENCE IMAGE PERFECTLY)
-		-- =========================================================================
 		function TabObject:AddKeybind(keybindConfig)
 			keybindConfig = keybindConfig or {}
 			local title = keybindConfig.Title or "Keybind"
